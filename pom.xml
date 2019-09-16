@@ -38,6 +38,7 @@
     <jaeger.version>0.35.5</jaeger.version>
     <embedded-consul.version>1.0.2</embedded-consul.version>
     <jwt.version>1.6</jwt.version>
+    <api.errors.version>1.1</api.errors.version>
     <slf4j.version>1.7.21</slf4j.version>
   </properties>
 
@@ -228,6 +229,11 @@
       </dependency>
       <dependency>
         <groupId>io.vertx</groupId>
+        <artifactId>vertx-codegen</artifactId>
+        <version>${vertx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.vertx</groupId>
         <artifactId>vertx-config-yaml</artifactId>
         <version>${vertx.version}</version>
       </dependency>
@@ -336,7 +342,7 @@
       <dependency>
         <groupId>com.cloudentity.tools</groupId>
         <artifactId>api-errors</artifactId>
-        <version>${service.tools.version}</version>
+        <version>${api.errors.version}</version>
       </dependency>
       <!-- LOGGING -->
       <dependency>

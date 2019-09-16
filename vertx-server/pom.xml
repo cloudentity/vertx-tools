@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>com.cloudentity.tools</groupId>
-    <artifactId>vertx-tools-agg</artifactId>
+    <artifactId>vertx-tools-open</artifactId>
     <version>1.27-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>

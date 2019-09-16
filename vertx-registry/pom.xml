@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.cloudentity.tools</groupId>
-    <artifactId>vertx-tools-agg</artifactId>
+    <artifactId>vertx-tools-open</artifactId>
     <version>1.27-SNAPSHOT</version>
   </parent>         
 
