@@ -1,0 +1,21 @@
+{
+  "apiServer": {
+    "http": {
+      "port": 7788
+    },
+    "routes": [
+      {
+        "id": "test-route",
+        "method": "GET",
+        "urlPath": "/test",
+        "skipBodyHandler": false
+      }
+    ]
+  },
+  "test-route": {
+    "static-response": "OK"
+  },
+  "registry:routes": {
+    "test-route": { "main": "com.cloudentity.tools.test.utils.TestRoute" }
+  }
+}

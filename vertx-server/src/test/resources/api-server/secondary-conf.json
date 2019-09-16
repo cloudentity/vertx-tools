@@ -1,0 +1,69 @@
+{
+  "secondaryApiServer": {
+    "routesRegistry": "secondary-routes",
+    "filtersRegistry": "secondary-filters",
+    "http": {
+      "port": 7774
+    },
+    "routes": [
+      {
+        "id": "test-route",
+        "method": "GET",
+        "urlPath": "/test"
+      },
+      {
+        "id": "test-regex-route",
+        "method": "GET",
+        "urlPath": "/(\\w+)?(/)?regex",
+        "regex": true
+      },
+      {
+        "id": "scala-test-route",
+        "method": "GET",
+        "urlPath": "/scala-test"
+      },
+      {
+        "id": "exception-route",
+        "method": "GET",
+        "urlPath": "/exception"
+      },
+      {
+        "id": "limit-route",
+        "method": "POST",
+        "urlPath": "/limit",
+        "bodySizeLimitKb": 1
+      },
+      {
+        "id": "test-route",
+        "method": "GET",
+        "urlPath": "/passing-filter",
+        "filters": ["passing-filter"]
+      },
+      {
+        "id": "test-route",
+        "method": "GET",
+        "urlPath": "/aborting-filter",
+        "filters": ["aborting-filter"]
+      }
+    ],
+    "appendRoutes": [
+      {
+        "id": "extra-test-route",
+        "handler": "test-route",
+        "method": "GET",
+        "urlPath": "/extra-test"
+      }
+    ]
+  },
+  "registry:secondary-routes": {
+    "test-route":       { "main": "com.cloudentity.tools.vertx.server.api.TestRoute" },
+    "test-regex-route": { "main": "com.cloudentity.tools.vertx.server.api.TestRegexRoute" },
+    "scala-test-route": { "main": "com.cloudentity.tools.vertx.server.api.ScalaTestRoute" },
+    "exception-route":  { "main": "com.cloudentity.tools.vertx.server.api.ExceptionThrowingRoute" },
+    "limit-route":      { "main": "com.cloudentity.tools.vertx.server.api.TestRoute" }
+  },
+  "registry:secondary-filters": {
+    "passing-filter":   { "main": "com.cloudentity.tools.vertx.server.api.PassingFilter" },
+    "aborting-filter":  { "main": "com.cloudentity.tools.vertx.server.api.AbortingFilter" }
+  }
+}

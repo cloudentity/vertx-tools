@@ -1,0 +1,5 @@
+{
+  "modules": ["namespace-a/module-a", "module-b"],
+  "should-be-overridden-by-root": true,
+  "x": true
+}

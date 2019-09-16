@@ -1,0 +1,10 @@
+{
+  "registry:test": {
+    "verticle-with-config": {
+      "main": "com.cloudentity.tools.vertx.registry.TestVerticleWithConfig",
+      "verticleConfig": {
+        "attribute": "value"
+      }
+    }
+  }
+}

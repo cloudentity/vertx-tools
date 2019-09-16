@@ -1,0 +1,2 @@
+com.cloudentity.tools.vertx.conf.classpath.ClasspathConfigStoreFactory
+com.cloudentity.tools.vertx.conf.classpath.ClasspathFolderConfigStoreFactory

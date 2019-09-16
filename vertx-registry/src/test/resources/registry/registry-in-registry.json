@@ -1,0 +1,12 @@
+{
+  "registry:super": {
+    "test": {
+      "main": "com.cloudentity.tools.vertx.registry.RegistryVerticle"
+    }
+  },
+  "registry:test": {
+    "healthy1-verticle": {
+      "main": "com.cloudentity.tools.vertx.registry.HealthyTestVerticle"
+    }
+  }
+}

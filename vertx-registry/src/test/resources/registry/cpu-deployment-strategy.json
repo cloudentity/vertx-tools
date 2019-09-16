@@ -1,0 +1,8 @@
+{
+  "registry:test": {
+    "healthy1-verticle": {
+      "main": "com.cloudentity.tools.vertx.registry.StatefulVerticle",
+      "deploymentStrategy": "cpu"
+    }
+  }
+}

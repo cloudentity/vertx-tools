@@ -1,0 +1,7 @@
+{
+  "registry:test": {
+    "failing1-verticle": {
+      "main": "com.cloudentity.tools.vertx.registry.FailingTestVerticle"
+    }
+  }
+}

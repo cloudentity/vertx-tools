@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>vertx-jwt</artifactId>
+
+  <parent>
+    <groupId>com.cloudentity.tools</groupId>
+    <artifactId>vertx-tools-agg</artifactId>
+    <version>1.27-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudentity.tools</groupId>
+      <artifactId>vertx-bus</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.orchis.tools</groupId>
+      <artifactId>jwt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudentity.tools</groupId>
+      <artifactId>vertx-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

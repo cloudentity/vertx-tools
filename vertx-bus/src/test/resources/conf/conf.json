@@ -1,0 +1,11 @@
+{
+  "verticleA": {
+    "key": "value"
+  },
+  "verticleB": {
+    "conf": {
+      "key": "value"
+    }
+  },
+  "verticleC": "$ref:verticleA"
+}

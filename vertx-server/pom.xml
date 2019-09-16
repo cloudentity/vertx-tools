@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>com.cloudentity.tools</groupId>
+    <artifactId>vertx-tools-agg</artifactId>
+    <version>1.27-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>vertx-server</artifactId>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+    </dependency>
+    <!-- cloudentity -->
+    <dependency>
+      <groupId>com.cloudentity.tools</groupId>
+      <artifactId>vertx-bus</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudentity.tools</groupId>
+      <artifactId>vertx-bus-scala</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudentity.tools</groupId>
+      <artifactId>vertx-registry</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudentity.tools</groupId>
+      <artifactId>vertx-http-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudentity.tools</groupId>
+      <artifactId>api-errors</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudentity.tools</groupId>
+      <artifactId>vertx-cmd</artifactId>
+    </dependency>
+    <!-- vertx -->
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web</artifactId>
+    </dependency>
+    <!-- utils -->
+    <dependency>
+      <groupId>com.cloudentity.tools</groupId>
+      <artifactId>vertx-jwt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.scalaz</groupId>
+      <artifactId>scalaz-core_2.12</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.circe</groupId>
+      <artifactId>circe-core_2.12</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.circe</groupId>
+      <artifactId>circe-parser_2.12</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.circe</groupId>
+      <artifactId>circe-generic_2.12</artifactId>
+    </dependency>
+    <!-- logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <!-- test -->
+    <dependency>
+      <groupId>com.cloudentity.tools</groupId>
+      <artifactId>vertx-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest_2.12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scalacheck</groupId>
+      <artifactId>scalacheck_2.12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-unit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

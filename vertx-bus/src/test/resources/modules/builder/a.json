@@ -1,0 +1,3 @@
+{
+  "a": "$env:A:string:a"
+}

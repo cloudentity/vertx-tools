@@ -1,0 +1,24 @@
+{
+  "registry:system": {
+    "consul-sd-registrar": {
+      "main": "com.cloudentity.tools.vertx.sd.register.ConsulSdRegistrar",
+      "verticleConfig": {
+        "consul": {
+          "host": "$env:CONSUL_HOST:string",
+          "port": "$env:CONSUL_PORT:int:8500",
+          "ssl": "$env:CONSUL_SSL:boolean:false"
+        },
+        "register": {
+          "serviceName": "$env:SELF_SD_SERVICE_NAME:string",
+          "host": "$env:SELF_SD_HOST:string",
+          "port": "$env:SELF_SD_PORT:int",
+          "ssl": "$env:SELF_SD_SSL:boolean:false",
+          "healthCheckPath": "$env:SELF_SD_HEALTHCHECK_PATH:string:/alive",
+          "healthCheckInterval": "$env:SELF_SD_HEALTHCHECK_INTERVAL:string:3s",
+          "deregisterAfter": "$env:SELF_SD_DEREGISTER_AFTER:string:600s",
+          "tags": "$env:?SELF_SD_TAGS:array"
+        }
+      }
+    }
+  }
+}

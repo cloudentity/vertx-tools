@@ -1,0 +1,26 @@
+{
+  "registry:system": {
+    "service-discovery": {
+      "main": "com.cloudentity.tools.vertx.sd.SdVerticle",
+      "verticleConfig": {
+        "scan-period": "$env:SD_SCAN_PERIOD:int:3000"
+      }
+    },
+    "consul-sd-provider": {
+      "main": "com.cloudentity.tools.vertx.sd.provider.ConsulSdProvider",
+      "verticleConfig": {
+        "consul": {
+          "host": "$env:CONSUL_HOST:string",
+          "port": "$env:CONSUL_PORT:int:8500",
+          "ssl": "$env:CONSUL_SSL:boolean:false",
+          "aclToken": "$env:?CONSUL_ACL_TOKEN:string",
+          "dc": "$env:?CONSUL_DC:string",
+          "timeoutMs": "$env:?CONSUL_TIMEOUT:int"
+        },
+        "discovery": {
+          "scan-period": "$env:CONSUL_SD_SCAN_PERIOD:int:2000"
+        }
+      }
+    }
+  }
+}

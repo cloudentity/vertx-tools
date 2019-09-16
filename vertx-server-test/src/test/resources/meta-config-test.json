@@ -1,0 +1,12 @@
+{
+  "scanPeriod": 3000,
+  "stores": [
+    {
+      "type": "file",
+      "format": "json",
+      "config": {
+        "path": "src/test/resources/config-test.json"
+      }
+    }
+  ]
+}

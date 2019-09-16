@@ -1,0 +1,8 @@
+{
+  "registry:test": {
+    "verticle-with-prefix": {
+      "main": "com.cloudentity.tools.vertx.registry.HealthyTestVerticle",
+      "prefix": "verticle-with-prefix"
+    }
+  }
+}

@@ -1,0 +1,4 @@
+com.cloudentity.tools.vertx.conf.ext.HttpExtConfigStoreFactory
+com.cloudentity.tools.vertx.conf.ext.FileExtConfigStoreFactory
+com.cloudentity.tools.vertx.conf.ext.VaultExtConfigStoreFactory
+com.cloudentity.tools.vertx.conf.ext.ConsulExtConfigStoreFactory

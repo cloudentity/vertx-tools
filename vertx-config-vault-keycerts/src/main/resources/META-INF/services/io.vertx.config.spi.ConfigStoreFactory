@@ -1,0 +1,2 @@
+com.cloudentity.tools.vertx.vault.VaultKeyCertsConfigStoreFactory
+com.cloudentity.tools.vertx.vault.VaultKeyCertsExtConfigStoreFactory

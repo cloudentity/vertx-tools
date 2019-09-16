@@ -1,0 +1,5 @@
+{
+  "should-be-overriden-by-root": false,
+  "should-be-overridden-by-module-b": false,
+  "env-a": "$env:A:boolean:true"
+}
