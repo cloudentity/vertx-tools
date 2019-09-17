@@ -45,7 +45,7 @@
   <scm>
     <connection>scm:git:ssh://git@bitbucket.org/syntegritynet/open-tools-vertx.git</connection>
     <developerConnection>scm:git:ssh://git@bitbucket.org/syntegritynet/open-tools-vertx.git</developerConnection>
-    <url>https://bitbucket.org/syntegritynet/orchis-tools-vertx</url>
+    <url>https://bitbucket.org/syntegritynet/open-tools-vertx</url>
     <tag>HEAD</tag>
   </scm>
 
