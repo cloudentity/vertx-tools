@@ -33,15 +33,15 @@ object SmartHttp {
     *   "failureHttpCodes": [500],
     *   "retryFailedResponse": false,
     *   "retryOnException": false,
-    *   "circuitBreakerOptions": {}
+    *   "circuitBreaker": {}
     * }
     *
     * "serviceLocation" is optional, if set then service discovery is disabled and provided location is used instead
     * "serviceTags" is optional - client filters out service nodes without those tags
     * "http" is converted to io.vertx.core.http.HttpClientOptions
-    * "circuitBreakerOptions" is converted to io.vertx.circuitbreaker.CircuitBreakerOptions
+    * "circuitBreaker" is converted to io.vertx.circuitbreaker.CircuitBreakerOptions
     *
-    * If "circuitBreakerOptions" is not set or "circuitBreakerOptions" has "off" field set to true then CB is not used by the HTTP client.
+    * If "circuitBreaker" is not set or "circuitBreaker" has "off" field set to true then CB is not used by the HTTP client.
     */
   def clientBuilder(vertx: Vertx, config: JsonObject): SmartHttpClientBuilder =
     SmartHttpClientBuilderImpl.fromConfig(vertx, config)

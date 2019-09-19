@@ -117,7 +117,7 @@ object SmartHttpClientBuilderImpl {
             responseTimeout          = Option(config.getValue("responseTimeout")).map(_.asInstanceOf[Int])
           ),
 
-          circuitBreakerConfig     = Option(config.getJsonObject("circuitBreakerOptions"))
+          circuitBreakerConfig     = Option(config.getJsonObject("circuitBreakerOptions", config.getJsonObject("circuitBreaker")))
         )
       )
     } match {

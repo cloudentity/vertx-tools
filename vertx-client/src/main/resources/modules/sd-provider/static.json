@@ -1,0 +1,16 @@
+{
+  "registry:system": {
+    "service-discovery": {
+      "main": "com.cloudentity.tools.vertx.sd.SdVerticle",
+      "verticleConfig": {
+        "scan-period": "$env:SD_SCAN_PERIOD:int:3000"
+      }
+    },
+    "fixed-sd-provider": {
+      "main": "com.cloudentity.tools.vertx.sd.provider.FixedSdProvider",
+      "verticleConfig": {
+        "records": "$ref:sd-records"
+      }
+    }
+  }
+}
