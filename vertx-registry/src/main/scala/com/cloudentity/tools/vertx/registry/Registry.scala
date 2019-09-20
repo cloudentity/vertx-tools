@@ -336,7 +336,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
         }
         oks.foreach { depl =>
           val logObj = new JsonObject()
-            .put("verticleId", depl.id.value)
+            .put("verticleId", depl.verticleId.value)
             .put("main", depl.descriptor.main)
             .put("prefix", depl.descriptor.prefix.map(_.toString).getOrElse(null))
             .put("verticleConfig", depl.descriptor.verticleConfig.getOrElse(null))
