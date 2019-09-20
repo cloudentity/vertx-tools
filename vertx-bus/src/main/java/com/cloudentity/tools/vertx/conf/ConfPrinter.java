@@ -17,7 +17,10 @@ public class ConfPrinter {
   private static final int MAX_COL_WIDTH = 35;
 
   public static void logEnvVariables(JsonObject conf) {
-    List<ResolvedRef> rows = ConfReference.findResolvedEnvRefs(conf);
+    List<ResolvedRef> rows =
+      ConfReference.findResolvedEnvRefs(conf).stream()
+        .filter(ConfPrinter::filterOutEmptyOptional)
+        .collect(Collectors.toList());
 
     String table =
       AsciiTable.getTable(AsciiTable.FANCY_ASCII, rows,
@@ -42,6 +45,10 @@ public class ConfPrinter {
     if (!missingVars.isEmpty()) {
       InitLog.error("Missing environment variables: [" + String.join(", ", missingVars) + "]");
     }
+  }
+
+  private static boolean filterOutEmptyOptional(ResolvedRef ref) {
+    return !ref.ref.optional || ref.resolvedValue != null;
   }
 
   private static Column column(String label) {

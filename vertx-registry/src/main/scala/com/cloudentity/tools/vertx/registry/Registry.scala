@@ -196,8 +196,8 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
       Future.failed(new NoStackTraceThrowable(s"Could not start '${registryType.value}' verticle Registry. Missing 'registry:${registryType.value}' configuration."))
     else {
       val message = s"Skipping verticle Registry '${registryType.value}' start. Configuration 'registry:${registryType.value}' missing"
-      log.warn(message)
-      InitLog.warn(message)
+      log.debug(message)
+      InitLog.debug(message)
       Future.successful(())
     }
 
@@ -210,12 +210,15 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
 
     val message = s"Found descriptors for following verticles: [${descriptors.map(_._1.value).mkString(", ")}]"
     log.info(message)
-    InitLog.info(message)
+    InitLog.debug(message)
 
     val (disabledDescriptors, activeDescriptors) = descriptors.partition((disabledVerticle _).tupled)
-    val disabledMessage = s"Disabled verticles: [${disabledDescriptors.map(_._1.value).mkString(", ")}]"
-    log.info(disabledMessage)
-    InitLog.info(disabledMessage)
+
+    if (disabledDescriptors.nonEmpty) {
+      val disabledMessage = s"Disabled verticles: [${disabledDescriptors.map(_._1.value).mkString(", ")}]"
+      log.info(disabledMessage)
+      InitLog.info(disabledMessage)
+    }
 
     activeDescriptors
   }

@@ -61,7 +61,7 @@
     </dependency>
     <dependency>
       <groupId>io.jaegertracing</groupId>
-      <artifactId>jaeger-core</artifactId>
+      <artifactId>jaeger-client</artifactId>
     </dependency>
 
     <!--TEST-->

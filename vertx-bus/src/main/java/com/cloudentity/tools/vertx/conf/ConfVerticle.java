@@ -59,16 +59,17 @@ public class ConfVerticle extends ServiceVerticle implements ConfService {
       ConfBuilder.Config cfg = configResult.get();
       globalConf = cfg.resolvedConfig;
 
-      InitLog.info("Configuration: {}", cfg.resolvedConfigWithMask);
       InitLog.info("Environment variables in root configuration: ");
       ConfPrinter.logEnvVariables(config);
 
       cfg.validModules.forEach(module -> {
         InitLog.info("Injected '" + module.name + "' classpath module configuration. Environment variables: ");
         ConfPrinter.logEnvVariables(moduleConfigWithEnvFallback(module.rawConfig, config));
-        InitLog.info("Unresolved '" + module.name + "' classpath module configuration: " + module.rawConfig.toString());
+        InitLog.debug("Unresolved '" + module.name + "' classpath module configuration: " + module.rawConfig.toString());
         InitLog.info("");
       });
+
+      InitLog.info("Configuration: {}", cfg.resolvedConfigWithMask);
       log.debug("Configuration:\n{}", globalConf.encodePrettily());
 
       return Future.<Void>succeededFuture();
