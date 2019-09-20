@@ -335,7 +335,16 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
           // TODO notify health-check verticles deployment is OK
         }
         oks.foreach { depl =>
-          val message = s"Successfully deployed verticle $depl"
+          val logObj = new JsonObject()
+            .put("verticleId", depl.id.value)
+            .put("main", depl.descriptor.main)
+            .put("prefix", depl.descriptor.prefix.map(_.toString).getOrElse(null))
+            .put("verticleConfig", depl.descriptor.verticleConfig.getOrElse(null))
+            .put("configPath", depl.descriptor.configPath.getOrElse(null))
+            .put("options", depl.descriptor.options)
+            .put("deploymentStrategy", depl.descriptor.deploymentStrategy.toString)
+
+          val message = s"Successfully deployed verticle ${logObj}"
           log.info(message)
           InitLog.info(message)
           registry.put(depl.verticleId, depl)
