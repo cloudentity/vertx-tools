@@ -30,7 +30,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <tools.base.init-logging.version>1.17</tools.base.init-logging.version>
     <vertx.version>3.8.0</vertx.version>
     <jackson-databind.version>2.9.9.3</jackson-databind.version>
     <scala.version>2.12.9</scala.version>
@@ -346,11 +345,6 @@
         <version>${api.errors.version}</version>
       </dependency>
       <!-- LOGGING -->
-      <dependency>
-        <artifactId>init-logging</artifactId>
-        <groupId>com.syntegritynet.overlay.tools.base</groupId>
-        <version>${tools.base.init-logging.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>

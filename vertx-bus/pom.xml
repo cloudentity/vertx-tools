@@ -12,10 +12,6 @@
 
   <dependencies>
     <dependency>
-      <artifactId>init-logging</artifactId>
-      <groupId>com.syntegritynet.overlay.tools.base</groupId>
-    </dependency>
-    <dependency>
       <groupId>com.cloudentity.tools</groupId>
       <artifactId>vertx-json</artifactId>
     </dependency>

@@ -3,9 +3,9 @@ package com.cloudentity.tools.vertx.registry
 import java.util
 
 import RegistryVerticle._
-import com.syntegrity.tools.init.logging.InitLog
 import com.cloudentity.tools.vertx.scala.bus.ScalaServiceVerticle
 import com.cloudentity.tools.vertx.verticles.VertxDeploy
+
 import io.vertx.core.impl.NoStackTraceThrowable
 import io.vertx.core.json.JsonObject
 import io.vertx.core.{AsyncResult, DeploymentOptions, Future => VxFuture}
@@ -15,6 +15,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 import scalaz._
 import Scalaz._
+import com.cloudentity.tools.vertx.logging.InitLog
 
 object RegistryVerticle {
   case class DeploymentId(value: String)

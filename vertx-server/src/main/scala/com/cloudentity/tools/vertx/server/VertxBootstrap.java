@@ -1,6 +1,5 @@
 package com.cloudentity.tools.vertx.server;
 
-import com.syntegrity.tools.init.logging.InitLog;
 import com.cloudentity.tools.vertx.bus.VertxBus;
 import com.cloudentity.tools.vertx.conf.ConfBuilder;
 import com.cloudentity.tools.vertx.conf.ConfPrinter;
@@ -8,6 +7,7 @@ import com.cloudentity.tools.vertx.conf.ConfVerticleDeploy;
 import com.cloudentity.tools.vertx.conf.ModulesReader;
 import com.cloudentity.tools.vertx.json.VertxJson;
 import com.cloudentity.tools.vertx.launchers.OrchisCommandLauncher;
+import com.cloudentity.tools.vertx.logging.InitLog;
 import com.cloudentity.tools.vertx.server.api.ApiServerDeployer;
 import com.cloudentity.tools.vertx.shutdown.ShutdownVerticle;
 import com.cloudentity.tools.vertx.tracing.TracingVerticle;

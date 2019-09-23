@@ -1,8 +1,8 @@
 package com.cloudentity.tools.vertx.conf;
 
+import com.cloudentity.tools.vertx.logging.InitLog;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
-import com.syntegrity.tools.init.logging.InitLog;
 import io.vertx.core.json.JsonObject;
 
 import java.util.Arrays;

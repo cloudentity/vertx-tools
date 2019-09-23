@@ -1,9 +1,9 @@
 package com.cloudentity.tools.vertx.conf;
 
-import com.syntegrity.tools.init.logging.InitLog;
 import com.cloudentity.tools.vertx.bus.ServiceVerticle;
 import com.cloudentity.tools.vertx.bus.VertxBus;
 import com.cloudentity.tools.vertx.json.JsonExtractor;
+import com.cloudentity.tools.vertx.logging.InitLog;
 import io.vavr.control.Either;
 import io.vertx.config.ConfigChange;
 import io.vertx.config.ConfigRetriever;
