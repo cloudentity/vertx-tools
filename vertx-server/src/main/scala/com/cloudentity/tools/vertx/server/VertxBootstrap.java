@@ -1,7 +1,6 @@
 package com.cloudentity.tools.vertx.server;
 
 import com.cloudentity.tools.vertx.bus.VertxBus;
-import com.cloudentity.tools.vertx.conf.ConfBuilder;
 import com.cloudentity.tools.vertx.conf.ConfPrinter;
 import com.cloudentity.tools.vertx.conf.ConfVerticleDeploy;
 import com.cloudentity.tools.vertx.conf.ModulesReader;
