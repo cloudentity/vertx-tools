@@ -1,7 +1,6 @@
 package com.cloudentity.tools.vertx.server.api.routes;
 
 import com.cloudentity.tools.vertx.bus.ServiceVerticle;
-import com.cloudentity.tools.vertx.server.api.routes.impl.JwtFilter;
 import com.cloudentity.tools.vertx.server.api.tracing.RoutingWithTracing;
 import com.cloudentity.tools.vertx.tracing.TracingContext;
 import io.vertx.core.Future;
@@ -9,7 +8,6 @@ import io.vertx.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.Optional;
 
 public abstract class RouteVerticle extends ServiceVerticle implements RouteService {
@@ -30,10 +28,6 @@ public abstract class RouteVerticle extends ServiceVerticle implements RouteServ
   public Future handleRequest(RoutingContext ctx) {
     handle(ctx);
     return Future.succeededFuture();
-  }
-
-  protected Optional<Map<String, Object>> getJwtContent(RoutingContext ctx) {
-    return Optional.ofNullable(ctx.get(JwtFilter.JWT_CONTENT_KEY));
   }
 
   protected TracingContext getTracingContext(RoutingContext ctx) {

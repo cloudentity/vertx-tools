@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.cloudentity.tools</groupId>
-  <artifactId>vertx-tools-open</artifactId>
+  <artifactId>vertx-tools</artifactId>
   <version>1.27-SNAPSHOT</version>
 
   <modules>
@@ -14,7 +14,6 @@
     <module>vertx-bus-scala</module>
     <module>vertx-json</module>
     <module>vertx-client</module>
-    <module>vertx-jwt</module>
     <module>vertx-test</module>
     <module>vertx-test-scala</module>
     <module>vertx-registry</module>
@@ -37,7 +36,6 @@
     <circe.version>0.11.1</circe.version>
     <jaeger.version>0.35.5</jaeger.version>
     <embedded-consul.version>1.0.2</embedded-consul.version>
-    <jwt.version>1.6</jwt.version>
     <api.errors.version>1.1</api.errors.version>
     <slf4j.version>1.7.21</slf4j.version>
   </properties>
@@ -285,11 +283,6 @@
       </dependency>
       <dependency>
         <groupId>com.cloudentity.tools</groupId>
-        <artifactId>vertx-jwt</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.cloudentity.tools</groupId>
         <artifactId>vertx-client</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -334,11 +327,6 @@
         <version>${project.version}</version>
       </dependency>
       <!-- CLOUDENTITY -->
-      <dependency>
-        <groupId>io.orchis.tools</groupId>
-        <artifactId>jwt</artifactId>
-        <version>${jwt.version}</version>
-      </dependency>
       <dependency>
         <groupId>com.cloudentity.tools</groupId>
         <artifactId>api-errors</artifactId>

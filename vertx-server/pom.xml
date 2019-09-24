@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>com.cloudentity.tools</groupId>
-    <artifactId>vertx-tools-open</artifactId>
+    <artifactId>vertx-tools</artifactId>
     <version>1.27-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -47,10 +47,6 @@
       <artifactId>vertx-web</artifactId>
     </dependency>
     <!-- utils -->
-    <dependency>
-      <groupId>com.cloudentity.tools</groupId>
-      <artifactId>vertx-jwt</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.scalaz</groupId>
       <artifactId>scalaz-core_2.12</artifactId>

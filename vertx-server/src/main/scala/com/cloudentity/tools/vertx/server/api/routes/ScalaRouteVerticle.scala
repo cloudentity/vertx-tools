@@ -1,9 +1,6 @@
 package com.cloudentity.tools.vertx.server.api.routes
 
-import java.util
-
 import com.cloudentity.tools.vertx.scala.bus.ScalaServiceVerticle
-import com.cloudentity.tools.vertx.server.api.routes.impl.JwtFilter
 import com.cloudentity.tools.vertx.server.api.tracing.RoutingWithTracing
 import com.cloudentity.tools.vertx.tracing.TracingContext
 import io.vertx.core.Future
@@ -28,9 +25,6 @@ abstract class ScalaRouteVerticle extends ScalaServiceVerticle with RouteService
     handle(ctx)
     Future.succeededFuture[Void]
   }
-
-  protected def getJwtContent(ctx: RoutingContext): Option[util.Map[String, AnyRef]] =
-    Option(ctx.get(JwtFilter.JWT_CONTENT_KEY))
 
   protected def handle(ctx: RoutingContext): Unit
 

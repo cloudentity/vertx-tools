@@ -4,7 +4,7 @@
 
   <parent>
     <groupId>com.cloudentity.tools</groupId>
-    <artifactId>vertx-tools-open</artifactId>
+    <artifactId>vertx-tools</artifactId>
     <version>1.27-SNAPSHOT</version>
   </parent>
 
