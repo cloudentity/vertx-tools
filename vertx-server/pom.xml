@@ -35,10 +35,6 @@
     </dependency>
     <dependency>
       <groupId>com.cloudentity.tools</groupId>
-      <artifactId>api-errors</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.cloudentity.tools</groupId>
       <artifactId>vertx-cmd</artifactId>
     </dependency>
     <!-- vertx -->

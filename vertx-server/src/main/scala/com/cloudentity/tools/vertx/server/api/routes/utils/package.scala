@@ -1,9 +1,9 @@
 package com.cloudentity.tools.vertx.server.api.routes
 
 import com.cloudentity.tools.vertx.scala.Operation
-import com.cloudentity.tools.api.errors.ApiError
 import com.cloudentity.tools.vertx.scala.bus.ScalaServiceVerticle
 import com.cloudentity.tools.vertx.scala.VertxExecutionContext
+import com.cloudentity.tools.vertx.server.api.errors.ApiError
 import io.vertx.core.{Future => VxFuture}
 
 import scala.concurrent.Future

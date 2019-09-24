@@ -1,6 +1,6 @@
 package com.cloudentity.tools.vertx.server.api;
 
-import com.cloudentity.tools.api.errors.ApiError;
+import com.cloudentity.tools.vertx.server.api.errors.ApiError;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
 

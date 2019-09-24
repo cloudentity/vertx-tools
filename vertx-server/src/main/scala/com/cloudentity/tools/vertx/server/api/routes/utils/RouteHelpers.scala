@@ -1,6 +1,5 @@
 package com.cloudentity.tools.vertx.server.api.routes.utils
 
-import com.cloudentity.tools.api.errors.ApiError
 import com.cloudentity.tools.vertx.scala.bus.ScalaServiceVerticle
 import com.cloudentity.tools.vertx.scala.{FutureConversions, Futures, Operation}
 import com.cloudentity.tools.vertx.server.api.ResponseHelpers.respondWithError
@@ -8,6 +7,7 @@ import com.cloudentity.tools.vertx.server.http._
 import HttpStatus._
 import com.cloudentity.tools.vertx.http.Headers
 import com.cloudentity.tools.vertx.http.headers.HeadersSyntax
+import com.cloudentity.tools.vertx.server.api.errors.ApiError
 import com.cloudentity.tools.vertx.server.api.tracing.RoutingWithTracing
 import com.cloudentity.tools.vertx.tracing.LoggingWithTracing
 import io.vertx.core.http.HttpServerResponse

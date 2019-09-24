@@ -1,8 +1,8 @@
 package com.cloudentity.tools.vertx.server.api.routes.utils
 
-import com.cloudentity.tools.api.errors.ApiError
 import com.cloudentity.tools.vertx.http.Headers
 import com.cloudentity.tools.vertx.scala.Operation
+import com.cloudentity.tools.vertx.server.api.errors.ApiError
 import com.cloudentity.tools.vertx.server.api.routes.{RouteService, ScalaRouteVerticle}
 import io.vertx.ext.web.RoutingContext
 
