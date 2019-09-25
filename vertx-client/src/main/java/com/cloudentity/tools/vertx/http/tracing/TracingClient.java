@@ -1,4 +1,4 @@
-package com.cloudentity.tools.vertx.server.api.tracing;
+package com.cloudentity.tools.vertx.http.tracing;
 
 import com.cloudentity.tools.vertx.http.builder.RequestCtxBuilder;
 import com.cloudentity.tools.vertx.tracing.TracingContext;
