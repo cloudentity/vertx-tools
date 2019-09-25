@@ -6,7 +6,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
 
 | Module                          | Description                                                                                       |
 |---------------------------------|---------------------------------------------------------------------------------------------------|
-| vertx-bus                       | Verticles with Future-oriented even-bus abstraction and configuration injection                   |
+| vertx-bus                       | Verticles with Future event-bus abstraction and configuration injection                           |
 | vertx-bus-scala                 | Scala extensions for vertx-bus                                                                    |
 | vertx-registry                  | Dependency injection and component management                                                     |
 | vertx-server                    | HTTP server framework                                                                             |
