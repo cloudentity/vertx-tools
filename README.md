@@ -34,6 +34,12 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
   * [Configuring VertxOptions](#meta-vertx-options)
   * [Integration with Vault](#meta-vault)
   * [Custom configuration stores](#meta-custom-stores)
+    * [classpath](docs/config-stores/classpath.md)
+    * [classpath-folder](docs/config-stores/classpath-folder.md)
+    * [consul-folder](docs/config-stores/consul-folder.md)
+    * [consul-json](docs/config-stores/consul-json.md)
+    * [vault-keycerts](docs/config-stores/vault-keycerts.md)
+    * [ext](docs/config-stores/ext.md)
 * [Modules configuration](#modules-config)
   * [How modules configuration is resolved](#modules-how)
   * [Modules and deploying verticles](#modules-verticles)
@@ -585,7 +591,7 @@ Every time you call `ComponentVerticle.getConfig()` you retrieve version of the 
 You can register `ComponentVerticle` to receive information whenever global configuration changes. To do so you need to call
 `ComponentVerticle.registerConfChangeConsumer` method passing consumer of `io.vertx.config.ConfigChange` object.
 
-### Disabling config store with environment variables
+### Disabling config store
 
 You can use `enabled` flag to control whether config store should be used. It's set to `true` by default:
 
@@ -738,13 +744,12 @@ When configuration references have been resolved then "my-service-verticle" stor
 
 ### Custom configuration stores
 
-TODO
-include::config-stores/classpath.adoc[]
-include::config-stores/classpath-folder.adoc[]
-include::config-stores/consul-folder.adoc[]
-include::config-stores/consul-json.adoc[]
-include::config-stores/vault-keycerts.adoc[]
-include::config-stores/ext.adoc[]
+* [classpath](docs/config-stores/classpath.md)
+* [classpath-folder](docs/config-stores/classpath-folder.md)
+* [consul-folder](docs/config-stores/consul-folder.md)
+* [consul-json](docs/config-stores/consul-json.md)
+* [vault-keycerts](docs/config-stores/vault-keycerts.md)
+* [ext](docs/config-stores/ext.md)
 
 ## Modules configuration
 
