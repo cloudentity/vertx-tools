@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * Verticle handling local deployment of verticles based on a directory with configuration files.
  */
+@Deprecated
 public class DirectoryScanningVerticleDeployer extends AbstractVerticle {
 
   private static final Logger log = LoggerFactory.getLogger(DirectoryScanningVerticleDeployer.class);

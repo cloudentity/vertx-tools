@@ -1,5 +1,6 @@
 package com.cloudentity.tools.vertx.verticleScanner;
 
+@Deprecated
 public class DeployedService {
 
   private String deploymentId;
