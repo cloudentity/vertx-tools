@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.cloudentity.tools</groupId>
+    <groupId>com.cloudentity.tools.vertx</groupId>
     <artifactId>vertx-tools</artifactId>
     <version>1.27-SNAPSHOT</version>
   </parent>
@@ -44,7 +44,7 @@
       <artifactId>vertx-circuit-breaker</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-bus</artifactId>
     </dependency>
     <dependency>
@@ -108,7 +108,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-test</artifactId>
       <scope>test</scope>
     </dependency>

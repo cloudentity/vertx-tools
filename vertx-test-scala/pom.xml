@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.cloudentity.tools</groupId>
+    <groupId>com.cloudentity.tools.vertx</groupId>
     <artifactId>vertx-tools</artifactId>
     <version>1.27-SNAPSHOT</version>
   </parent>         
@@ -18,11 +18,11 @@
     </dependency>
     <!-- cloudentity -->
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-bus-scala</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-test</artifactId>
     </dependency>
     <!-- vertx -->

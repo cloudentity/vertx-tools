@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>vertx-tools</artifactId>
-    <groupId>com.cloudentity.tools</groupId>
+    <groupId>com.cloudentity.tools.vertx</groupId>
     <version>1.27-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -13,19 +13,19 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-config-classpath</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-config-consul-json</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-config-ext</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-config-vault-keycerts</artifactId>
     </dependency>
   </dependencies>

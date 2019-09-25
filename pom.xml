@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.cloudentity.tools</groupId>
+  <groupId>com.cloudentity.tools.vertx</groupId>
   <artifactId>vertx-tools</artifactId>
   <version>1.27-SNAPSHOT</version>
 
@@ -246,82 +246,82 @@
       </dependency>
       <!-- MODULES -->
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-cmd</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-bus</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-bus-scala</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-config-consul-json</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-config-classpath</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-config-vault-keycerts</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-json</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-client</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-test</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-registry</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-test-scala</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-http-common</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-server</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-server-test</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-config-common</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.cloudentity.tools</groupId>
+        <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-config-ext</artifactId>
         <version>${project.version}</version>
       </dependency>

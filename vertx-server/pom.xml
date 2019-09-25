@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>com.cloudentity.tools</groupId>
+    <groupId>com.cloudentity.tools.vertx</groupId>
     <artifactId>vertx-tools</artifactId>
     <version>1.27-SNAPSHOT</version>
   </parent>
@@ -18,23 +18,23 @@
     </dependency>
     <!-- cloudentity -->
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-bus</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-bus-scala</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-registry</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-http-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-cmd</artifactId>
     </dependency>
     <!-- vertx -->
@@ -66,7 +66,7 @@
     </dependency>
     <!-- test -->
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-test</artifactId>
       <scope>test</scope>
     </dependency>

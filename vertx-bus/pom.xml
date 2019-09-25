@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.cloudentity.tools</groupId>
+    <groupId>com.cloudentity.tools.vertx</groupId>
     <artifactId>vertx-tools</artifactId>
     <version>1.27-SNAPSHOT</version>
   </parent>
@@ -12,7 +12,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.cloudentity.tools</groupId>
+      <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-json</artifactId>
     </dependency>
     <dependency>
