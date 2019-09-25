@@ -23,8 +23,8 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
 
 * [How to start](#how-to-start)
 * [Configuration](#config)
-  * [Configuration and Service/ComponentVerticle](#config-verticle)
-  * [Where ComponentVerticle's configuration is read from](#config-where)
+  * [Configuration and verticles](#config-verticle)
+  * [Where verticle's configuration is read from](#config-where)
   * [Configuration references](#config-references)
   * [Nullifying object attributes](#config-nullify)
   * [ComponentVerticle initialization](#config-init)
@@ -53,7 +53,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
   * [Call ServiceVerticle](#bus-call)
   * [Service client timeout](#bus-timeout)
   * [ServiceVerticle initialization](#bus-verticle-init)
-  * [ServiceVerticle and ComponentVerticle cleanup](#bus-verticle-cleanup)
+  * [Verticles cleanup](#bus-verticle-cleanup)
 * [Dependency injection](#di)
   * [Defining deployment strategy](#di-strategy)
   * [Defining configuration path of verticle](#di-config-path)
@@ -223,14 +223,14 @@ and environment variables referenced by root configuration and each module.
 
 ## Configuration
 
-### Configuration and Service/ComponentVerticle
+### Configuration and verticles
 
 `vertx-bus` project provides solution for configuration management. It implements `com.cloudentity.tools.vertx.conf.ConfVerticle`
 singleton verticle that reads `meta-config.json` file in and exposes configuration to other verticles.
 The easiest way to have access to configuration from `ConfVerticle` is to extend `ComponentVerticle` (`ServiceVerticle` extends `ComponentVerticle`).
 `ComponentVerticle` implements `getConfig()` method that returns `JsonObject` with configuration associated with the instance of `ComponentVerticle`.
 
-### Where ComponentVerticle's configuration is read from
+### Where verticle's configuration is read from
 
 `ComponentVerticle` has `configPath()` method that returns comma-separated path to the verticle's configuration JsonObject.
 
@@ -271,7 +271,7 @@ public String verticleId() {
 `configPath()` reads information passed to the verticle at the deployment time in `DeploymentOptions.config.configPath`
 and falls back to `verticleId` attribute. You can pass it on your own or use `RegistryVerticle` that does it for you.
 
-Note: if you are using Registry to deploy verticles, you can put the configuration with deployment options. See TODO <<Injecting configuration to ComponentVerticle or ServiceVerticle>>
+Note: if you are using Registry to deploy verticles, you can put the configuration with deployment options. See [Injecting configuration to verticle](#di-config-inject)
 
 ### Configuration references
 It is possible to make a reference to configuration value. This way it is easy to share common configuration.
@@ -612,7 +612,7 @@ You can use `enabled` flag to control whether config store should be used. It's 
 ```
 
 If `enabled` is `false` then the entry is filtered out from the `stores` array. If you reference environment variable
-(see TODO <<Configuration references>>) then you can control what config stores are used without changing content of meta config file.
+(see [Configuration references](#config-references)) then you can control what config stores are used without changing content of meta config file.
 
 ```json
 {
@@ -835,11 +835,11 @@ The global configuration looks as follows:
 }
 ```
 
-When the modules are merged with root configuration then `ConfVerticle` resolves configuration references. See TODO <<Configuration references>>.
+When the modules are merged with root configuration then `ConfVerticle` resolves configuration references. See [Configuration references](#config-references).
 
 ### Modules and deploying verticles
 
-What actually makes configuration modules useful is the possibility to control what verticles are deployed. In TODO <<Dependency Injection and RegistryVerticle>>
+What actually makes configuration modules useful is the possibility to control what verticles are deployed. In [Dependency Injection](#di)
 you learn how to deploy them. The application must start a verticle registry that the modules will use to deploy their verticles.
 
 The simplest root configuration looks like this:
@@ -906,7 +906,7 @@ When the application starts the `registry:components` is deployed that in turn d
 
 ### Modules configuration and Docker
 
-If you build your application using modules with environment variable references TODO (see <<Configuration references>>) it's easy to run it in Docker container.
+If you build your application using modules with environment variable references (see [Configuration references](#config-references) it's easy to run it in Docker container.
 
 Your `modules` configuration attribute should have following value:
 
@@ -1190,7 +1190,7 @@ Let's follow Initialization sequence of `ServiceVerticle`. It covers initializat
   * call ServiceVerticle.initService
   * call ServiceVerticle.initServiceAsync
 
-### ServiceVerticle and ComponentVerticle cleanup
+### Verticles cleanup
 
 If your `ServiceVerticle` or `ComponentVerticle` needs to do some cleanup when the verticle is stopped, e.g. close connection pool when closing application, then implement one of `cleanup` or `cleanupAsync`.
 These methods are called when Vertx executes `AbstractVerticle.stop` method.
@@ -1347,7 +1347,7 @@ You can define default deployment strategy for all verticles in the registry. If
 
 ### Defining configuration path of ComponentVerticle or ServiceVerticle
 
-When you are deploying `ComponentVerticle` or `ServiceVerticle` you can override its default configuration path TODO (see <<Default implementation of configPath()>>).
+When you are deploying `ComponentVerticle` or `ServiceVerticle` you can override its default configuration path TODO (see default implementation of `configPath()` in [Configuration and verticles](#config-verticles).
 To do so add "configPath" string at the level of "main" key:
 
 ```json
