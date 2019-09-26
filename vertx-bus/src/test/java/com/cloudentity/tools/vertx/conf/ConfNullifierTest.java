@@ -49,4 +49,11 @@ public class ConfNullifierTest {
     ConfNullifier.nullify(conf);
     assertEquals(new JsonObject().put("y", new JsonObject().put("z", "w")), conf.getJsonObject("x"));
   }
+
+  @Test
+  public void shouldNullifyChildFirst() {
+    JsonObject conf = new JsonObject("{\"x\":{\"y\":{\"_nullify\":true,\"z\":{\"_nullify\":true,\"w\":{\"_nullify\":true,\"a\":null}}}}}");
+    ConfNullifier.nullify(conf);
+    assertEquals(new JsonObject().put("x", new JsonObject()), conf);
+  }
 }

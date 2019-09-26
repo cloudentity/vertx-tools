@@ -28,18 +28,18 @@ public class ConfNullifier {
   private static void nullifyEntry(Iterator<java.util.Map.Entry<String, Object>> it, java.util.Map.Entry<String, Object> entry) {
     if (entry.getValue() != null) {
       if (entry.getValue() instanceof JsonObject) {
+        nullify((JsonObject) entry.getValue());
         if (shouldNullify((JsonObject) entry.getValue())) {
           it.remove();
         } else {
           removeNullifyFlag((JsonObject) entry.getValue());
-          nullify((JsonObject) entry.getValue());
         }
       } else if (entry.getValue() instanceof java.util.Map) {
+        nullify((java.util.Map) entry.getValue());
         if (shouldNullify((java.util.Map) entry.getValue())) {
           it.remove();
         } else {
           removeNullifyFlag((java.util.Map) entry.getValue());
-          nullify((java.util.Map) entry.getValue());
         }
       }
     }
