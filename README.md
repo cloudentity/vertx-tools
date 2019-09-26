@@ -11,6 +11,8 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
 | vertx-registry                  | Dependency injection and component management                                                     |
 | vertx-server                    | HTTP server framework                                                                             |
 | vertx-client                    | Future-oriented wrapper of Vertx HTTP client with service-discovery, load-balancing and retries   |
+| vertx-sd                        | Service-discovery                                                                                 |
+| vertx-sd-consul                 | Consul service-discovery provider                                                                 |
 | vertx-config-classpath          | Vertx config-stores reading from classpath                                                        |
 | vertx-config-consul-json        | Vertx config-stores reading from Consul                                                           |
 | vertx-config-vault-keycerts     | Vertx config-store reading keys and certificates from Vault                                       |

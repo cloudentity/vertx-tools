@@ -2,9 +2,9 @@ package com.cloudentity.tools.vertx.http
 
 import com.cloudentity.tools.vertx.http.builder.SmartHttpClientBuilderImpl
 import com.cloudentity.tools.vertx.http.builder.SmartHttpClientBuilderImpl.CallOk
+import com.cloudentity.tools.vertx.http.circuit.NoopCB
 import com.cloudentity.tools.vertx.http.client.SmartHttpClientImpl
-import com.cloudentity.tools.vertx.sd.{Location, Node, Sd, ServiceName}
-import com.cloudentity.tools.vertx.sd.circuit.NoopCB
+import com.cloudentity.tools.vertx.sd.{Location, Node, ServiceName}
 import io.vertx.core.{Future, Vertx}
 import io.vertx.core.http.HttpClientOptions
 import io.vertx.core.json.JsonObject

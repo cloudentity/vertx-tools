@@ -3,7 +3,7 @@ package com.cloudentity.tools.vertx.http.builder
 import com.cloudentity.tools.vertx.http.SmartHttp._
 import com.cloudentity.tools.vertx.http._
 import com.cloudentity.tools.vertx.http.client.SmartHttpClientImpl
-import com.cloudentity.tools.vertx.sd.{Location, Sd}
+import com.cloudentity.tools.vertx.sd.Location
 import io.vertx.core.http.{HttpClientOptions}
 import io.vertx.core.json.{JsonArray, JsonObject}
 import io.vertx.core.{Future, Vertx}

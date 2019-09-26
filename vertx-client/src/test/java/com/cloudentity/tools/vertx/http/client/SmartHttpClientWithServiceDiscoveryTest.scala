@@ -1,8 +1,9 @@
 package com.cloudentity.tools.vertx.http.client
 
+import com.cloudentity.tools.vertx.http.{Sd, SmartSd}
 import com.cloudentity.tools.vertx.http.builder.SmartHttpClientBuilderImpl._
-import com.cloudentity.tools.vertx.sd.SdTestTools.{deployEventBusDiscovery, eventBusSdProvider}
 import com.cloudentity.tools.vertx.sd._
+import com.cloudentity.tools.vertx.sd.test.SdTestTools._
 import com.cloudentity.tools.vertx.test.ServiceVerticleIntegrationTest
 import io.vertx.circuitbreaker.CircuitBreakerOptions
 import io.vertx.core.Vertx

@@ -13,6 +13,8 @@
     <module>vertx-bus</module>
     <module>vertx-bus-scala</module>
     <module>vertx-json</module>
+    <module>vertx-sd</module>
+    <module>vertx-sd-consul</module>
     <module>vertx-client</module>
     <module>vertx-test</module>
     <module>vertx-test-scala</module>
@@ -62,26 +64,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.owasp</groupId>
-        <artifactId>dependency-check-maven</artifactId>
-        <version>5.2.1</version>
-        <configuration>
-          <skipProvidedScope>true</skipProvidedScope>
-          <skipRuntimeScope>true</skipRuntimeScope>
-          <formats>
-              <format>HTML</format>
-              <format>JUNIT</format>
-          </formats>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
         <version>3.0.1</version>
@@ -101,11 +83,6 @@
         <configuration>
           <tagNameFormat>@{project.version}</tagNameFormat>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>versions-maven-plugin</artifactId>
-        <version>2.1</version>
       </plugin>
       <plugin>
         <artifactId>maven-scm-plugin</artifactId>
@@ -174,6 +151,39 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>check-deps</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.owasp</groupId>
+            <artifactId>dependency-check-maven</artifactId>
+            <version>5.2.1</version>
+            <configuration>
+              <skipProvidedScope>true</skipProvidedScope>
+              <skipRuntimeScope>true</skipRuntimeScope>
+              <formats>
+                <format>HTML</format>
+                <format>JUNIT</format>
+              </formats>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <dependencyManagement>
     <dependencies>
@@ -278,6 +288,16 @@
       <dependency>
         <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-json</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cloudentity.tools.vertx</groupId>
+        <artifactId>vertx-sd</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cloudentity.tools.vertx</groupId>
+        <artifactId>vertx-sd-consul</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

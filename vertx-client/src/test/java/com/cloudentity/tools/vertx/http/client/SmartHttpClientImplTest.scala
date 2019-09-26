@@ -1,6 +1,6 @@
 package com.cloudentity.tools.vertx.http.client
 
-import com.cloudentity.tools.vertx.http.{SmartHttp, SmartHttpClient}
+import com.cloudentity.tools.vertx.http.{Sd, SmartHttp, SmartHttpClient}
 import com.cloudentity.tools.vertx.http.builder.SmartHttpClientBuilderImpl._
 import com.cloudentity.tools.vertx.http.builder.SmartHttpResponse
 import com.cloudentity.tools.vertx.sd._

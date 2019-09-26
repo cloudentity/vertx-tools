@@ -3,8 +3,8 @@ package com.cloudentity.tools.vertx.http
 import java.util.function.{Function => JFunction}
 
 import com.cloudentity.tools.vertx.http.builder.{SmartHttpClientBuilder, SmartHttpClientBuilderImpl, SmartHttpResponse}
-import com.cloudentity.tools.vertx.sd.circuit.CircuitBreakerFactory
-import com.cloudentity.tools.vertx.sd.{ServiceName, SmartSd}
+import com.cloudentity.tools.vertx.http.circuit.CircuitBreakerFactory
+import com.cloudentity.tools.vertx.sd.ServiceName
 import io.vertx.circuitbreaker.CircuitBreakerOptions
 import io.vertx.core.json.JsonObject
 import io.vertx.core.{Future, Vertx}

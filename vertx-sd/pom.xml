@@ -8,7 +8,7 @@
     <version>1.27-SNAPSHOT</version>
   </parent>
 
-  <artifactId>vertx-client</artifactId>
+  <artifactId>vertx-sd</artifactId>
 
   <dependencies>
     <dependency>
@@ -17,7 +17,7 @@
     </dependency>
     <dependency>
       <groupId>com.cloudentity.tools.vertx</groupId>
-      <artifactId>vertx-sd</artifactId>
+      <artifactId>vertx-bus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -25,27 +25,16 @@
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-codegen</artifactId>
+      <artifactId>vertx-service-discovery</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-circuit-breaker</artifactId>
     </dependency>
     <dependency>
       <groupId>org.scalaz</groupId>
       <artifactId>scalaz-core_2.12</artifactId>
       <version>${scalaz.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.circe</groupId>
-      <artifactId>circe-core_2.12</artifactId>
-      <version>${circe.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.circe</groupId>
-      <artifactId>circe-parser_2.12</artifactId>
-      <version>${circe.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.circe</groupId>
-      <artifactId>circe-generic_2.12</artifactId>
-      <version>${circe.version}</version>
     </dependency>
 
 

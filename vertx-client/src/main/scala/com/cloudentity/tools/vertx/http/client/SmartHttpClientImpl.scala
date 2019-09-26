@@ -1,17 +1,15 @@
 package com.cloudentity.tools.vertx.http.client
 
-import java.util.Optional
-
 import com.cloudentity.tools.vertx.http.SmartHttp._
 import com.cloudentity.tools.vertx.http.builder.RequestCtxBuilderImpl._
 import com.cloudentity.tools.vertx.http.builder.SmartHttpClientBuilderImpl._
 import com.cloudentity.tools.vertx.http.builder._
-import com.cloudentity.tools.vertx.http.SmartHttpClient
-import com.cloudentity.tools.vertx.sd.{Node, Sd}
+import com.cloudentity.tools.vertx.http.{Sd, SmartHttpClient}
+import com.cloudentity.tools.vertx.sd.Node
 import com.cloudentity.tools.vertx.tracing.{LoggingWithTracing, TracingContext}
 import io.vertx.core.buffer.Buffer
-import io.vertx.core.http.{HttpClient, HttpClientOptions, HttpClientResponse, HttpMethod, RequestOptions}
-import io.vertx.core.{AsyncResult, Future, Handler, Vertx}
+import io.vertx.core.http.{HttpClient, HttpClientResponse, HttpMethod, RequestOptions}
+import io.vertx.core.{Future, Handler}
 import scalaz.{-\/, \/, \/-}
 
 case class ClientResponse(body: Option[Buffer], http: HttpClientResponse)
