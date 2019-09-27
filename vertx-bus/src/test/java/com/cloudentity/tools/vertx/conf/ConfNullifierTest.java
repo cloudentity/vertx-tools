@@ -1,5 +1,6 @@
 package com.cloudentity.tools.vertx.conf;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;
 
@@ -51,9 +52,16 @@ public class ConfNullifierTest {
   }
 
   @Test
-  public void shouldNullifyChildFirst() {
-    JsonObject conf = new JsonObject("{\"x\":{\"y\":{\"_nullify\":true,\"z\":{\"_nullify\":true,\"w\":{\"_nullify\":true,\"a\":null}}}}}");
+  public void shouldNullifyInArray() {
+    JsonObject conf =
+      new JsonObject().put("arr",
+      new JsonArray().add(
+        new JsonObject()
+          .put("x", new JsonObject().put("_nullify", true))
+      ));
+
     ConfNullifier.nullify(conf);
-    assertEquals(new JsonObject().put("x", new JsonObject()), conf);
+
+    assertEquals(null, conf.getJsonArray("arr").getJsonObject(0).getJsonObject("x"));
   }
 }

@@ -1,9 +1,11 @@
 package com.cloudentity.tools.vertx.conf;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Function;
 
 public class ConfNullifier {
   /**
@@ -14,33 +16,45 @@ public class ConfNullifier {
   public static void nullify(JsonObject obj) {
     Iterator<Map.Entry<String, Object>> it = obj.iterator();
     while (it.hasNext()) {
-      nullifyEntry(it, it.next());
+      nullifyEntry(it, it.next(), x -> x.getValue());
     }
   }
 
   private static void nullify(java.util.Map<String, Object> obj) {
     Iterator<java.util.Map.Entry<String, Object>> it = obj.entrySet().iterator();
     while (it.hasNext()) {
-      nullifyEntry(it, it.next());
+      nullifyEntry(it, it.next(), x -> x.getValue());
     }
   }
 
-  private static void nullifyEntry(Iterator<java.util.Map.Entry<String, Object>> it, java.util.Map.Entry<String, Object> entry) {
-    if (entry.getValue() != null) {
-      if (entry.getValue() instanceof JsonObject) {
-        nullify((JsonObject) entry.getValue());
-        if (shouldNullify((JsonObject) entry.getValue())) {
+  private static void nullify(java.util.List<Object> arr) {
+    Iterator<Object> it = arr.iterator();
+    while (it.hasNext()) {
+      nullifyEntry(it, it.next(), x -> x);
+    }
+  }
+
+  private static <T> void nullifyEntry(Iterator<T> it, T entry, Function<T, Object> valueF) {
+    Object value = valueF.apply(entry);
+    if (value != null) {
+      if (value instanceof JsonObject) {
+        nullify((JsonObject) value);
+        if (shouldNullify((JsonObject) value)) {
           it.remove();
         } else {
-          removeNullifyFlag((JsonObject) entry.getValue());
+          removeNullifyFlag((JsonObject) value);
         }
-      } else if (entry.getValue() instanceof java.util.Map) {
-        nullify((java.util.Map) entry.getValue());
-        if (shouldNullify((java.util.Map) entry.getValue())) {
+      } else if (value instanceof java.util.Map) {
+        nullify((java.util.Map) value);
+        if (shouldNullify((java.util.Map) value)) {
           it.remove();
         } else {
-          removeNullifyFlag((java.util.Map) entry.getValue());
+          removeNullifyFlag((java.util.Map) value);
         }
+      } else if (value instanceof JsonArray) {
+        nullify(((JsonArray) value).getList());
+      } else if (value instanceof java.util.List) {
+        nullify((java.util.List) value);
       }
     }
   }
