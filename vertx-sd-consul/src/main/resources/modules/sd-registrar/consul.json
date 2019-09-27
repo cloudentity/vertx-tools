@@ -6,7 +6,10 @@
         "consul": {
           "host": "$env:CONSUL_HOST:string",
           "port": "$env:CONSUL_PORT:int:8500",
-          "ssl": "$env:CONSUL_SSL:boolean:false"
+          "ssl": "$env:CONSUL_SSL:boolean:false",
+          "aclToken": "$env:?CONSUL_ACL_TOKEN:string",
+          "dc": "$env:?CONSUL_DC:string",
+          "timeoutMs": "$env:?CONSUL_TIMEOUT:int"
         },
         "register": {
           "serviceName": "$env:SELF_SD_SERVICE_NAME:string",
