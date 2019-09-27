@@ -1,6 +1,7 @@
 package com.cloudentity.tools.vertx.http
 
 import scala.collection.immutable.TreeMap
+import scala.collection.JavaConverters._
 
 object Headers {
   implicit val ordering = new Ordering[String] {
@@ -12,6 +13,12 @@ object Headers {
 
   def of(hs: Map[String, String]): Headers =
     new Headers(TreeMap(hs.mapValues(List(_)).toList:_*))
+
+  def of(hs: java.util.Map[String, String]): Headers =
+    new Headers(TreeMap(hs.asScala.mapValues(List(_)).toList:_*))
+
+  def empty(): Headers =
+    new Headers(TreeMap())
 
   def of(hs: (String, String)*): Headers =
     apply(hs.groupBy(_._1).mapValues(_.map(_._2).toList).toList:_*)

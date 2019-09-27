@@ -97,7 +97,6 @@
         <version>3.2.1</version>
         <configuration>
           <recompileMode>incremental</recompileMode>
-          <useZincServer>true</useZincServer>
           <scalaVersion>${scala.version}</scalaVersion>
           <args>
             <arg>-unchecked</arg>
