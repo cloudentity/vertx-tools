@@ -145,8 +145,8 @@ class ConsulSdRegistrar extends ComponentVerticle {
       rootPathOpt          = Option(registerConf.getString("rootPath"))
 
       serviceName         <- Option(registerConf.getString("serviceName")).toRight(missingAttr(s"$REGISTER_CONF_KEY.serviceName"))
-      healthCheckHost      = registerConf.getString("healthCheckHost", host)
-      healthCheckPort      = registerConf.getInteger("healthCheckPort", port)
+      healthCheckHost      = Option(registerConf.getString("healthCheckHost")).getOrElse(host)
+      healthCheckPort      = Option(registerConf.getInteger("healthCheckPort")).getOrElse(port)
       healthCheckPath     <- Option(registerConf.getString("healthCheckPath")).toRight(missingAttr(s"$REGISTER_CONF_KEY.healthCheckPath"))
       healthCheckInterval  = registerConf.getString("healthCheckInterval", "3s")
       deregisterAfter      = Option(registerConf.getString("deregisterAfter"))
