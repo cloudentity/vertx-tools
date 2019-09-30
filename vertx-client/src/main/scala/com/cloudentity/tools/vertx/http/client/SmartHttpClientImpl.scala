@@ -155,7 +155,7 @@ class SmartHttpClientImpl(
   private def finishWithLastResponse(promise: Future[ClientResponse], lastResult: Option[Throwable \/ ClientResponse], req: Request): Unit =
     lastResult match {
       case Some(\/-(response)) => promise.complete(response)
-      case Some(-\/(ex))       => promise.fail(ex)
+      case Some(-\/(ex))       => if (!promise.isComplete) promise.fail(ex)
       case None                => promise.fail(s"Request failed. ${reqSignature(req)}")
     }
 
