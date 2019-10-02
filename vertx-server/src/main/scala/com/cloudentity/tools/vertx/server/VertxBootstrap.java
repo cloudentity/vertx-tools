@@ -15,6 +15,8 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -25,6 +27,9 @@ public class VertxBootstrap extends AbstractVerticle {
 
   String shutdownVerticleDeploymentId;
 
+  private Logger log = LoggerFactory.getLogger(this.getClass());
+  private InitLog initLog = InitLog.of(log);
+
   @Override
   public void start(Future startFuture) throws Exception {
     VertxBus.registerPayloadCodec(vertx.eventBus());
@@ -33,7 +38,7 @@ public class VertxBootstrap extends AbstractVerticle {
     String runMode = getRunMode();
     switch (runMode) {
       case "standard":
-        InitLog.info("Starting application");
+        initLog.info("Starting application");
         ConfVerticleDeploy.deployVerticleFromConf(vertx, config())
           .compose(x -> VertxDeploy.deploy(vertx, new TracingVerticle()))
           .compose(x -> VertxDeploy.deploy(vertx, new ShutdownVerticle(false)))
@@ -48,9 +53,9 @@ public class VertxBootstrap extends AbstractVerticle {
 
         break;
       case "dry":
-        InitLog.info("Running in dry mode");
-        InitLog.info("Unresolved meta config: " + config().toString());
-        ConfPrinter.logMetaConfigEnvVariables(config());
+        initLog.info("Running in dry mode");
+        initLog.info("Unresolved meta config: " + config().toString());
+        ConfPrinter.logMetaConfigEnvVariables(config(), log);
         logAvailableModules();
 
         ConfVerticleDeploy.deployVerticleFromConf(vertx, config())
@@ -63,7 +68,7 @@ public class VertxBootstrap extends AbstractVerticle {
         break;
       default:
         String errMsg = "Unsupported run mode: '" + runMode + '"';
-        InitLog.error(errMsg);
+        initLog.error(errMsg);
         startFuture.fail(errMsg);
     }
   }
@@ -80,20 +85,20 @@ public class VertxBootstrap extends AbstractVerticle {
   private void logAvailableModules() {
     List<String> availableModules = ModulesReader.readAvailableModuleNames();
     availableModules.sort(String::compareTo);
-    InitLog.info("Available modules: [" + String.join(", ", availableModules) + "]");
+    initLog.info("Available modules: [" + String.join(", ", availableModules) + "]");
   }
 
   private Handler<AsyncResult<Object>> handler(Future startFuture) {
     return result -> {
       if (result.succeeded()) {
-        InitLog.info("Application started successfully");
+        initLog.info("Application started successfully");
         startFuture.complete();
       } else {
-        InitLog.error("Application failed to start properly", result.cause());
+        initLog.error("Application failed to start properly", result.cause());
         if (shutdownVerticleDeploymentId != null) {
-          vertx.undeploy(shutdownVerticleDeploymentId, x -> startFuture.fail(result.cause()));
+          vertx.undeploy(shutdownVerticleDeploymentId, x -> startFuture.fail("Exiting."));
         } else {
-          startFuture.fail(result.cause());
+          startFuture.fail("Exiting.");
         }
       }
     };

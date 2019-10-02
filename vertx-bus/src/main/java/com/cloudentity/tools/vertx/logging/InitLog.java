@@ -1,38 +1,42 @@
 package com.cloudentity.tools.vertx.logging;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 public class InitLog {
-  private static final Logger log = LoggerFactory.getLogger(InitLog.class);
-  private static final Marker initMarker = MarkerFactory.getMarker("INIT");
+  private Logger log;
+  private final Marker initMarker = MarkerFactory.getMarker("INIT");
 
-  public InitLog() {
+  public InitLog(Logger log) {
+    this.log = log;
   }
 
-  public static void error(String format, Object... arguments) {
+  public static InitLog of(Logger log) {
+    return new InitLog(log);
+  }
+
+  public void error(String format, Object... arguments) {
     log.error(initMarker, format, arguments);
   }
 
-  public static void error(String message, Throwable e) {
+  public void error(String message, Throwable e) {
     log.error(initMarker, message, e);
   }
 
-  public static void warn(String format, Object... arguments) {
+  public void warn(String format, Object... arguments) {
     log.warn(initMarker, format, arguments);
   }
 
-  public static void info(String format, Object... arguments) {
+  public void info(String format, Object... arguments) {
     log.info(initMarker, format, arguments);
   }
 
-  public static void debug(String format, Object... arguments) {
+  public void debug(String format, Object... arguments) {
     log.debug(initMarker, format, arguments);
   }
 
-  public static void trace(String format, Object... arguments) {
+  public void trace(String format, Object... arguments) {
     log.trace(initMarker, format, arguments);
   }
 }
