@@ -2,6 +2,8 @@ package com.cloudentity.tools.vertx.conf;
 
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConfPrinterTest {
   @Test
@@ -13,6 +15,6 @@ public class ConfPrinterTest {
         .put("y", "$env:Y:string")
         .put("z", "$env:?Z:string");
 
-    ConfPrinter.logEnvVariables(conf);
+    ConfPrinter.logEnvVariables(conf, LoggerFactory.getLogger("test"));
   }
 }

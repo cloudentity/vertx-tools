@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class ConfVerticle extends ServiceVerticle implements ConfService {
 
   private static final Logger log = LoggerFactory.getLogger(ConfVerticle.class);
+  private static final InitLog initLog = InitLog.of(log);
 
   public static final String CONFIG_CHANGE_ADDRESS = "com.cloudentity.configuration.change";
 
@@ -59,23 +60,23 @@ public class ConfVerticle extends ServiceVerticle implements ConfService {
       ConfBuilder.Config cfg = configResult.get();
       globalConf = cfg.resolvedConfig;
 
-      InitLog.info("Environment variables in root configuration: ");
-      ConfPrinter.logEnvVariables(config);
+      initLog.info("Environment variables in root configuration: ");
+      ConfPrinter.logEnvVariables(config, log);
 
       cfg.validModules.forEach(module -> {
-        InitLog.info("Injected '" + module.name + "' classpath module configuration. Environment variables: ");
-        ConfPrinter.logEnvVariables(moduleConfigWithEnvFallback(module.rawConfig, config));
-        InitLog.debug("Unresolved '" + module.name + "' classpath module configuration: " + module.rawConfig.toString());
-        InitLog.info("");
+        initLog.info("Injected '" + module.name + "' classpath module configuration. Environment variables: ");
+        ConfPrinter.logEnvVariables(moduleConfigWithEnvFallback(module.rawConfig, config), log);
+        initLog.debug("Unresolved '" + module.name + "' classpath module configuration: " + module.rawConfig.toString());
+        initLog.info("");
       });
 
-      InitLog.info("Configuration: {}", cfg.resolvedConfigWithMask);
+      initLog.info("Configuration: {}", cfg.resolvedConfigWithMask);
       log.debug("Configuration:\n{}", globalConf.encodePrettily());
 
       return Future.<Void>succeededFuture();
     } else {
       List<String> missingModules = configResult.getLeft().stream().map(module -> module.name).collect(Collectors.toList());
-      InitLog.error("Could not read classpath modules configuration: [{}]", String.join(", ", missingModules));
+      initLog.error("Could not read classpath modules configuration: [{}]", String.join(", ", missingModules));
       return Future.<Void>failedFuture("");
     }
   }

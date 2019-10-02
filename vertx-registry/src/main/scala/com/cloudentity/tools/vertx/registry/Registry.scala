@@ -81,6 +81,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
   def this() = this(null, true)
 
   val log = LoggerFactory.getLogger(this.getClass)
+  val initLog = InitLog.of(log)
 
   val internalConfigKey = "config"
 
@@ -106,9 +107,8 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
         val kos: List[Throwable]  = results.collect { case -\/(ko) => ko }
 
         if (kos.isEmpty) {
-          val message = s"RegistryVerticle '${registryType.value}' started successfully"
-          log.info(message)
-          InitLog.info(message)
+          val message = s"'${registryType.value}' registry started successfully"
+          initLog.info(message)
           setupChangeListener()
 
           Future.successful(())
@@ -118,7 +118,6 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
             vertx.undeploy(d.id.value, (x: AsyncResult[_]) => log.info(s"Undeploy ${d.verticleId} result ${x.succeeded()}"))
           }
           val message = s"Some verticle deployments failed: ${kos.map(x => s"'${x.getMessage}'").mkString(", ")}"
-          InitLog.error(message)
           Future.failed(new NoStackTraceThrowable(message))
         }
       }
@@ -197,8 +196,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
       Future.failed(new NoStackTraceThrowable(s"Could not start '${registryType.value}' verticle Registry. Missing 'registry:${registryType.value}' configuration."))
     else {
       val message = s"Skipping verticle Registry '${registryType.value}' start. Configuration 'registry:${registryType.value}' missing"
-      log.debug(message)
-      InitLog.debug(message)
+      initLog.debug(message)
       Future.successful(())
     }
 
@@ -210,15 +208,13 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
       }
 
     val message = s"Found descriptors for following verticles: [${descriptors.map(_._1.value).mkString(", ")}]"
-    log.info(message)
-    InitLog.debug(message)
+    initLog.debug(message)
 
     val (disabledDescriptors, activeDescriptors) = descriptors.partition((disabledVerticle _).tupled)
 
     if (disabledDescriptors.nonEmpty) {
       val disabledMessage = s"Disabled verticles: [${disabledDescriptors.map(_._1.value).mkString(", ")}]"
-      log.info(disabledMessage)
-      InitLog.info(disabledMessage)
+      initLog.info(disabledMessage)
     }
 
     activeDescriptors
@@ -271,7 +267,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
       }
       .recover { case ex: Throwable => {
         val message = s"Could not deploy '${verticleId.value}' with $descriptor"
-        InitLog.error(message, ex)
+        initLog.error(message, ex)
         -\/(new Exception(message, ex))
       }
     }
@@ -309,8 +305,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
         log.info(s"Undeploying $depl")
         VertxDeploy.undeploy(vertx, depl.id.value).toScala
           .map { _ =>
-            log.info(s"${depl.verticleId} undeployed")
-            InitLog.info(s"${depl.verticleId} undeployed")
+            initLog.info(s"${depl.verticleId} undeployed")
             \/-(id)
           }
           .recover { case ex: Throwable =>
@@ -329,8 +324,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
         if (!kos.isEmpty) {
           // TODO notify health-check something is wrong
           kos.foreach(ex => {
-            log.error("Could not deploy verticle", ex)
-            InitLog.error("Could not deploy verticle", ex)
+            initLog.error("Could not deploy verticle", ex)
           })
         } else {
           // TODO notify health-check verticles deployment is OK
@@ -340,19 +334,16 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
             .put("verticleId", depl.verticleId.value)
             .put("main", depl.descriptor.main)
             .put("prefix", depl.descriptor.prefix.map(_.toString).getOrElse(null))
-            .put("verticleConfig", depl.descriptor.verticleConfig.getOrElse(null))
             .put("configPath", depl.descriptor.configPath.getOrElse(null))
             .put("options", depl.descriptor.options)
             .put("deploymentStrategy", depl.descriptor.deploymentStrategy.toString)
 
           val message = s"Successfully deployed verticle ${logObj}"
-          log.info(message)
-          InitLog.info(message)
+          initLog.info(message)
           registry.put(depl.verticleId, depl)
         }
       case Failure(ex) => {
-        log.error("Unexpected error on verticles deployment", ex)
-        InitLog.error("Unexpected error on verticles deployment", ex)
+        initLog.error("Unexpected error on verticles deployment", ex)
       }
     }
 
@@ -365,19 +356,16 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
         if (!kos.isEmpty) {
           // TODO notify health-check
           kos.foreach(ex => {
-            log.error("Could not deploy verticle", ex)
-            InitLog.error("Could not deploy verticle", ex)
+            initLog.error("Could not deploy verticle", ex)
           })
         }
         oks.foreach { id =>
           val message = s"Successfully undeployed verticle '${id.value}'"
-          log.info(message)
-          InitLog.info(message)
+          initLog.info(message)
           registry.remove(id)
         }
       case Failure(ex) => {
-        log.error("Unexpected error on verticles deployment", ex)
-        InitLog.error("Unexpected error on verticles deployment", ex)
+        initLog.error("Unexpected error on verticles deployment", ex)
       }
     }
 

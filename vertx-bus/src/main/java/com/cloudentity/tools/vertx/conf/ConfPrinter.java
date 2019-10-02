@@ -4,6 +4,7 @@ import com.cloudentity.tools.vertx.logging.InitLog;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import io.vertx.core.json.JsonObject;
+import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +17,7 @@ import static com.github.freva.asciitable.HorizontalAlign.LEFT;
 public class ConfPrinter {
   private static final int MAX_COL_WIDTH = 35;
 
-  public static void logEnvVariables(JsonObject conf) {
+  public static void logEnvVariables(JsonObject conf, Logger log) {
     List<ResolvedRef> rows =
       ConfReference.findResolvedEnvRefs(conf).stream()
         .filter(ConfPrinter::filterOutEmptyOptional)
@@ -38,12 +39,12 @@ public class ConfPrinter {
         line.replaceAll("G<([^>]*)>G", ANSI_GREEN + "  $1  " + ANSI_RESET)
           .replaceAll("Y<([^>]*)>Y", ANSI_YELLOW + "  $1  " + ANSI_RESET)
           .replaceAll("R<([^>]*)>R", ANSI_RED + "  $1  " + ANSI_RESET);
-      InitLog.info(result);
+      InitLog.of(log).info(result);
     });
 
     List<String> missingVars = rows.stream().filter(x -> x.resolvedValue == null && !x.ref.optional).map(x -> x.ref.path).collect(Collectors.toList());
     if (!missingVars.isEmpty()) {
-      InitLog.error("Missing environment variables: [" + String.join(", ", missingVars) + "]");
+      InitLog.of(log).error("Missing environment variables: [" + String.join(", ", missingVars) + "]");
     }
   }
 
@@ -77,13 +78,13 @@ public class ConfPrinter {
     }
   }
 
-  public static void logMetaConfigEnvVariables(JsonObject conf) {
-    InitLog.info("Environment variables in meta config: ");
+  public static void logMetaConfigEnvVariables(JsonObject conf, Logger log) {
+    InitLog.of(log).info("Environment variables in meta config: ");
     conf.getJsonArray("stores").forEach(store -> {
       if (store instanceof JsonObject) {
         JsonObject obj = (JsonObject) store;
-        InitLog.info("- " + ((JsonObject) store).getString("type"));
-        ConfPrinter.logEnvVariables(obj);
+        InitLog.of(log).info("- " + ((JsonObject) store).getString("type"));
+        ConfPrinter.logEnvVariables(obj, log);
       }
     });
   }
