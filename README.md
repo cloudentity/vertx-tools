@@ -90,7 +90,7 @@ Add following entry in your `pom.xml` or its equivalent if you are not using Mav
 </dependency>
 ```
 
-Note: vertx-tools are not available in public Mave repository. Build them first using `mvn clean install command`.
+Note: vertx-tools are not available in public Maven repository. Build them first using `mvn clean install command`.
 
 #### Create meta-config.json
 
