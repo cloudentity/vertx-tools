@@ -73,6 +73,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
   * [Create RouteVerticle passing request param to ServiceVerticle](#example-route-service)
   * [Create RouteVerticle dispatching request to one of multiple VertxEndpoint implementations](#example-route-service-multiple)
 
+<a id="how-to-start"></a>
 ## How to start
 
 This section describes how to use `vertx-server` module. If you are interested in `vertx-bus` functionality then go to [configuration](#config) or [event bus communication](#event-bus).
@@ -88,6 +89,8 @@ Add following entry in your `pom.xml` or its equivalent if you are not using Mav
   <version>${vertx-tools.version}</version>
 </dependency>
 ```
+
+Note: vertx-tools are not available in public Mave repository. Build them first using `mvn clean install command`.
 
 #### Create meta-config.json
 
@@ -223,8 +226,10 @@ If you are interested how the application config looks like you can run it in dr
 It prints available modules, configuration (with and without resolved modules and references)
 and environment variables referenced by root configuration and each module.
 
+<a id="config"></a>
 ## Configuration
 
+<a id="config-verticle"></a>
 ### Configuration and verticles
 
 `vertx-bus` project provides solution for configuration management. It implements `com.cloudentity.tools.vertx.conf.ConfVerticle`
@@ -232,6 +237,7 @@ singleton verticle that reads `meta-config.json` file in and exposes configurati
 The easiest way to have access to configuration from `ConfVerticle` is to extend `ComponentVerticle` (`ServiceVerticle` extends `ComponentVerticle`).
 `ComponentVerticle` implements `getConfig()` method that returns `JsonObject` with configuration associated with the instance of `ComponentVerticle`.
 
+<a id="config-where"></a>
 ### Where verticle's configuration is read from
 
 `ComponentVerticle` has `configPath()` method that returns comma-separated path to the verticle's configuration JsonObject.
@@ -245,7 +251,7 @@ Let's assume the global configuration JsonObject is as follows:
       "port": 8080
     },
     "routes": []
-  }
+  },
   "components": {
     "my-component": {
       "message": "Hello world!"
@@ -275,6 +281,7 @@ and falls back to `verticleId` attribute. You can pass it on your own or use `Re
 
 Note: if you are using Registry to deploy verticles, you can put the configuration with deployment options. See [Injecting configuration to verticle](#di-config-inject)
 
+<a id="config-references"></a>
 ### Configuration references
 It is possible to make a reference to configuration value. This way it is easy to share common configuration.
 The reference is a JSON string with following format `"$ref:{configuration-path}"`. The configuration-path in
@@ -481,6 +488,7 @@ Reference path and default value can contain escaped colon '\\:'.
 
 E.g. Given `$ref:path:string:localhost\\:8080` the default value is `localhost:8080`.
 
+<a id="config-nullify"></a>
 ### Nullifying object attributes
 
 Let's consider scenario where we need to configure object with one-of alternative via environment variables.
@@ -545,10 +553,11 @@ In our example, if `PEM_CERT_PATHS` is only variable set then we end up with fol
   }
 }
 ```
-
+<a id="config-init"></a>
 ### ComponentVerticle initialization
-See section on ServiceVerticle initialization.
+See section on [ServiceVerticle initialization](#bus-verticle-init).
 
+<a id="meta"></a>
 ## Meta configuration
 
 When we start `vertx-server` application we need to pass path to `meta-config.json` in the command line argument `-conf`.
@@ -575,6 +584,7 @@ Sample `meta-config.json` looks like this:
 }
 ```
 
+<a id="meta-management"></a>
 ### Configuration management
 
 The advantage of using `meta-config.json` is ease of changing the way configuration is distributed.
@@ -593,6 +603,7 @@ Every time you call `ComponentVerticle.getConfig()` you retrieve version of the 
 You can register `ComponentVerticle` to receive information whenever global configuration changes. To do so you need to call
 `ComponentVerticle.registerConfChangeConsumer` method passing consumer of `io.vertx.config.ConfigChange` object.
 
+<a id="meta-disable"></a>
 ### Disabling config store
 
 You can use `enabled` flag to control whether config store should be used. It's set to `true` by default:
@@ -632,11 +643,13 @@ If `enabled` is `false` then the entry is filtered out from the `stores` array. 
 }
 ```
 
+<a id="meta-vertx-options"></a>
 ### Configuring VertxOptions
 
 You can define `io.vertx.core.VertxOptions` that will be used to initialize Vertx instance at the application startup.
 You need to provide JSON object at "vertx.options" path that is decoded to VertxOptions.
 
+<a id="meta-vault"></a>
 ### Integration with Vault - how to store passwords/secrets
 
 Add Vault store in `meta-config.json`:
@@ -744,6 +757,7 @@ When configuration references have been resolved then "my-service-verticle" stor
 
 ```
 
+<a id="meta-custom-stores"></a>
 ### Custom configuration stores
 
 * [classpath](docs/config-stores/classpath.md)
@@ -753,6 +767,7 @@ When configuration references have been resolved then "my-service-verticle" stor
 * [vault-keycerts](docs/config-stores/vault-keycerts.md)
 * [ext](docs/config-stores/ext.md)
 
+<a id="modules-config"></a>
 ## Modules configuration
 
 When we develop an application we usually want to split it into modules.
@@ -764,6 +779,7 @@ In order to make it easier to configure application there is a special configura
 Module configuration should reference environment variable for those attributes we want to set for different environments
 (urls, hosts, ports, header names, etc.)
 
+<a id="modules-how"></a>
 ### How modules configuration is resolved
 
 Let’s say our root configuration looks like this:
@@ -839,6 +855,7 @@ The global configuration looks as follows:
 
 When the modules are merged with root configuration then `ConfVerticle` resolves configuration references. See [Configuration references](#config-references).
 
+<a id="modules-verticles"></a>
 ### Modules and deploying verticles
 
 What actually makes configuration modules useful is the possibility to control what verticles are deployed. In [Dependency Injection](#di)
@@ -906,6 +923,7 @@ When modules configuration and root configuration is merged we end up with follo
 
 When the application starts the `registry:components` is deployed that in turn deploys `module-a-verticle` and `module-b-verticle`.
 
+<a id="modules-docker"></a>
 ### Modules configuration and Docker
 
 If you build your application using modules with environment variable references (see [Configuration references](#config-references) it's easy to run it in Docker container.
@@ -943,6 +961,7 @@ You can specify a set of default modules that will be used if `modules` attribut
 }
 ```
 
+<a id="modules-shared"></a>
 ### Shared modules dependency
 
 As a rule of thumb the module configuration file should be complete, i.e. it should not depend on other configuration
@@ -1035,6 +1054,7 @@ finally we get the following config:
 }
 ```
 
+<a id="modules-required"></a>
 ### Required modules
 
 If we want to load some modules regardless the deployment (e.g. to split classpath configuration for easier maintenance) we can define them in `requiredModules` attribute.
@@ -1047,6 +1067,7 @@ If we want to load some modules regardless the deployment (e.g. to split classpa
 
 First `requiredModules` are loaded and then all the other modules.
 
+<a id="bus"></a>
 ## Event bus communication and ServiceVerticle
 
 Using Vertx' event bus is quite cumbersome. You need to make sure you send messages on proper address and of proper type.
@@ -1055,6 +1076,7 @@ but in fact you are passing messages via event bus. Note that `ServiceVerticle` 
 
 Let's imagine we have a simple verticle that wants to send a string to `UpperCaseVerticle` and receive that string in upper-case. We need to do following steps:
 
+<a id="bus-define"></a>
 ### Define service interface
 
 ```java
@@ -1067,6 +1089,7 @@ public interface UpperCaseService {
 }
 ```
 
+<a id="bus-implement"></a>
 ### Implement ServiceVerticle
 
 ```java
@@ -1092,6 +1115,7 @@ Note that all the methods in `UpperCaseService` interface return a `Future` even
 have been synchronous (i.e. `s.toUpperCase()`). It is so due to the fact that the interface is used also by the client,
 so there will be asynchronous operations to send and receive messages over event bus.
 
+<a id="bus-publish"></a>
 ### Consuming published messages
 
 If there is no need to return any value then the method in the service interface should return `void`.
@@ -1119,6 +1143,7 @@ public class NotifierVerticle extends ServiceVerticle implements NotifierService
 }
 ```
 
+<a id="bus-call"></a>
 ### Call ServiceVerticle
 
 ```java
@@ -1165,6 +1190,7 @@ public class ClientVerticle extends ComponentVerticle {
 }
 ```
 
+<a id="bus-timeout"></a>
 ### Service client timeout
 
 When you create a client using `ServiceClientFactory` or `createClient` then by default all the calls timeout after 30 seconds.
@@ -1172,6 +1198,7 @@ You can change that timeout by setting `VERTX_SERVICE_CLIENT_TIMEOUT` system or 
 It applies to all clients unless they are created using `ServiceClientFactory` and `DeliveryOptions` as argument.
 `DeliveryOptions` should have `sendTimeout` property set.
 
+<a id="bus-verticle-init"></a>
 ### ServiceVerticle initialization
 
 In vertx-server we are using hierarchy of verticles: ComponentVerticle - ServiceVerticle - RouteVerticle.
@@ -1192,6 +1219,7 @@ Let's follow Initialization sequence of `ServiceVerticle`. It covers initializat
   * call ServiceVerticle.initService
   * call ServiceVerticle.initServiceAsync
 
+<a id="bus-verticle-cleanup"></a>
 ### Verticles cleanup
 
 If your `ServiceVerticle` or `ComponentVerticle` needs to do some cleanup when the verticle is stopped, e.g. close connection pool when closing application, then implement one of `cleanup` or `cleanupAsync`.
@@ -1242,6 +1270,7 @@ public class ResourceVerticle extends ComponentVerticle {
 }
 ```
 
+<a id="di"></a>
 ## Dependency Injection and RegistryVerticle
 
 `RegistryVerticle` and `ServiceVerticle` provides Dependency Injection capabilities. `ServiceVerticle` gives you the way to define interface
@@ -1286,6 +1315,7 @@ The verticle's id can be accessed from verticle's code with `AbstractVerticle.co
 
 IMPORTANT: `config` is reserved key in the registry configuration object, it can't be used as verticle id.
 
+<a id="di-strategy"></a>
 ### Defining deployment strategy
 
 Deployment strategy controls how many instances of a verticle is deployed.
@@ -1347,6 +1377,7 @@ You can define default deployment strategy for all verticles in the registry. If
 }
 ```
 
+<a id="di-config-path"></a>
 ### Defining configuration path of ComponentVerticle or ServiceVerticle
 
 When you are deploying `ComponentVerticle` or `ServiceVerticle` you can override its default configuration path TODO (see default implementation of `configPath()` in [Configuration and verticles](#config-verticles).
@@ -1399,6 +1430,7 @@ In result, "verticle-a-id" verticle will get it's configuration from "components
 
 In result, "verticle-a-id" verticle will get it's configuration from "components.verticle-a" object and resolved json path references.
 
+<a id="di-config-inject"></a>
 ### Injecting configuration to ComponentVerticle or ServiceVerticle
 
 You can keep verticle's configuration next to its deployment options.
@@ -1418,6 +1450,7 @@ You can keep verticle's configuration next to its deployment options.
 
 In result, "verticle-a-id" verticle is configured with `{ "ttl": 1000 }`.
 
+<a id="di-impls"></a>
 ### Deploying multiple implementations of VertxEndpoint
 
 `ServiceVerticle.vertxServiceAddressPrefix()` method allows to deploy multiple verticles implementing the same `@VertxEndpoint` interface.
@@ -1450,6 +1483,7 @@ Alternatively, we can set `prefix` to custom address:
 }
 ```
 
+<a id="di-deployment-opts"></a>
 ### Defining custom DeploymentOptions
 You can make the RegistryVerticle to deploy verticle using custom io.vertx.core.DeploymentOptions defined in configuration file. To do so add JSON object "options" key at the level of "main" key.
 
@@ -1468,6 +1502,7 @@ For example, let's deploy 4 instances ServiceVerticleA:
 }
 ```
 
+<a id="di-disable"></a>
 ### Disabling verticle
 You can skip deployment of a verticle defined in registry. To do so, set `disabled` flag to true.
 
@@ -1483,6 +1518,7 @@ E.g.
 }
 ```
 
+<a id="server"></a>
 ## Serving HTTP requests and ApiServer
 
 `vertx-server` gives you easy way to define HTTP APIs. You've already seen in TODO <<Step by step setup>> section how to configure
@@ -1491,6 +1527,7 @@ The [vertx-web docs](http://vertx.io/docs/vertx-web/java) will guide you how to 
 to the [chase](http://vertx.io/docs/vertx-web/java/#_handling_requests_and_calling_the_next_handler)).
 Let's focus on routes configuration now.
 
+<a id="server-routes"></a>
 ### Routes configuration
 
 ```json
@@ -1600,6 +1637,7 @@ E.g. let's append extra route:
 }
 ```
 
+<a id="server-filters"></a>
 ### HTTP filters
 
 If you want to apply HTTP filters to your route you need to add filter configuration in `filters` attribute, e.g.:
@@ -1782,6 +1820,7 @@ If your filter does not accept configuration use `Unit` as type of configuration
 
 Note: `ScalaRouteFilterVerticle` caches decoded configuration.
 
+<a id="server-config"></a>
 ### HTTP server configuration
 vertx-server uses `io.vertx.core.http.HttpServer` as underlying implementation.
 You can provide its `io.vertx.core.http.HttpServerOptions` in "apiServer.http" configuration.
@@ -1804,6 +1843,7 @@ For example, let's define that the HTTP server starts on port 8081 and binds to 
 }
 ```
 
+<a id="server-multiple"></a>
 ### Deploying multiple servers
 
 By default configuration of API server and its routes and filters are at `apiServer`, `registry:routes` and `registry:filters` configuration paths.
@@ -1846,8 +1886,10 @@ the configuration should look like this:
 
 `anotherApiServer.routesRegistry` and `anotherApiServer.filtersRegistry` attributes define names of the corresponding registries.
 
+<a id="examples"></a>
 ## Examples
 
+<a id="examples-route"></a>
 ### Create RouteVerticle with configuration access
 We gonna create RouteVerticle that serves static content read from configuration.
 
@@ -1921,6 +1963,7 @@ Final config.json:
 }
 ```
 
+<a id="examples-route-service"></a>
 ### Create RouteVerticle passing request param to ServiceVerticle
 We gonna create a RandomGenerator service that generates random integer smaller than value given as method argument. Next, we create a RouteVerticle that reads request path parameter and passes it to RandomGenerator to generate value.
 
@@ -2053,6 +2096,7 @@ Final config.json:
 }
 ```
 
+<a id="examples-route-service-multiple"></a>
 ### Create RouteVerticle dispatching request to one of multiple VertxEndpoint implementations
 
 We gonna create a DateTimeGenerator service that returns string representation of current date-time. It reads the timezone from configuration. There will be two instances of DateTimeGenerator: GMT and Europe/Warsaw. The RouteVerticle will decide what time generator should be used based on the request parameter.
