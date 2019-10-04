@@ -387,7 +387,7 @@ Default value is optional, so we can have following configuration:
 
 For unit testing it might be cumbersome to provide environment or system variables. To facilitate testing, instead of setting those variables
 you can define a map in the root configuration at `env` or `sys` attribute and provide values for the variables.
-If environment or system variable is not set then there is an attempt to read it from corresponding attribute in root configuration.
+Environment or system variable is overridden by the value read from corresponding attribute in root configuration.
 
 For example let's have following reference to `CASSANDRA_PORT` variable that was not set as environment variable:
 

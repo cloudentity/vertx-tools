@@ -108,7 +108,7 @@ public class ConfReference {
   }
 
   private static Function<String, String> resolveSysVariableWithFallback(JsonObject conf) {
-    return ref -> Optional.ofNullable(System.getProperty(ref)).orElse(getVariableFallback(conf, "sys", ref));
+    return ref -> Optional.ofNullable(getVariableFallback(conf, "sys", ref)).orElse(System.getProperty(ref));
   }
 
   /**
@@ -128,7 +128,7 @@ public class ConfReference {
   }
 
   private static Function<String, String> resolveEnvVariableWithFallback(JsonObject conf) {
-    return ref -> Optional.ofNullable(System.getenv(ref)).orElse(getVariableFallback(conf, "env", ref));
+    return ref -> Optional.ofNullable(getVariableFallback(conf, "env", ref)).orElse(System.getenv(ref));
   }
 
   private static String getVariableFallback(JsonObject conf, String variableType, String variableName) {
