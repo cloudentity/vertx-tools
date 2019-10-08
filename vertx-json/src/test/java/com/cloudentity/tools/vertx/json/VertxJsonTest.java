@@ -16,6 +16,7 @@ public class VertxJsonTest {
   @Before
   public void setUp() throws Exception {
     VertxJson.registerJsonObjectDeserializer();
+    VertxJson.configureJsonMapper();
   }
 
   @Test

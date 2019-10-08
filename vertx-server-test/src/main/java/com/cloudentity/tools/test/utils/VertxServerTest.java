@@ -77,6 +77,7 @@ abstract public class VertxServerTest {
 
   protected void configureRestAssured(JsonObject metaConfJson) throws IOException {
     VertxJson.registerJsonObjectDeserializer();
+    VertxJson.configureJsonMapper();
 
     ConfigRetrieverConf metaConf = ConfigFactory.build(metaConfJson, ConfigRetrieverConf.class);
     String configPath = metaConf.getStores().get(0).getConfig().getString("path");

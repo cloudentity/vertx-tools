@@ -34,6 +34,7 @@ public class VertxBootstrap extends AbstractVerticle {
   public void start(Future startFuture) throws Exception {
     VertxBus.registerPayloadCodec(vertx.eventBus());
     VertxJson.registerJsonObjectDeserializer();
+    VertxJson.configureJsonMapper();
 
     String runMode = getRunMode();
     switch (runMode) {
