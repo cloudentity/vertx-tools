@@ -764,8 +764,6 @@ When configuration references have been resolved then "my-service-verticle" stor
 ### Custom configuration stores
 
 * [classpath](docs/config-stores/classpath.md)
-* [classpath-folder](docs/config-stores/classpath-folder.md)
-* [consul-folder](docs/config-stores/consul-folder.md)
 * [consul-json](docs/config-stores/consul-json.md)
 * [vault-keycerts](docs/config-stores/vault-keycerts.md)
 * [ext](docs/config-stores/ext.md)
