@@ -27,6 +27,7 @@ import java.util.*;
  * * `sourceFormat` - optional, format of the underlying configuration object, supported formats: 'json' (JSON object, default), 'string', `hocon`, `json-array`
  * * `base64Encode` - optional, default false, if true then it base64-encodes the config value
  * * `maskSecrets` - optional, default false, if true then config values are masked when printed in init log
+ * * `cache` - optional, default false, if true then config values are read only once and are not refreshed
  *
  * ===== Example - wrapping JsonObject configuration attribute:
  * Let's use FileExtConfigStore that wraps FileConfigStore.
@@ -112,21 +113,29 @@ public class ExtConfigStore implements ConfigStore {
   private final Optional<String> sourcePathOpt;
   private boolean base64Encode;
   private boolean maskSecrets;
+  private boolean cache;
 
-  public ExtConfigStore(ConfigStore store, Optional<String> outputPathOpt, Optional<String> sourceFormatOpt, Optional<String> sourcePathOpt, boolean base64Encode, boolean maskSecrets) {
+  private Buffer cached;
+
+  public ExtConfigStore(ConfigStore store, Optional<String> outputPathOpt, Optional<String> sourceFormatOpt, Optional<String> sourcePathOpt, boolean base64Encode, boolean maskSecrets, boolean cache) {
     this.store = store;
     this.outputPathOpt = outputPathOpt;
     this.sourceFormatOpt = sourceFormatOpt;
     this.sourcePathOpt = sourcePathOpt;
     this.base64Encode = base64Encode;
     this.maskSecrets = maskSecrets;
+    this.cache = cache;
   }
 
   @Override
   public void get(Handler<AsyncResult<Buffer>> handler) {
-    Future<Buffer> fut = Future.future();
-    store.get(fut);
-    fut.map(this::base64EncodeConfig).map(this::wrapConfig).map(this::maskSecrets).setHandler(handler);
+    if (cache && cached != null) {
+      handler.handle(Future.succeededFuture(cached));
+    } else {
+      Future<Buffer> fut = Future.future();
+      store.get(fut);
+      fut.map(this::base64EncodeConfig).map(this::wrapConfig).map(this::maskSecrets).map(this::cache).setHandler(handler);
+    }
   }
 
   private Buffer wrapConfig(Buffer buffer) {
@@ -173,6 +182,15 @@ public class ExtConfigStore implements ConfigStore {
     if (maskSecrets) {
       JsonObject o = buffer.toJsonObject();
       return o.put("_mask", SecretsMask.create(o)).toBuffer();
+    } else {
+      return buffer;
+    }
+  }
+
+  private Buffer cache(Buffer buffer) {
+    if (cache) {
+      this.cached = buffer;
+      return buffer;
     } else {
       return buffer;
     }

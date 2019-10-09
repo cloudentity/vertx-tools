@@ -20,6 +20,7 @@ ExtConfigStore config attributes:
 * `sourceFormat` - optional, format of the underlying configuration object, supported formats: 'json' (JSON object, default), 'string', `hocon`, `json-array`
 * `base64Encode` - optional, default false, if true then it base64-encodes the config value
 * `maskSecrets` - optional, default false, if true then config values are masked when printed in init log
+* `cache` - optional, default false, if true then config values are read only once and are not refreshed
 
 ##### Example - wrapping JsonObject configuration attribute:
 Let's use FileExtConfigStore that wraps FileConfigStore.

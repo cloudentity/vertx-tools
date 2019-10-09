@@ -15,8 +15,9 @@ public class ExtConfigStoreFactory {
     Optional<String> outputPathOpt = Optional.ofNullable(extConf.getString("outputPath"));
     Optional<String> sourceFormatOpt = Optional.ofNullable(extConf.getString("sourceFormat"));
     Optional<String> sourcePathOpt = Optional.ofNullable(extConf.getString("sourcePath"));
-    boolean encodeBase64 = extConf.getBoolean("base64Encode", false);
-    boolean maskSecrets = extConf.getBoolean("maskSecrets", false);
-    return new ExtConfigStore(configStore, outputPathOpt, sourceFormatOpt, sourcePathOpt, encodeBase64, maskSecrets);
+    boolean encodeBase64 = Optional.ofNullable(extConf.getBoolean("base64Encode")).orElse(false);
+    boolean maskSecrets = Optional.ofNullable(extConf.getBoolean("maskSecrets")).orElse(false);
+    boolean cache = Optional.ofNullable(extConf.getBoolean("cache")).orElse(false);
+    return new ExtConfigStore(configStore, outputPathOpt, sourceFormatOpt, sourcePathOpt, encodeBase64, maskSecrets, cache);
   }
 }
