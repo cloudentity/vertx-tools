@@ -37,8 +37,6 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
   * [Integration with Vault](#meta-vault)
   * [Custom configuration stores](#meta-custom-stores)
     * [classpath](docs/config-stores/classpath.md)
-    * [classpath-folder](docs/config-stores/classpath-folder.md)
-    * [consul-folder](docs/config-stores/consul-folder.md)
     * [consul-json](docs/config-stores/consul-json.md)
     * [vault-keycerts](docs/config-stores/vault-keycerts.md)
     * [ext](docs/config-stores/ext.md)
