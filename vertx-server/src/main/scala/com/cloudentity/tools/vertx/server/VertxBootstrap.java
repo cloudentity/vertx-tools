@@ -40,7 +40,7 @@ public class VertxBootstrap extends AbstractVerticle {
     switch (runMode) {
       case "standard":
         initLog.info("Starting application");
-        ConfVerticleDeploy.deployVerticleFromConf(vertx, config())
+        ConfVerticleDeploy.deployVerticleFromMetaConfig(vertx, config())
           .compose(x -> VertxDeploy.deploy(vertx, new TracingVerticle()))
           .compose(x -> VertxDeploy.deploy(vertx, new ShutdownVerticle(false)))
           .compose(deploymentId -> {
@@ -59,7 +59,7 @@ public class VertxBootstrap extends AbstractVerticle {
         ConfPrinter.logMetaConfigEnvVariables(config(), log);
         logAvailableModules();
 
-        ConfVerticleDeploy.deployVerticleFromConf(vertx, config())
+        ConfVerticleDeploy.deployVerticleFromMetaConfig(vertx, config())
           .setHandler(async -> {
             vertx.close();
             if (async.succeeded()) Future.succeededFuture();

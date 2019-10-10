@@ -29,11 +29,9 @@ public class ConfVerticleDeploy {
    *   ]
    * }
    */
-  public static Future<String> deployVerticleFromConf(Vertx vertx, JsonObject conf) {
+  public static Future<String> deployVerticleFromMetaConfig(Vertx vertx, JsonObject metaConfig) {
     try {
-      JsonObject resolvedConf = ConfReference.populateRefs(conf, conf);
-      ConfigRetriever retriever = ConfigRetrieverFactory.buildFromJson(vertx, resolvedConf);
-      return VertxDeploy.deploy(vertx, new ConfVerticle(retriever));
+      return VertxDeploy.deploy(vertx, new ConfVerticle(vertx, metaConfig));
     } catch (Throwable ex) {
       return Future.failedFuture(ex);
     }
@@ -45,13 +43,5 @@ public class ConfVerticleDeploy {
 
   public static Future<String> deployFileConfVerticle(Vertx vertx, String configFilePath, ConfigRetrieverOptions retOpts) {
     return VertxDeploy.deploy(vertx, new ConfVerticle(ConfigRetrieverFactory.buildFileRetriever(vertx, configFilePath, retOpts)));
-  }
-
-  public static Future<String> deployDirectoryConfVerticle(Vertx vertx, String configDirectoryPath) {
-    return deployDirectoryConfVerticle(vertx, configDirectoryPath, new ConfigRetrieverOptions());
-  }
-
-  public static Future<String> deployDirectoryConfVerticle(Vertx vertx, String configDirectoryPath, ConfigRetrieverOptions retOpts) {
-    return VertxDeploy.deploy(vertx, new ConfVerticle(ConfigRetrieverFactory.buildDirectoryRetriever(vertx, configDirectoryPath, retOpts)));
   }
 }

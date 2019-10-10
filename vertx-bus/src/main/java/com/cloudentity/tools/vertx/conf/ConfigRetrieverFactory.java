@@ -37,28 +37,6 @@ public class ConfigRetrieverFactory {
     return ConfigRetriever.create(vertx, retOpts);
   }
 
-  public static ConfigRetriever buildDirectoryRetriever(Vertx vertx, String descriptorsDirectoryPath) {
-    return buildDirectoryRetriever(vertx, descriptorsDirectoryPath, new ConfigRetrieverOptions());
-  }
-
-  public static ConfigRetriever buildDirectoryRetriever(Vertx vertx, String descriptorsDirectoryPath, ConfigRetrieverOptions retOpts) {
-    ConfigStoreOptions dir = new ConfigStoreOptions()
-      .setType("directory")
-      .setConfig(new JsonObject()
-        .put("path", descriptorsDirectoryPath)
-        .put("filesets",
-          new JsonArray().add(new JsonObject().put("pattern", "*.json"))
-        )
-      );
-
-    retOpts.setStores(Lists.newArrayList(dir));
-    return ConfigRetriever.create(vertx, retOpts);
-  }
-
-  public static ConfigRetriever buildFileRetriever(Vertx vertx, String descriptorsFilePath) {
-    return buildFileRetriever(vertx, descriptorsFilePath, new ConfigRetrieverOptions());
-  }
-
   public static ConfigRetriever buildFileRetriever(Vertx vertx, String descriptorsFilePath, ConfigRetrieverOptions retOpts) {
     ConfigStoreOptions file = new ConfigStoreOptions()
       .setType("file")

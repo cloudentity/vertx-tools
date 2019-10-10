@@ -8,6 +8,7 @@ import io.vavr.control.Either;
 import io.vertx.config.ConfigChange;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,15 @@ public class ConfVerticle extends ServiceVerticle implements ConfService {
     this.retriever = retriever;
   }
 
+  public ConfVerticle(Vertx vertx, JsonObject metaConfig) {
+    initLog.info("Environment variables in meta configuration: ");
+    ConfPrinter.logMaskedEnvVariables(metaConfig, log);
+
+    JsonObject resolvedMetaConf = ConfReference.populateRefs(metaConfig, metaConfig);
+    ConfigRetriever retriever = ConfigRetrieverFactory.buildFromJson(vertx, resolvedMetaConf);
+    this.retriever = retriever;
+  }
+
   JsonObject globalConf;
   JsonObject rawGlobalConf;
 
@@ -52,7 +62,7 @@ public class ConfVerticle extends ServiceVerticle implements ConfService {
   }
 
   private Future<Void> setInitialConfig(JsonObject config) {
-    log.debug("Unresolved root configuration: {}", config);
+    initLog.debug("Unresolved root configuration: {}", config);
     rawGlobalConf = config;
 
     Either<List<ConfBuilder.MissingModule>, ConfBuilder.Config> configResult = ConfBuilder.buildFinalConfig(config);
@@ -71,7 +81,7 @@ public class ConfVerticle extends ServiceVerticle implements ConfService {
       });
 
       initLog.info("Configuration: {}", cfg.resolvedConfigWithMask);
-      log.debug("Configuration:\n{}", globalConf.encodePrettily());
+      initLog.debug("Configuration:\n{}", globalConf.encodePrettily());
 
       return Future.<Void>succeededFuture();
     } else {

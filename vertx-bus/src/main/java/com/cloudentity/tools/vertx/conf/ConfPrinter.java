@@ -18,6 +18,14 @@ public class ConfPrinter {
   private static final int MAX_COL_WIDTH = 35;
 
   public static void logEnvVariables(JsonObject conf, Logger log) {
+    logEnvVariables(conf, log, false);
+  }
+
+  public static void logMaskedEnvVariables(JsonObject conf, Logger log) {
+    logEnvVariables(conf, log, true);
+  }
+
+  private static void logEnvVariables(JsonObject conf, Logger log, boolean maskValues) {
     List<ResolvedRef> rows =
       ConfReference.findResolvedEnvRefs(conf).stream()
         .filter(ConfPrinter::filterOutEmptyOptional)
@@ -28,7 +36,7 @@ public class ConfPrinter {
         Arrays.asList(
           column("STATE").dataAlign(CENTER).with(ref -> evnState(ref)),
           column("ENV").with(ref -> ref.ref.path),
-          column("VALUE").with(ref -> ref.resolvedValue != null ? ref.resolvedValue.toString() : "null"),
+          column("VALUE").with(ref -> { if (maskValues) return  "***"; else return ref.resolvedValue != null ? ref.resolvedValue.toString() : "null"; }),
           column("DEFAULT").with(ref -> ref.ref.defaultValue.orElse("null")),
           column("TYPE").with(ref -> ref.ref.valueType.orElse("string"))
         )
@@ -84,7 +92,7 @@ public class ConfPrinter {
       if (store instanceof JsonObject) {
         JsonObject obj = (JsonObject) store;
         InitLog.of(log).info("- " + ((JsonObject) store).getString("type"));
-        ConfPrinter.logEnvVariables(obj, log);
+        ConfPrinter.logEnvVariables(obj, log, true);
       }
     });
   }
