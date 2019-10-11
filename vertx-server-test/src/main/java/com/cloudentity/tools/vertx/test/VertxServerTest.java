@@ -1,4 +1,4 @@
-package com.cloudentity.tools.test.utils;
+package com.cloudentity.tools.vertx.test;
 
 import com.cloudentity.tools.vertx.conf.ConfReference;
 import com.cloudentity.tools.vertx.conf.retriever.ConfigRetrieverConf;

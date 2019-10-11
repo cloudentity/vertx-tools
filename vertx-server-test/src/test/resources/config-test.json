@@ -16,6 +16,6 @@
     "static-response": "OK"
   },
   "registry:routes": {
-    "test-route": { "main": "com.cloudentity.tools.test.utils.TestRoute" }
+    "test-route": { "main": "com.cloudentity.tools.vertx.test.TestRoute" }
   }
 }

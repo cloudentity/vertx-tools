@@ -1,4 +1,4 @@
-package com.cloudentity.tools.test.utils;
+package com.cloudentity.tools.vertx.test;
 
 import com.cloudentity.tools.vertx.server.api.routes.RouteVerticle;
 import io.vertx.ext.web.RoutingContext;

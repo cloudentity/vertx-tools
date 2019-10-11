@@ -1,4 +1,4 @@
-package com.cloudentity.tools.test.utils;
+package com.cloudentity.tools.vertx.test;
 
 import io.restassured.RestAssured;
 import org.junit.Test;
