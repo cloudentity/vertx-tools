@@ -1,0 +1,27 @@
+{
+  "apiServer": {
+    "http": {
+      "port": 7774
+    },
+    "routes": {
+      "a": [
+        {
+          "id": "test-route",
+          "method": "GET",
+          "urlPath": "/test"
+        }
+      ],
+      "b": [
+        {
+          "id": "scala-test-route",
+          "method": "GET",
+          "urlPath": "/scala-test"
+        }
+      ]
+    }
+  },
+  "registry:routes": {
+    "test-route":       { "main": "com.cloudentity.tools.vertx.server.api.TestRoute" },
+    "scala-test-route": { "main": "com.cloudentity.tools.vertx.server.api.ScalaTestRoute" }
+  }
+}

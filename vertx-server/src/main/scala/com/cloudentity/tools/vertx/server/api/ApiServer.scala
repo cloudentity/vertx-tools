@@ -22,7 +22,7 @@ class ApiServer(serverConf: ApiServerConf) extends AbstractVerticle with FutureC
   implicit lazy val ec = VertxExecutionContext(vertx.getOrCreateContext())
 
   override def start(async: VxFuture[Void]): Unit = {
-    val allRouteConfs = serverConf.prependRoutes.getOrElse(Nil) ::: serverConf.routes ::: serverConf.appendRoutes.getOrElse(Nil)
+    val allRouteConfs = serverConf.prependRoutes.getOrElse(Nil) ::: serverConf.routes.value ::: serverConf.appendRoutes.getOrElse(Nil)
     val activeRouteConfs = allRouteConfs.filterNot(route => serverConf.disabledRoutes.getOrElse(Nil).contains(route.id))
 
     val createServer: Future[(List[(RouteConf, RouteService)], Router)] =

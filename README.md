@@ -1563,6 +1563,10 @@ Route configuration has following fields:
 Route configuration is used to register `io.vertx.ext.web.Route` using `io.vertx.ext.web.Router.route(HttpMethod, String)`.
 If method attribute in configuration is missing then `Router.route(String)` method is used instead (effectively the Route matches all requests with given urlPath regardless HTTP method).
 
+> NOTE<br/>
+> `routes` can also be defined as a map from string to an array of route objects.
+> All the arrays are joined in a single array and then the logic for default array routes configuration format applies. The order of joining is undefined.
+
 #### Base path
 
 You can set server's base path using 'basePath' attribute, e.g.:
