@@ -28,7 +28,7 @@ class ApiServerRoot() extends ScalaComponentVerticle {
             for {
               _ <- RegistryVerticle.deploy(vertx, serverConf.routesRegistry.getOrElse("routes")).toScala()
               _ <- RegistryVerticle.deploy(vertx, serverConf.filtersRegistry.getOrElse("filters"), false).toScala()
-              _ <- validateFilterConfs(vertx, serverConf.routes.flatMap(_.filters.getOrElse(Nil)))
+              _ <- validateFilterConfs(vertx, serverConf.routes.value.flatMap(_.filters.getOrElse(Nil)))
               _ <- deployServers(vertx, serverConf)
             } yield (())
         case Left(ex) =>
