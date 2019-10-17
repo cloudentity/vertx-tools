@@ -96,7 +96,7 @@ Note: vertx-tools are not available in public Maven repository. Build them first
 The best place to put it is `src/main/resources`. Let's assume we want to load configuration from a local file.
 The `meta-config.json` should contain following code:
 
-```json
+```
 {
   "scanPeriod": 5000,
   "stores": [
@@ -116,7 +116,7 @@ The `meta-config.json` should contain following code:
 In previous step we configured the app to read configuration from `src/main/resources/config.json` file. The minimal configuration looks like this:
 
 
-```json
+```
 {
   "apiServer": {
     "http": {
@@ -242,7 +242,7 @@ The easiest way to have access to configuration from `ConfVerticle` is to extend
 
 Let's assume the global configuration JsonObject is as follows:
 
-```json
+```
 {
   "apiServer": {
     "http": {
@@ -287,7 +287,7 @@ the reference string is a path at which the value that should be injected is.
 
 For example, the following configuration:
 
-```json
+```
 {
   "verticle-a": {
     "cassandra-port": "$ref:cassandra.port",
@@ -303,7 +303,7 @@ For example, the following configuration:
 
 after reference resolution looks like this:
 
-```json
+```
 {
   "verticle-a": {
     "cassandra-port": 9000,
@@ -326,7 +326,7 @@ When the value cannot be resolved at `{reference-path}` then default-value is ca
 
 E.g. following config resolves server.port to 80:
 
-```json
+```
 {
   "server": {
     "port": "$ref:port:int:8080"
@@ -337,7 +337,7 @@ E.g. following config resolves server.port to 80:
 
 E.g. following config resolves server.port to 8080:
 
-```json
+```
 {
   "server": {
     "port": "$ref:port:int:8080"
@@ -354,7 +354,7 @@ System and environment properties are resolved using `System.getProperty` and `S
 
 Example, following configuration:
 
-```json
+```
 {
   "cassandra-port": "$env:CASSANDRA_PORT:int:9000"
 }
@@ -362,7 +362,7 @@ Example, following configuration:
 
 is resolved to this one (provided CASSANDRA_PORT environment property is set to 8000):
 
-```json
+```
 {
   "cassandra-port": 8000
 }
@@ -370,14 +370,14 @@ is resolved to this one (provided CASSANDRA_PORT environment property is set to 
 
 or to this one (provided CASSANDRA_PORT is not set):
 
-```json
+```
 {
   "cassandra-port": 9000
 }
 ```
 Default value is optional, so we can have following configuration:
 
-```json
+```
 {
   "cassandra-port": "$env:CASSANDRA_PORT:int"
 }
@@ -394,7 +394,7 @@ Environment or system variable is overridden by the value read from correspondin
 
 For example let's have following reference to `CASSANDRA_PORT` environment variable:
 
-```json
+```
 {
   "cassandra-port": "$env:CASSANDRA_PORT:int",
   "env": {
@@ -405,7 +405,7 @@ For example let's have following reference to `CASSANDRA_PORT` environment varia
 
 After resolution, we end up with the following configuration:
 
-```json
+```
 {
   "cassandra-port": 9000,
   "env": {
@@ -421,7 +421,7 @@ To do so, property name should be wrapped in curly braces `{` and `}`.
 
 For example, given `KEY=user` and following configuration:
 
-```json
+```
 {
   "path": "$env:/apis/{KEY}:string"
 }
@@ -431,7 +431,7 @@ the value of `path` is `/apis/user`.
 
 We can also use default value:
 
-```json
+```
 {
   "path": "$env:/apis/{KEY}:string:session"
 }
@@ -449,7 +449,7 @@ As an example, let's have KAFKA_TOPICS env variable set to `["value1", "value2"]
 
 The following configuration:
 
-```json
+```
 {
   "topics": "$env:KAFKA_TOPICS:array"
 }
@@ -457,7 +457,7 @@ The following configuration:
 
 is resolved to:
 
-```json
+```
 {
   "topics": ["value1", "value2"]
 }
@@ -465,7 +465,7 @@ is resolved to:
 
 You can use default value as well:
 
-```json
+```
 {
   "topics": "$env:KAFKA_TOPICS:array:[\"value1\", \"value1\"]"
 }
@@ -476,7 +476,7 @@ You can use default value as well:
 If a reference could not be resolved and had no default value then warning is logged.
 If configuration attribute is optional you can prepend `?` to its reference path to silence the warning.
 
-```json
+```
 {
   "consul": {
     "tags": "$env:?CONSUL_TAGS:array"
@@ -499,7 +499,7 @@ Let's consider scenario where we need to configure object with one-of alternativ
 As an example let's configure `HttpServerOptions.trustOptions`. To do so you choose one of: PemTrustOptions, JksTrustOptions or PfxTrustOptions.
 If you choose PemTrustOptions, then `pemTrustOptions` configuration attribute should be set and `jksTrustOptions` and `pfxTrustOptions` should be `null`.
 
-```json
+```
 {
   "pemTrustOptions": {
     "certPaths": ["/etc/ssl/cert.pem"]
@@ -509,7 +509,7 @@ If you choose PemTrustOptions, then `pemTrustOptions` configuration attribute sh
 
 Let's configure `trustOptions` using environment variables:
 
-```json
+```
 {
   "pemTrustOptions": {
     "certPaths": "$env:PEM_CERT_PATHS:array"
@@ -528,7 +528,7 @@ have value of empty JSON object. We need `jksTrustOptions` and `pfxTrustOptions`
 
 In order to do so we need to set `_nullify` attribute to `true` in all config objects:
 
-```json
+```
 {
   "pemTrustOptions": {
     "_nullify": true,
@@ -549,7 +549,7 @@ If `_nullify` attribute is set and all other attributes in JsonObject are `null`
 
 In our example, if `PEM_CERT_PATHS` is only variable set then we end up with following final configuration:
 
-```json
+```
 {
   "pemTrustOptions": {
     "certPaths": ["/etc/ssl/cert.pem"]
@@ -566,7 +566,7 @@ See section on [ServiceVerticle initialization](#bus-verticle-init).
 When we start `vertx-server` application we need to pass path to `meta-config.json` in the command line argument `-conf`.
 Sample `meta-config.json` looks like this:
 
-```json
+```
 {
   "scanPeriod": 5000,
   "stores": [
@@ -611,7 +611,7 @@ You can register `ComponentVerticle` to receive information whenever global conf
 
 You can use `enabled` flag to control whether config store should be used. It's set to `true` by default:
 
-```json
+```
 {
   "scanPeriod": 5000,
   "stores": [
@@ -630,7 +630,7 @@ You can use `enabled` flag to control whether config store should be used. It's 
 If `enabled` is `false` then the entry is filtered out from the `stores` array. If you reference environment variable
 (see [Configuration references](#config-references)) then you can control what config stores are used without changing content of meta config file.
 
-```json
+```
 {
  "scanPeriod": 5000,
  "stores": [
@@ -657,7 +657,7 @@ You need to provide JSON object at "vertx.options" path that is decoded to Vertx
 
 Add Vault store in `meta-config.json`:
 
-```json
+```
 {
   "type": "vault",
   "format": "json",
@@ -695,7 +695,7 @@ Let's assume we store two passwords in Vault:
 
 and we have following `meta-config.json`:
 
-```json
+```
 {
   "scanPeriod": 5000,
   "stores": [
@@ -723,7 +723,7 @@ and we have following `meta-config.json`:
 
 Following config.json:
 
-```json
+```
 {
   "my-service-verticle": {
     "password1": "$ref:pass1",
@@ -734,7 +734,7 @@ Following config.json:
 
 The final configuration object looks like this:
 
-```json
+```
 {
   "my-service-verticle": {
     "password1": "$ref:pass1",
@@ -748,7 +748,7 @@ The final configuration object looks like this:
 
 When configuration references have been resolved then "my-service-verticle" stores passwords from Vault:
 
-```json
+```
 {
   "my-service-verticle": {
     "password1": "!@#$",
@@ -785,7 +785,7 @@ Module configuration should reference environment variable for those attributes 
 
 Let’s say our root configuration looks like this:
 
-```json
+```
 {
   "apiServer": {
     "http": {
@@ -805,7 +805,7 @@ The modules configuration should be stored on classpath in `modules` folder. Thi
 
 Let `modules/policy-storage/cassandra.json` has following content:
 
-```json
+```
 {
   "cassandra": {
     "host": "localhost",
@@ -816,7 +816,7 @@ Let `modules/policy-storage/cassandra.json` has following content:
 
 and `modules/sd-registrar/consul.json` following:
 
-```json
+```
 {
   "consul": {
     "host": "localhost",
@@ -829,7 +829,7 @@ and `modules/sd-registrar/consul.json` following:
 
 The global configuration looks as follows:
 
-```json
+```
 {
   "apiServer": {
     "http": {
@@ -864,7 +864,7 @@ you learn how to deploy them. The application must start a verticle registry tha
 
 The simplest root configuration looks like this:
 
-```json
+```
 {
   "registry:components": {
   },
@@ -876,7 +876,7 @@ The simplest root configuration looks like this:
 
 The modules configuration can look like this:
 
-```json
+```
 {
   "registry:components": {
     "module-a-verticle": {
@@ -891,7 +891,7 @@ The modules configuration can look like this:
 
 and
 
-```json
+```
 {
   "registry:components": {
     "module-b-verticle": {
@@ -903,7 +903,7 @@ and
 
 When modules configuration and root configuration is merged we end up with following configuration:
 
-```json
+```
 {
   "registry:components": {
     "module-a-verticle": {
@@ -931,7 +931,7 @@ If you build your application using modules with environment variable references
 
 Your `modules` configuration attribute should have following value:
 
-```json
+```
 {
   "modules": "$env:MODULES:array"
 }
@@ -955,7 +955,7 @@ As an extra feature, `ConfVerticle` prints out what env variables are used and w
 
 You can specify a set of default modules that will be used if `modules` attribute is not set.
 
-```json
+```
 {
   "modules": "$env:MODULES:array",
   "defaultModules": ["module-a", "module-b"]
@@ -979,7 +979,7 @@ Example:
 
 Let's have two modules that require open-api client verticle. The configuration of module A should like like this:
 
-```json
+```
 {
   "registry:components": {
     "sevice-x-client": {
@@ -1003,7 +1003,7 @@ Let's have two modules that require open-api client verticle. The configuration 
 
 similarly module B:
 
-```json
+```
 {
   "registry:components": {
     "sevice-x-client": {
@@ -1027,7 +1027,7 @@ similarly module B:
 
 finally we get the following config:
 
-```json
+```
 {
   "registry:components": {
     "sevice-x-client": {
@@ -1060,7 +1060,7 @@ finally we get the following config:
 
 If we want to load some modules regardless the deployment (e.g. to split classpath configuration for easier maintenance) we can define them in `requiredModules` attribute.
 
-```json
+```
 {
   "requiredModules": ["module-x"]
 }
@@ -1295,7 +1295,7 @@ public class App extends VertxBootstrap {
 The "components" `RegistryVerticle` gets its configuration at "registry:components" key and deploys defined verticles.
 The minimal registry configuration has following structure:
 
-```json
+```
 {
   "registry:components": {
     "verticle-a-id": {
@@ -1327,7 +1327,7 @@ By default `simple` strategy is used, which uses `options.instances` attribute f
 
 The following configuration deploys 5 instances of `com.example.Verticle``:
 
-```json
+```
 {
   "registry:components": {
     "verticle-id": {
@@ -1347,7 +1347,7 @@ Default value of `options.instances` is 1.
 CPU deployment strategy deploys one verticle instance per available CPU.
 To use it set `deploymentStrategy` to `cpu` in verticle descriptor:
 
-```json
+```
 {
   "registry:components": {
     "verticle-id": {
@@ -1365,7 +1365,7 @@ If you want to deploy 2 times number of CPUs then use `cpux2` deployment strateg
 You can define default deployment strategy for all verticles in the registry. If deployment strategy is not defined in the verticle descriptor, then default one is used. To do so set `config.defaultDeploymentStrategy`:
 
 .default deployment strategy
-```json
+```
 {
   "registry:components": {
     "config": {
@@ -1384,7 +1384,7 @@ You can define default deployment strategy for all verticles in the registry. If
 When you are deploying `ComponentVerticle` or `ServiceVerticle` you can override its default configuration path TODO (see default implementation of `configPath()` in [Configuration and verticles](#config-verticles).
 To do so add "configPath" string at the level of "main" key:
 
-```json
+```
 {
   "registry:components": {
     "verticle-a-id": {
@@ -1402,7 +1402,7 @@ To do so add "configPath" string at the level of "main" key:
 
 In result, "verticle-a-id" verticle will get it's configuration from "components.verticle-a" object.
 
-```json
+```
 {
   "registry:components": {
     "verticle-a-id": {
@@ -1436,7 +1436,7 @@ In result, "verticle-a-id" verticle will get it's configuration from "components
 
 You can keep verticle's configuration next to its deployment options.
 
-```json
+```
 {
   "registry:components": {
     "verticle-a-id": {
@@ -1458,7 +1458,7 @@ In result, "verticle-a-id" verticle is configured with `{ "ttl": 1000 }`.
 Instead of setting the address value programmatically we can use verticle's id defined in `Registry` configuration.
 To do so set `prefix` attribute to true:
 
-```json
+```
 {
   "registry:components": {
     "verticle-a-id": {
@@ -1473,7 +1473,7 @@ In this case `vertxServiceAddressPrefix()` returns `verticle-a-id`.
 
 Alternatively, we can set `prefix` to custom address:
 
-```json
+```
 {
   "registry:components": {
     "verticle-a-id": {
@@ -1490,7 +1490,7 @@ You can make the RegistryVerticle to deploy verticle using custom io.vertx.core.
 
 For example, let's deploy 4 instances ServiceVerticleA:
 
-```json
+```
 {
   "registry:components": {
     "verticle-a-id": {
@@ -1508,7 +1508,7 @@ For example, let's deploy 4 instances ServiceVerticleA:
 You can skip deployment of a verticle defined in registry. To do so, set `disabled` flag to true.
 
 E.g.
-```json
+```
 {
   "registry:components": {
     "verticle-a-id": {
@@ -1531,7 +1531,7 @@ Let's focus on routes configuration now.
 <a id="server-routes"></a>
 ### Routes configuration
 
-```json
+```
 {
   "apiServer": {
     ...
@@ -1567,7 +1567,7 @@ If method attribute in configuration is missing then `Router.route(String)` meth
 
 You can set server's base path using 'basePath' attribute, e.g.:
 
-```json
+```
 {
   "apiServer": {
     ...
@@ -1601,7 +1601,7 @@ so you may want to execute some routes before or after others. The final list of
 
 E.g. let's disable "route-id" route:
 
-```json
+```
 {
   "apiServer": {
     ...
@@ -1619,7 +1619,7 @@ E.g. let's disable "route-id" route:
 
 E.g. let's append extra route:
 
-```json
+```
 {
   "apiServer": {
     ...
@@ -1643,7 +1643,7 @@ E.g. let's append extra route:
 
 If you want to apply HTTP filters to your route you need to add filter configuration in `filters` attribute, e.g.:
 
-```json
+```
 {
   "apiServer": {
     ...
@@ -1662,7 +1662,7 @@ If you want to apply HTTP filters to your route you need to add filter configura
 
 Make sure that `registry:filters` contains all the filters you need, e.g.:
 
-```json
+```
 {
   "registry:filters": {
     "my-filter": { "main": "com.example.MyFilter" }
@@ -1673,7 +1673,7 @@ Make sure that `registry:filters` contains all the filters you need, e.g.:
 
 If the filter you use has some configuration you can pass it in instead of filter name in `filters` attribute following way:
 
-```json
+```
 {
   "apiServer": {
     ...
@@ -1719,7 +1719,7 @@ The configuration is sent as string-representation of JSON.
 
 E.g. `rawJsonConf` contains `null` with following configuration:
 
-```json
+```
 ...
 "routes": [
  {
@@ -1732,7 +1732,7 @@ E.g. `rawJsonConf` contains `null` with following configuration:
 
 E.g. `rawJsonConf` contains `{ "param": "value" }`  with following configuration:
 
-```json
+```
 ...
 "routes": [
   {
@@ -1750,7 +1750,7 @@ E.g. `rawJsonConf` contains `{ "param": "value" }`  with following configuration
 
 E.g. `rawJsonConf` contains `"param"` with following configuration:
 
-```json
+```
 ...
 "routes": [
   {
@@ -1773,7 +1773,7 @@ Let's implement a filter that returns 401 if "role" header doesn't contain confi
 
 Configuration looks like this:
 
-```json
+```
 ...
 "routes": [
   {
@@ -1828,7 +1828,7 @@ You can provide its `io.vertx.core.http.HttpServerOptions` in "apiServer.http" c
 
 For example, let's define that the HTTP server starts on port 8081 and binds to localhost:
 
-```json
+```
 {
   "apiServer": {
     "http": {
@@ -1859,7 +1859,7 @@ static void deployApiServer(Vertx vertx) {
 
 the configuration should look like this:
 
-```json
+```
 {
   "anotherApiServer": {
     "routesRegistry": "another-routes",
@@ -1896,7 +1896,7 @@ We gonna create RouteVerticle that serves static content read from configuration
 
 Add route definition at "apiServer.routes" in config.json:
 
-```json
+```
 {
   "id": "accessing-configuration-route",
   "method": "GET",
@@ -1906,7 +1906,7 @@ Add route definition at "apiServer.routes" in config.json:
 
 1. Set any JSON object as route configuration at "accessing-configuration-route" in config.json:
 
-```json
+```
 ...
 "accessing-configuration-route": {
   "content": "Hello world!"
@@ -1930,7 +1930,7 @@ public class AccessingConfigurationRoute extends RouteVerticle {
 
 3. Add AccessingConfigurationRoute to "registry:routes" in config.json:
 
-```json
+```
 ...
 "registry:routes": {
   "accessing-configuration-route": { "main": "examples.app.routes.AccessingConfigurationRoute" }
@@ -1941,7 +1941,7 @@ public class AccessingConfigurationRoute extends RouteVerticle {
 
 Final config.json:
 
-```json
+```
 {
   "apiServer": {
     "http": {
@@ -1970,7 +1970,7 @@ We gonna create a RandomGenerator service that generates random integer smaller 
 
 1. Add route definition at "apiServer.routes" in config.json:
 
-```json
+```
 {
   "id": "calling-singleton-route",
   "method": "GET",
@@ -1980,7 +1980,7 @@ We gonna create a RandomGenerator service that generates random integer smaller 
 
 2. Add CallingSingletonServiceRoute to "registry:routes" in config.json:
 
-```json
+```
 ...
 "registry:routes": {
   "calling-singleton-route": { "main": "examples.app.routes.CallingSingletonServiceRoute" }
@@ -2022,7 +2022,7 @@ public class App extends VertxBootstrap {
 
 4.2.1 Add "registry:components" entry in config.json and add ServiceVerticle:
 
-```json
+```
 ...
 "components:registry": {
   "random-generator": { "main": "examples.app.components.RandomGenerator" }
@@ -2074,7 +2074,7 @@ public class CallingSingletonServiceRoute extends RouteVerticle {
 
 Final config.json:
 
-```json
+```
 {
   "apiServer": {
    "http": {
@@ -2104,7 +2104,7 @@ We gonna create a DateTimeGenerator service that returns string representation o
 
 1. Add route definition at "apiServer.routes" in config.json:
 
-```json
+```
 {
   "id": "calling-non-singleton-route",
   "method": "GET",
@@ -2114,7 +2114,7 @@ We gonna create a DateTimeGenerator service that returns string representation o
 
 2. Add CallingNonSingletonServiceRoute to "registry:routes" in config.json:
 
-```json
+```
 ...
 "registry:routes": {
   "calling-non-singleton-route": { "main": "examples.app.routes.CallingNonSingletonServiceRoute" }
@@ -2157,7 +2157,7 @@ public class DateTimeGeneratorVerticle extends ServiceVerticle implements DateTi
 
 4. Add "registry:timers" entry in config.json:
 
-```json
+```
 ...
 "components:timers": {
    "gmt-timer": { "main": "examples.app.components.DateTimeGeneratorVerticle" },
@@ -2179,7 +2179,7 @@ public class App extends VertxBootstrap {
 
 6. Add configuration for "gmt-timer" and "cest-timer" verticles:
 
-```json
+```
 {
   "gmt-timer": {
     "zoneId": "GMT"
@@ -2229,7 +2229,7 @@ public class CallingNonSingletonServiceRoute extends RouteVerticle {
 
 Final config.json:
 
-```json
+```
 {
   "apiServer": {
     "http": {
