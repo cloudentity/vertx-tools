@@ -1565,7 +1565,7 @@ If method attribute in configuration is missing then `Router.route(String)` meth
 
 > NOTE<br/>
 > `routes` can also be defined as a map from string to an array of route objects.
-> All the arrays are joined in a single array and then the logic for default array routes configuration format applies. The order of joining is undefined.
+> All the arrays are joined in a single array and then the logic for default array routes configuration format applies. The arrays are joined in alphabetical order of keys.
 
 #### Base path
 

@@ -14,7 +14,7 @@ object RouteConfs {
   implicit lazy val RouteConfDecoder = deriveDecoder[RouteConf]
 
   implicit lazy val ListRouteConfDecoder: Decoder[List[RouteConf]] = Decoder.decodeList[RouteConf](RouteConfDecoder)
-  implicit lazy val MapRouteConfDecoder: Decoder[List[RouteConf]] = Decoder.decodeMap[String, List[RouteConf]](StringKeyDecoder, ListRouteConfDecoder).map(_.values.toList.flatten)
+  implicit lazy val MapRouteConfDecoder: Decoder[List[RouteConf]] = Decoder.decodeMap[String, List[RouteConf]](StringKeyDecoder, ListRouteConfDecoder).map(_.toList.sortBy(_._1).flatMap(_._2))
 
   implicit lazy val RouteConfsDecoder: Decoder[RouteConfs] = ListRouteConfDecoder.or(MapRouteConfDecoder).map(RouteConfs.apply)
 }
