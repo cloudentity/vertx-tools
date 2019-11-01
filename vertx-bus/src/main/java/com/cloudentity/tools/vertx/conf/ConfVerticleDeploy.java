@@ -31,7 +31,7 @@ public class ConfVerticleDeploy {
    */
   public static Future<String> deployVerticleFromMetaConfig(Vertx vertx, JsonObject metaConfig) {
     try {
-      return VertxDeploy.deploy(vertx, new ConfVerticle(vertx, metaConfig));
+      return VertxDeploy.deploy(vertx, ConfVerticle.buildFromMetaConfig(vertx, metaConfig).get());
     } catch (Throwable ex) {
       return Future.failedFuture(ex);
     }
