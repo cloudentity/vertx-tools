@@ -33,6 +33,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
 * [Meta configuration](#meta)
   * [Configuration management](#meta-management)
   * [Disabling config store](#meta-disable)
+  * [Configuration store modules](#store-modules)
   * [Configuring VertxOptions](#meta-vertx-options)
   * [Integration with Vault](#meta-vault)
   * [Custom configuration stores](#meta-custom-stores)
@@ -646,9 +647,10 @@ If `enabled` is `false` then the entry is filtered out from the `stores` array. 
 }
 ```
 
-### Config store module
+<a id="store-modules"></a>
+### Configuration store modules
 
-Store configuration can be read from classpath file in `store-modules` folder.
+Store configuration can be read from a classpath file in `store-modules` folder.
 
 Given following meta-config:
 
@@ -694,7 +696,7 @@ then the resolved meta-config is:
        "type": "file",
        "format": "json",
        "config": {
-         "path": "src/main/resources/config-a1.json"
+         "path": "src/main/resources/config-a.json"
        }
      },
      {
