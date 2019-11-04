@@ -47,6 +47,8 @@ public class MetaConfBuilder {
     }
 
     rawMetaConfig.put("stores", stores);
-    return Either.right(new MetaConfig(rawMetaConfig.copy(), ConfReference.populateRefs(rawMetaConfig, rawMetaConfig)));
+    JsonObject resolvedMetaConfig = ConfReference.populateRefs(rawMetaConfig, rawMetaConfig);
+    ConfNullifier.nullify(resolvedMetaConfig);
+    return Either.right(new MetaConfig(rawMetaConfig.copy(), resolvedMetaConfig));
   }
 }
