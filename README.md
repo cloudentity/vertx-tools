@@ -33,6 +33,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
 * [Meta configuration](#meta)
   * [Configuration management](#meta-management)
   * [Disabling config store](#meta-disable)
+  * [Configuration store modules](#store-modules)
   * [Configuring VertxOptions](#meta-vertx-options)
   * [Integration with Vault](#meta-vault)
   * [Custom configuration stores](#meta-custom-stores)
@@ -643,6 +644,123 @@ If `enabled` is `false` then the entry is filtered out from the `stores` array. 
      }
    }
  ]
+}
+```
+
+<a id="store-modules"></a>
+### Configuration store modules
+
+Store configuration can be read from a classpath file in `store-modules` folder.
+
+Given following meta-config:
+
+```
+{
+ "scanPeriod": 5000,
+ "stores": [
+   {
+     "module": "config-store-module-a"
+   },
+   {
+     "type": "file",
+     "format": "json",
+     "config": {
+       "path": "src/main/resources/config-b.json"
+     }
+   }
+ ]
+}
+```
+
+`store-modules/config-store-module-a.json` classpath file is read and its content replaces module JSON object in meta-config.
+
+For example, if `store-modules/config-store-module-a.json` has following content:
+
+```
+{
+  "type": "file",
+  "format": "json",
+  "config": {
+    "path": "src/main/resources/config-a.json"
+  }
+}
+```
+
+then the resolved meta-config is:
+
+```
+{
+  "scanPeriod": 5000,
+  "stores": [
+      {
+       "type": "file",
+       "format": "json",
+       "config": {
+         "path": "src/main/resources/config-a.json"
+       }
+     },
+     {
+       "type": "file",
+       "format": "json",
+       "config": {
+         "path": "src/main/resources/config-b.json"
+       }
+     }
+  ]
+}
+```
+
+Config-store module can contain a JSON array with configuration of multiple config-stores instead of JSON object with single config-store.
+
+If the content of `config-store-module-a.json` was:
+
+```
+[
+  {
+    "type": "file",
+    "format": "json",
+    "config": {
+      "path": "src/main/resources/config-a1.json"
+    }
+  },
+  {
+    "type": "file",
+    "format": "json",
+    "config": {
+      "path": "src/main/resources/config-a2.json"
+    }
+  }
+]
+```
+
+then the resolved meta-config is:
+
+```
+{
+  "scanPeriod": 5000,
+  "stores": [
+      {
+        "type": "file",
+        "format": "json",
+        "config": {
+          "path": "src/main/resources/config-a1.json"
+        }
+      },
+      {
+       "type": "file",
+       "format": "json",
+       "config": {
+         "path": "src/main/resources/config-a2.json"
+       }
+     },
+     {
+       "type": "file",
+       "format": "json",
+       "config": {
+         "path": "src/main/resources/config-b.json"
+       }
+     }
+  ]
 }
 ```
 

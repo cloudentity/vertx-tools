@@ -5,10 +5,12 @@ import com.cloudentity.tools.vertx.bus.VertxBus;
 import com.cloudentity.tools.vertx.json.JsonExtractor;
 import com.cloudentity.tools.vertx.logging.InitLog;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import io.vertx.config.ConfigChange;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.impl.NoStackTraceThrowable;
 import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +37,19 @@ public class ConfVerticle extends ServiceVerticle implements ConfService {
     this.retriever = retriever;
   }
 
-  public ConfVerticle(Vertx vertx, JsonObject metaConfig) {
-    initLog.info("Environment variables in meta configuration: ");
-    ConfPrinter.logMaskedEnvVariables(metaConfig, log);
+  public static Try<ConfVerticle> buildFromMetaConfig(Vertx vertx, JsonObject metaConfig) {
+    Either<List<ConfBuilder.MissingModule>, MetaConfBuilder.MetaConfig> metaConfigResult = MetaConfBuilder.buildFinalMetaConfig(metaConfig);
+    if (metaConfigResult.isRight()) {
+      MetaConfBuilder.MetaConfig meta = metaConfigResult.get();
+      initLog.info("Environment variables in meta configuration: ");
+      ConfPrinter.logMaskedEnvVariables(meta.rawMetaConfig, log);
 
-    JsonObject resolvedMetaConf = ConfReference.populateRefs(metaConfig, metaConfig);
-    ConfigRetriever retriever = ConfigRetrieverFactory.buildFromJson(vertx, resolvedMetaConf);
-    this.retriever = retriever;
+      ConfigRetriever retriever = ConfigRetrieverFactory.buildFromJson(vertx, meta.resolvedMetaConfig);
+      return Try.success(new ConfVerticle(retriever));
+    } else {
+      List<String> missingModules = metaConfigResult.getLeft().stream().map(module -> module.name).collect(Collectors.toList());
+      return Try.failure(new NoStackTraceThrowable("Could not read classpath config-store modules configuration: [" + String.join(", ", missingModules) + "]"));
+    }
   }
 
   JsonObject globalConf;
