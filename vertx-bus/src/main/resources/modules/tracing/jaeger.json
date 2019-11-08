@@ -4,6 +4,8 @@
     "JAEGER_AGENT_HOST": "$env:JAEGER_AGENT_HOST:string",
     "JAEGER_AGENT_PORT": "$env:?JAEGER_AGENT_PORT:string",
     "JAEGER_SAMPLER_MANAGER_HOST_PORT": "$env:JAEGER_SAMPLER_MANAGER_HOST_PORT:string",
-    "FORMAT": "$env:TRACING_FORMAT:string:cloudentity"
+    "FORMAT": "$env:TRACING_FORMAT:string:cloudentity",
+    "TRACE_ID": "$env:?TRACING_TRACE_ID:string",
+    "BAGGAGE_PREFIX": "$env:?TRACING_BAGGAGE_PREFIX:string"
   }
 }
