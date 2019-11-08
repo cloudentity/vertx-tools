@@ -36,12 +36,17 @@ public class JaegerTracing {
       });
   }
 
-  public static final TracingManager noTracing = TracingManager.of(
-    new JaegerTracer.Builder("service")
+  public static final TracingManager noTracing = buildNoTracing();
+
+  private static TracingManager buildNoTracing() {
+    JaegerTracer.Builder builder = new JaegerTracer.Builder("service")
       .withReporter(new DummyReporter())
-      .withSampler(new ConstSampler(true))
-      .build(), "uber-trace-id", "uberctx-"
-  );
+      .withSampler(new ConstSampler(true));
+    CodecConfig codecConfig = getCodec(new JsonObject());
+    registerCodec(builder, codecConfig);
+
+    return TracingManager.of(builder.build(), "uber-trace-id", "uberctx-");
+  }
 
 
   public static TracingManager getTracer(JsonObject json) {
@@ -59,13 +64,16 @@ public class JaegerTracing {
     Configuration config = Configuration.fromEnv();
     JaegerTracer.Builder builder = config.getTracerBuilder();
     CodecConfig codecConfig = getCodec(json);
+    registerCodec(builder, codecConfig);
 
+    return TracingManager.of(builder.build(), codecConfig.traceId, codecConfig.baggagePrefix);
+  }
+
+  private static void registerCodec(JaegerTracer.Builder builder, CodecConfig codecConfig) {
     builder.registerExtractor(Format.Builtin.HTTP_HEADERS, codecConfig.codec);
     builder.registerInjector(Format.Builtin.HTTP_HEADERS, codecConfig.codec);
     builder.registerExtractor(Format.Builtin.TEXT_MAP, codecConfig.codec);
     builder.registerInjector(Format.Builtin.TEXT_MAP, codecConfig.codec);
-
-    return TracingManager.of(builder.build(), codecConfig.traceId, codecConfig.baggagePrefix);
   }
 
   public static CodecConfig getCodec(JsonObject json) {
