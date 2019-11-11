@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class JaegerTracing {
   private static final Logger log = LoggerFactory.getLogger(JaegerTracing.class);
@@ -80,8 +81,8 @@ public class JaegerTracing {
     String format = json.getString("FORMAT", "cloudentity");
     switch (format) {
       case "cloudentity":
-        String traceId = json.getString("TRACE_ID", "x-trace-id");
-        String baggagePrefix = json.getString("BAGGAGE_PREFIX", "x-ctx-");
+        String traceId = Optional.ofNullable(json.getString("TRACE_ID")).orElse("x-trace-id");
+        String baggagePrefix = Optional.ofNullable(json.getString("BAGGAGE_PREFIX")).orElse("x-ctx-");
 
         TextMapCodec codec = TextMapCodec.builder()
           .withSpanContextKey(traceId)
