@@ -21,6 +21,15 @@ import java.util.Optional;
 public class JaegerTracing {
   private static final Logger log = LoggerFactory.getLogger(JaegerTracing.class);
 
+  private static final String UBER_TRACE_ID = "uber-trace-id";
+  private static final String UBER_BAGGAGE_PREFIX = "uberctx-";
+
+  private static final String CLOUDENTITY_TRACE_ID = "x-trace-id";
+  private static final String CLOUDENTITY_BAGGAGE_PREFIX = "x-ctx-";
+
+  private static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
+  private static final String ZIPKIN_BAGGAGE_PREFIX = "baggage-";
+
   /**
    * Creates a Jaeger Tracer using properties from global config json object "tracing" or return an dummy tracer
    * if this key does not exist.
@@ -43,10 +52,10 @@ public class JaegerTracing {
     JaegerTracer.Builder builder = new JaegerTracer.Builder("service")
       .withReporter(new DummyReporter())
       .withSampler(new ConstSampler(true));
-    CodecConfig codecConfig = getCodec(new JsonObject());
+    CodecConfig codecConfig = getCodec(new JsonObject().put("TRACE_ID", UBER_TRACE_ID).put("BAGGAGE_PREFIX", UBER_BAGGAGE_PREFIX));
     registerCodec(builder, codecConfig);
 
-    return TracingManager.of(builder.build(), "uber-trace-id", "uberctx-");
+    return TracingManager.of(builder.build(), UBER_TRACE_ID, UBER_BAGGAGE_PREFIX);
   }
 
 
@@ -81,8 +90,8 @@ public class JaegerTracing {
     String format = json.getString("FORMAT", "cloudentity");
     switch (format) {
       case "cloudentity":
-        String traceId = Optional.ofNullable(json.getString("TRACE_ID")).orElse("x-trace-id");
-        String baggagePrefix = Optional.ofNullable(json.getString("BAGGAGE_PREFIX")).orElse("x-ctx-");
+        String traceId = Optional.ofNullable(json.getString("TRACE_ID")).orElse(CLOUDENTITY_TRACE_ID);
+        String baggagePrefix = Optional.ofNullable(json.getString("BAGGAGE_PREFIX")).orElse(CLOUDENTITY_BAGGAGE_PREFIX);
 
         TextMapCodec codec = TextMapCodec.builder()
           .withSpanContextKey(traceId)
@@ -93,10 +102,10 @@ public class JaegerTracing {
         return new CodecConfig(codec, traceId, baggagePrefix);
 
       case "jaeger":
-        return new CodecConfig(new TextMapCodec(false), "uber-trace-id", "uberctx-");
+        return new CodecConfig(new TextMapCodec(false), UBER_TRACE_ID, UBER_BAGGAGE_PREFIX);
 
       case "zipkin":
-        return new CodecConfig(new B3TextMapCodec(), "X-B3-TraceId", "baggage-");
+        return new CodecConfig(new B3TextMapCodec(), ZIPKIN_TRACE_ID, ZIPKIN_BAGGAGE_PREFIX);
 
       default:
         throw new IllegalArgumentException("Unknown tracing format " + format + ". Available formats: jaeger, zipkin");
