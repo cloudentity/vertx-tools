@@ -47,6 +47,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
   * [Modules configuration and Docker](#modules-docker)
   * [Shared modules dependency](#modules-shared)
   * [Required modules](#modules-required)
+  * [Module instances](#module-instances)
 * [Event bus communication](#bus)
   * [Define service interface](#bus-define)
   * [Implement ServiceVerticle](#bus-implement)
@@ -1185,6 +1186,129 @@ If we want to load some modules regardless the deployment (e.g. to split classpa
 ```
 
 First `requiredModules` are loaded and then all the other modules.
+
+<a id="module-instances"></a>
+### Module instances
+
+It might be the case that you want to deploy the same module multiple times, but with different configuration values.
+Module instance supports `id` that can be referenced in the module configuration.
+
+```
+{
+  "modules": [
+    {
+      "module": "module-x",
+      "id": "a"
+    },
+    {
+      "module": "module-x",
+      "id": "b"
+    }
+  ]
+}
+```
+
+Let's suppose that `module-x` has following configuration:
+
+```
+{
+  "{!!}x": "abc"
+}
+```
+
+`{!!}` is replaced with `id` value. If `id` is missing then `{!!}` is removed. In the example above, the final configuration is:
+
+```
+{
+  "ax": "abc",
+  "bx": "abc"
+}
+```
+
+The id placeholder `{!!}` can also be used in the attribute value.
+
+Given the following `module-x`:
+
+```
+{
+  "{!!}x": "{!!}abc"
+}
+```
+
+The final configuration would be:
+
+```
+{
+  "ax": "aabc",
+  "bx": "babc"
+}
+```
+
+#### Module id separator
+
+Module id placeholder can contain separator that will make the resulting configuration more readable.
+
+Let's use `-` separator in `module-x`:
+
+```
+{
+  "{!!-}x": "abc"
+}
+```
+
+The final configuration would be:
+
+```
+{
+  "a-x": "abc",
+  "b-x": "abc"
+}
+```
+
+The separator can be any character but `}`.
+
+#### Env variable values per instance
+
+Normally, you would configure module using environment variable references.
+With module instances you can overwrite env variables per instance.
+
+To do so configure module instances:
+
+{
+  "modules": [
+    {
+      "module": "module-x",
+      "id": "a",
+      "env": {
+        "X": "def"
+      }
+    },
+    {
+      "module": "module-x",
+      "id": "b"
+    }
+  ]
+}
+```
+
+First instance of `module-x` will use overwritten value of env variable `X`. The second instance will use the original value of the variable.
+
+Given the following `module-x` and `X=abc`:
+
+```
+{
+  "{!!-}x": "$env:X:string"
+}
+```
+
+The final configuration will be:
+
+```
+{
+  "a-x": "def",
+  "b-x": "abc"
+}
+```
 
 <a id="bus"></a>
 ## Event bus communication and ServiceVerticle

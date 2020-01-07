@@ -186,7 +186,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X:string");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals("value", result.getValue("x"));
@@ -199,7 +199,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X:boolean");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(true, result.getValue("x"));
@@ -212,7 +212,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X:int");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(10, result.getValue("x"));
@@ -225,7 +225,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X:double");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(1.0d, result.getValue("x"));
@@ -238,7 +238,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X:array");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new JsonObject().put("x", new JsonArray().add("value")), result);
@@ -251,7 +251,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X:array");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new JsonObject().put("x", new JsonArray().add("value1").add("value2")), result);
@@ -264,7 +264,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X:array");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new JsonObject().put("x", new JsonArray().add(true).add(false)), result);
@@ -277,7 +277,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X:array");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new JsonObject().put("x", new JsonArray().add(1).add(2)), result);
@@ -290,7 +290,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X:array");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new JsonObject().put("x", new JsonArray().add(1.0d).add(2.0d)), result);
@@ -302,7 +302,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X_NON_EXISTING:array");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(null, result.getValue("x"));
@@ -314,7 +314,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X_MISSING:array:[\"value\\:1\",\"value\\:2\"]");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new JsonObject().put("x", new JsonArray().add("value:1").add("value:2")), result);
@@ -327,7 +327,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X:object");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     JsonObject expected =
@@ -349,7 +349,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$sys:X_NON_EXISTING:array").put("sys", sysFallback);
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, sysFallback);
 
     // then
     assertEquals(new JsonArray().add("X"), result.getValue("x"));
@@ -362,7 +362,7 @@ public class ConfReferenceTest {
     JsonObject conf = new JsonObject().put("x","$env:X_NON_EXISTING:array").put("env", envFallback);
 
     // when
-    JsonObject result = ConfReference.populateEnvRefs(conf);
+    JsonObject result = ConfReference.populateEnvRefs(conf, envFallback);
 
     // then
     assertEquals(new JsonArray().add("X"), result.getValue("x"));
