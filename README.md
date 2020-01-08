@@ -1212,11 +1212,11 @@ Let's suppose that `module-x` has following configuration:
 
 ```
 {
-  "{!!}x": "abc"
+  "{MODULE_ID}x": "abc"
 }
 ```
 
-`{!!}` is replaced with `id` value. If `id` is missing then `{!!}` is removed. In the example above, the final configuration is:
+`{MODULE_ID}` is replaced with `id` value. If `id` is missing then `{MODULE_ID}` is removed. In the example above, the final configuration is:
 
 ```
 {
@@ -1225,13 +1225,13 @@ Let's suppose that `module-x` has following configuration:
 }
 ```
 
-The id placeholder `{!!}` can also be used in the attribute value.
+The id placeholder `{MODULE_ID}` can also be used in the attribute value.
 
 Given the following `module-x`:
 
 ```
 {
-  "{!!}x": "{!!}abc"
+  "{MODULE_ID}x": "{MODULE_ID}abc"
 }
 ```
 
@@ -1252,7 +1252,7 @@ Let's use `-` separator in `module-x`:
 
 ```
 {
-  "{!!-}x": "abc"
+  "{MODULE_ID-}x": "abc"
 }
 ```
 
@@ -1297,7 +1297,7 @@ Given the following `module-x` and `X=abc`:
 
 ```
 {
-  "{!!-}x": "$env:X:string"
+  "{MODULE_ID-}x": "$env:X:string"
 }
 ```
 

@@ -11,7 +11,7 @@ public class ModuleIdReferenceTest {
   @Test
   public void shouldReplaceModuleIdInValue() {
     // given
-    JsonObject conf = new JsonObject().put("x", "{!!-}x");
+    JsonObject conf = new JsonObject().put("x", "{MODULE_ID-}x");
 
     // when
     ModuleIdReference.populateModuleIdRefs(conf, Optional.of("abc"));
@@ -23,7 +23,7 @@ public class ModuleIdReferenceTest {
   @Test
   public void shouldReplaceModuleIdInKey() {
     // given
-    JsonObject conf = new JsonObject().put("{!!-}x","x");
+    JsonObject conf = new JsonObject().put("{MODULE_ID-}x","x");
 
     // when
     ModuleIdReference.populateModuleIdRefs(conf, Optional.of("abc"));
@@ -35,7 +35,7 @@ public class ModuleIdReferenceTest {
   @Test
   public void shouldReplaceModuleIdInValueWithEmptyStringIfMissing() {
     // given
-    JsonObject conf = new JsonObject().put("x", "{!!-}x");
+    JsonObject conf = new JsonObject().put("x", "{MODULE_ID-}x");
 
     // when
     ModuleIdReference.populateModuleIdRefs(conf, Optional.empty());
@@ -47,7 +47,7 @@ public class ModuleIdReferenceTest {
   @Test
   public void shouldReplaceModuleIdInKeyWithEmptyStringIfMissing() {
     // given
-    JsonObject conf = new JsonObject().put("{!!-}x","x");
+    JsonObject conf = new JsonObject().put("{MODULE_ID-}x","x");
 
     // when
     ModuleIdReference.populateModuleIdRefs(conf, Optional.empty());

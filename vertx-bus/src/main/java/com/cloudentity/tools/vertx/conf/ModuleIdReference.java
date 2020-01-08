@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ModuleIdReference {
-  static Pattern moduleIdPattern = Pattern.compile("(.*)(\\{!!.?\\})(.*)");
+  static Pattern moduleIdPattern = Pattern.compile("(.*)(\\{MODULE_ID.?\\})(.*)");
 
   public static JsonObject populateModuleIdRefs(JsonObject conf, Optional<String> moduleIdOpt) {
     Function<String, String> replaceModuleId = value -> {
@@ -19,7 +19,7 @@ public class ModuleIdReference {
       if (matcher.matches()) {
         String idPlaceholder = matcher.group(2);
         if (moduleIdOpt.isPresent()) {
-          String separator = idPlaceholder.substring(3, 4);
+          String separator = idPlaceholder.substring(1 + "MODULE_ID".length(), 2 + "MODULE_ID".length());
 
           if ("}".equals(separator)) separator = "";
           return value.replace(idPlaceholder, moduleIdOpt.get() + separator);
