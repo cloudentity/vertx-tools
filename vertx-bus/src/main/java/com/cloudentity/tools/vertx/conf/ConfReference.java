@@ -36,9 +36,12 @@ public class ConfReference {
    * {@see ConfReference#populateInnerRefs}, {@see ConfReference#populateSysRefs}, {@see ConfReference#populateEnvRefs}.
    */
   public static JsonObject populateRefs(JsonObject conf, JsonObject globalConf) {
+    JsonObject envFallback = conf.getJsonObject("env", new JsonObject());
+    JsonObject sysFallback = conf.getJsonObject("sys", new JsonObject());
+
     JsonObject withConfRefs = ConfReference.populateInnerRefs(conf, globalConf);
-    JsonObject withSysRefs = ConfReference.populateSysRefs(withConfRefs);
-    JsonObject withEnvRefs = ConfReference.populateEnvRefs(withSysRefs);
+    JsonObject withSysRefs = ConfReference.populateSysRefs(withConfRefs, sysFallback);
+    JsonObject withEnvRefs = ConfReference.populateEnvRefs(withSysRefs, envFallback);
     return withEnvRefs;
   }
 
@@ -103,12 +106,12 @@ public class ConfReference {
    *
    * In case of array/object `property_type`, the sys value is expected to be JSON representation of the value.
    */
-  public static JsonObject populateSysRefs(JsonObject conf) {
-    return populatePropertyRefs(conf, sysRefPattern, "$sys", resolveSysVariableWithFallback(conf));
+  public static JsonObject populateSysRefs(JsonObject conf, JsonObject sysFallback) {
+    return populatePropertyRefs(conf, sysRefPattern, "$sys", resolveSysVariableWithFallback(sysFallback));
   }
 
-  private static Function<String, String> resolveSysVariableWithFallback(JsonObject conf) {
-    return ref -> Optional.ofNullable(getVariableFallback(conf, "sys", ref)).orElse(System.getProperty(ref));
+  private static Function<String, String> resolveSysVariableWithFallback(JsonObject fallback) {
+    return ref -> Optional.ofNullable(getVariableFallback(fallback, ref)).orElse(System.getProperty(ref));
   }
 
   /**
@@ -123,16 +126,16 @@ public class ConfReference {
    *
    * In case of array/object `property_type`, the sys value is expected to be JSON representation of the value.
    */
-  public static JsonObject populateEnvRefs(JsonObject conf) {
-    return populatePropertyRefs(conf, envRefPattern, "$env", resolveEnvVariableWithFallback(conf));
+  public static JsonObject populateEnvRefs(JsonObject conf, JsonObject envFallback) {
+    return populatePropertyRefs(conf, envRefPattern, "$env", resolveEnvVariableWithFallback(envFallback));
   }
 
-  private static Function<String, String> resolveEnvVariableWithFallback(JsonObject conf) {
-    return ref -> Optional.ofNullable(getVariableFallback(conf, "env", ref)).orElse(System.getenv(ref));
+  private static Function<String, String> resolveEnvVariableWithFallback(JsonObject fallback) {
+    return ref -> Optional.ofNullable(getVariableFallback(fallback, ref)).orElse(System.getenv(ref));
   }
 
-  private static String getVariableFallback(JsonObject conf, String variableType, String variableName) {
-    return Optional.ofNullable(conf.getJsonObject(variableType, new JsonObject()).getValue(variableName)).map(Object::toString).orElse(null);
+  private static String getVariableFallback(JsonObject fallback, String variableName) {
+    return Optional.ofNullable(fallback.getValue(variableName)).map(Object::toString).orElse(null);
   }
   /**
    * Extracts references from `conf` matching `refPattern` and substitutes them with corresponding values from `resolveValue`.
@@ -192,7 +195,7 @@ public class ConfReference {
 
     if (value == null) {
       if (!ref.optional) {
-        log.info("Could not resolve configuration reference: {}:{}. Setting null value.", refPrefix, ref);
+        log.debug("Could not resolve configuration reference: {}:{}. Setting null value.", refPrefix, ref);
       }
       return null;
     } else if (converter != null) {

@@ -21,7 +21,7 @@ public class SysReferenceTest {
     System.setProperty("PORT", "9000");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new Integer(9000), result.getInteger("port"));
@@ -36,7 +36,7 @@ public class SysReferenceTest {
     System.setProperty("PORT", "9000");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new Integer(9000), result.getInteger("port"));
@@ -49,7 +49,7 @@ public class SysReferenceTest {
     new JsonObject().put("port", "$sys:PORT:int");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(null, result.getInteger("port"));
@@ -62,7 +62,7 @@ public class SysReferenceTest {
     new JsonObject().put("port", "$sys:PORT:int:8000");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new Integer(8000), result.getInteger("port"));
@@ -77,7 +77,7 @@ public class SysReferenceTest {
     System.setProperty("PORT", "9");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new Integer(9000), result.getInteger("port"));
@@ -90,7 +90,7 @@ public class SysReferenceTest {
       new JsonObject().put("port", "$sys:{PORT}000:int:9");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(new Integer(9000), result.getInteger("port"));
@@ -103,7 +103,7 @@ public class SysReferenceTest {
       new JsonObject().put("port", "$sys:{PORT}000:int");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(null, result.getInteger("port"));
@@ -116,7 +116,7 @@ public class SysReferenceTest {
     new JsonObject().put("port", "$sys:PORT:bleh:8000");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(null, result.getInteger("port"));
@@ -129,7 +129,7 @@ public class SysReferenceTest {
     new JsonObject().put("port", "$sys:PORT:");
 
     // when
-    JsonObject result = ConfReference.populateSysRefs(conf);
+    JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
     assertEquals(null, result.getInteger("port"));

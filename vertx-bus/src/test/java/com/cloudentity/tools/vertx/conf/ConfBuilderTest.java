@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 public class ConfBuilderTest {
   @Test
-  public void shouldMergeModules() {
+  public void shouldMergeSimpleModules() {
     JsonObject raw =
       new JsonObject()
         .put("x", "$env:X:string:x")
@@ -35,6 +35,34 @@ public class ConfBuilderTest {
     assertEquals(1, refsB.size());
     assertEquals("b", refsB.get(0).resolvedValue);
 
+  }
+
+  @Test
+  public void shouldMergeModuleInstanceWithOverwrittenEnv() {
+    JsonObject raw =
+      new JsonObject()
+        .put("env", new JsonObject().put("Y", "123"))
+        .put("modules", new JsonArray().add(new JsonObject().put("module", "builder/multi-module").put("env", new JsonObject().put("Y", "abc"))));
+
+    Either<List<ConfBuilder.MissingModule>, ConfBuilder.Config> result = ConfBuilder.buildFinalConfig(raw);
+
+    assertTrue(result.isRight());
+    ConfBuilder.Config config = result.get();
+    assertEquals("abc", config.resolvedConfig.getString("y"));
+  }
+
+  @Test
+  public void shouldMergeModuleInstanceWithGlobalEnv() {
+    JsonObject raw =
+      new JsonObject()
+        .put("env", new JsonObject().put("Y", "123"))
+        .put("modules", new JsonArray().add(new JsonObject().put("module", "builder/multi-module")));
+
+    Either<List<ConfBuilder.MissingModule>, ConfBuilder.Config> result = ConfBuilder.buildFinalConfig(raw);
+
+    assertTrue(result.isRight());
+    ConfBuilder.Config config = result.get();
+    assertEquals("123", config.resolvedConfig.getString("y"));
   }
 
   @Test
