@@ -1,6 +1,7 @@
 package com.cloudentity.tools.vertx.conf;
 
 import com.cloudentity.tools.vertx.conf.ConfBuilder.MissingModule;
+import com.cloudentity.tools.vertx.conf.modules.StoreModulesReader;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import io.vertx.core.json.JsonArray;
@@ -8,6 +9,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class MetaConfBuilder {
   public static class MetaConfig {
@@ -33,7 +35,11 @@ public class MetaConfBuilder {
         Try<Either<JsonObject, JsonArray>> result = StoreModulesReader.readStoreModuleConfigFromClasspath(moduleName);
 
         if (result.isSuccess()) {
-          result.get().mapLeft(obj -> stores.add(obj)).map(arr -> stores.addAll(arr));
+          Optional<JsonObject> overwrite = Optional.ofNullable(store.getJsonObject("overwrite"));
+
+          result.get()
+            .mapLeft(obj -> stores.add(overwrite.map(o -> obj.mergeIn(o, true)).orElse(obj)))
+            .map(arr -> stores.addAll(arr));
         } else {
           missingModules.add(new MissingModule(moduleName, result.getCause()));
         }

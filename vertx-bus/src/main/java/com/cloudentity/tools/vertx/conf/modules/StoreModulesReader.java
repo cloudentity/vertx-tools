@@ -1,4 +1,4 @@
-package com.cloudentity.tools.vertx.conf;
+package com.cloudentity.tools.vertx.conf.modules;
 
 import io.vavr.control.Either;
 import io.vavr.control.Try;

@@ -1,4 +1,4 @@
-package com.cloudentity.tools.vertx.conf;
+package com.cloudentity.tools.vertx.conf.modules;
 
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;

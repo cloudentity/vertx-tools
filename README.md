@@ -1310,6 +1310,98 @@ The final configuration will be:
 }
 ```
 
+#### Module instances tree
+
+A list of module instances can be collected recursively from JSON object tree.
+
+Let's consider following global configuration object:
+
+```
+{
+  "apiGroups" : {
+    "x" : {
+      "xx" : {
+        "_modules" : [...],
+        "xxx" : {
+          "_modules" : [...]
+        }
+      }
+    },
+    "y" : {
+      "yy" : {
+        "_modules" : [...]
+      }
+    }
+  }
+}
+```
+
+We want to collect all the module definitions at `_modules` keys defined withing `apiGroups` object.
+To do so we need to configure `modules` in following way:
+
+```
+{
+  "modules": [
+    {
+      "collect": "tree",
+      "path": "apiGroups",
+      "key": "_modules"
+    }
+  ]
+}
+```
+
+Additionally, if we want to append the path of `_modules` attribute to the final module definition we need to set `idWithPath` to `true`.
+
+Let's consider simpler case in full detail. Given following global configuration:
+
+```
+{
+  "apiGroups" : {
+    "x" : {
+      "xx" : {
+        "_modules" : [
+          {
+            "module": "module-x",
+            "id": "a",
+            "env": {
+              "X": "def"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+and `modules`:
+
+```
+{
+  "modules": [
+    {
+      "collect": "tree",
+      "path": "apiGroups",
+      "key": "_modules",
+      "idWithPath": true
+    }
+  ]
+}
+```
+
+then single module instance will be collected and deployed (note `id` prepended with path of the module definition):
+
+```
+{
+  "module": "module-x",
+  "id": "apiGroups-x-xx-a",
+  "env": {
+    "X": "def"
+  }
+}
+```
+
 <a id="bus"></a>
 ## Event bus communication and ServiceVerticle
 
