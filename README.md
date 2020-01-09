@@ -1336,7 +1336,7 @@ Let's consider following global configuration object:
 }
 ```
 
-We want to collect all the module definitions at `_modules` keys defined withing `apiGroups` object.
+We want to collect all the module definitions at `_modules` keys defined within `apiGroups` object.
 To do so we need to configure `modules` in following way:
 
 ```
@@ -1351,7 +1351,7 @@ To do so we need to configure `modules` in following way:
 }
 ```
 
-Additionally, if we want to append the path of `_modules` attribute to the final module definition we need to set `idWithPath` to `true`.
+Additionally, if we want to append the path of `_modules` attribute to `id` in the final module definition we need to set `idWithPath` to `true`.
 
 Let's consider simpler case in full detail. Given following global configuration:
 
