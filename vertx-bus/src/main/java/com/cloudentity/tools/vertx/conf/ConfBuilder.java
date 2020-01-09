@@ -1,5 +1,8 @@
 package com.cloudentity.tools.vertx.conf;
 
+import com.cloudentity.tools.vertx.conf.modules.ModuleIdReference;
+import com.cloudentity.tools.vertx.conf.modules.ModulesReader;
+import com.cloudentity.tools.vertx.conf.modules.TreeModuleDefsCollector;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import io.vertx.core.json.JsonArray;
@@ -84,8 +87,13 @@ public class ConfBuilder {
     moduleDefs.forEach(moduleDef -> {
       if (moduleDef instanceof String){
         results.add(resolveSimpleModule(moduleDef.toString()));
-      } else if (moduleDef instanceof java.util.Map || moduleDef instanceof JsonObject) {
-        results.add(resolveModuleInstance(globalEnvFallback, (JsonObject) moduleDef));
+      } else if (moduleDef instanceof JsonObject) {
+        JsonObject moduleDefJson = (JsonObject) moduleDef;
+        if ("tree".equals(moduleDefJson.getString("collect"))) {
+          results.addAll(TreeModuleDefsCollector.collect(rawRootConfig, moduleDefJson).stream().map(def -> resolveModuleInstance(globalEnvFallback, def)).collect(Collectors.toList()));
+        } else {
+          results.add(resolveModuleInstance(globalEnvFallback, (JsonObject) moduleDef));
+        }
       }
     });
     return results;
