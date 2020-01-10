@@ -51,7 +51,8 @@ public class ConfBuilder {
     }
   }
 
-  public static Either<List<MissingModule>, Config> buildFinalConfig(JsonObject rawRootConfig) {
+  public static Either<List<MissingModule>, Config> buildFinalConfig(JsonObject rawRootConfigOriginal) {
+    JsonObject rawRootConfig = rawRootConfigOriginal.copy();
     List<Either<MissingModule, ValidRawModule>> modules = readRawModulesConfigs(rawRootConfig);
 
     List<MissingModule> missingModules = modules.stream().filter(x -> x.isLeft()).map(x -> x.getLeft()).collect(Collectors.toList());
