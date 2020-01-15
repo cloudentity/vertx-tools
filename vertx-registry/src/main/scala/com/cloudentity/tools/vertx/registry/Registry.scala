@@ -5,7 +5,6 @@ import java.util
 import RegistryVerticle._
 import com.cloudentity.tools.vertx.scala.bus.ScalaServiceVerticle
 import com.cloudentity.tools.vertx.verticles.VertxDeploy
-
 import io.vertx.core.impl.NoStackTraceThrowable
 import io.vertx.core.json.JsonObject
 import io.vertx.core.{AsyncResult, DeploymentOptions, Future => VxFuture}
@@ -80,7 +79,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
     */
   def this() = this(null, true)
 
-  val log = LoggerFactory.getLogger(this.getClass)
+  lazy val log = LoggerFactory.getLogger(this.getClass + Option(_registryType).map(":" + _.value).getOrElse(""))
   val initLog = InitLog.of(log)
 
   val internalConfigKey = "config"
@@ -228,8 +227,8 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
 
   private def setupChangeListener(): Unit =
     registerConfChangeConsumer { change =>
-      val prev = change.getPreviousConfiguration.getJsonObject(verticleId)
-      val next = change.getNewConfiguration.getJsonObject(verticleId)
+      val prev = change.getPreviousConfiguration.getJsonObject(verticleId, new JsonObject())
+      val next = change.getNewConfiguration.getJsonObject(verticleId, new JsonObject())
       log.debug(s"Verticle descriptors changed, prev=$prev, next=$next")
 
       val toRemoveNames = prev.fieldNames().asScala.toSet -- next.fieldNames().asScala.toSet
@@ -306,12 +305,8 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
       case Some(depl) =>
         log.info(s"Undeploying ${buildDeploymentLogObj(depl.verticleId.value, depl.descriptor)}")
         VertxDeploy.undeploy(vertx, depl.id.value).toScala
-          .map { _ =>
-            initLog.info(s"'${depl.verticleId.value}' undeployed")
-            \/-(id)
-          }
-          .recover { case ex: Throwable =>
-            -\/(new Exception(s"Could not undeploy '${depl.verticleId.value}", ex))
+          .map { _ => \/-(id) }.recover { case ex: Throwable =>
+            -\/(new Exception(s"Could not undeploy '${depl.verticleId.value}'", ex))
           }
       case None =>
         Future.successful(-\/(new Exception(s"Could not undeploy verticle '${id.value}'. Missing in registry")))
