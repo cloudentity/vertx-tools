@@ -121,10 +121,10 @@ public class ConfBuilder {
 
     Try<JsonObject> result = ModulesReader.readModuleConfigFromClasspath(moduleName);
     if (result.isSuccess()) {
-      JsonObject moduleWithEnvResolved = ConfReference.populateEnvRefs(result.get(), envFallback);
-      JsonObject moduleWithIdResolved  = ModuleIdReference.populateModuleIdRefs(moduleWithEnvResolved, moduleId);
+      JsonObject moduleWithIdResolved  = ModuleIdReference.populateModuleIdRefs(result.get(), moduleId);
+      JsonObject moduleWithEnvResolved = ConfReference.populateEnvRefs(moduleWithIdResolved, envFallback);
 
-      return Either.right(new ValidRawModule(moduleName, Optional.empty(), moduleWithIdResolved));
+      return Either.right(new ValidRawModule(moduleName, Optional.empty(), moduleWithEnvResolved));
     } else {
       return Either.left(new MissingModule(moduleName, result.getCause()));
     }
