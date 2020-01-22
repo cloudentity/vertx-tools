@@ -8,6 +8,8 @@
 
 ### Fixed
 - registry configuration change listener handles missing config object gracefully
+- smart http client supports transfer-encoding chunked
+- smart http client copies all header values per key
 
 ## [1.0.0] - 2019-11-27
 ### Added
