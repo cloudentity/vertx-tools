@@ -116,16 +116,19 @@ class SmartHttpClientImpl(
         client.request(rs.req.method, setupOptions(rs.req, node), handler)
           .exceptionHandler { ex => retryRun(rs, node, ex) }
 
+      if (rs.req.headers.getValues("Transfer-Encoding").getOrElse(Nil).contains("chunked"))
+        r.setChunked(true)
+
       rs.responseTimeout.foreach(ts => r.setTimeout(ts))
-      rs.req.headers.foreach(header => r.putHeader(header.key, header.value))
+      rs.req.headers.toMap.foreach { case (key, values) => values.foreach(value => r.headers().add(key, value)) }
 
       rs.req.body match {
         case Some(body) =>
           r.end(body)
         case None =>
-          rs.req.bodyPipe match {
-            case Some(bodyPipe) => bodyPipe.to(r)
-            case None           => r.end()
+          rs.req.bodyStream match {
+            case Some(bodyStream) => bodyStream.pipeTo(r)
+            case None             => r.end()
           }
 
       }
@@ -141,21 +144,21 @@ class SmartHttpClientImpl(
 
     if (rs.evalExceptionRetry(ex))
       discoverStep(rs.copy(attemptsLeft = rs.attemptsLeft - 1), Some(-\/(ex)))
-    else rs.promise.fail(ex)
+    else if (!rs.promise.isComplete) rs.promise.fail(ex)
   }
 
   private def step(rs: RequestStep, node: Node, response: ClientResponse): Unit =
     rs.evalResponse(new SmartHttpResponseImpl(response.body.getOrElse(Buffer.buffer()), response.http)) match {
       case CallOk =>
         log.debug(rs.tracing, s"Request succeeded: ${callSignature(rs.req, node)}, response ${respSignature(response.http)}")
-        rs.promise.complete(response)
+        if (!rs.promise.isComplete) rs.promise.complete(response)
       case CallFailed(retry) =>
         log.error(rs.tracing, s"Call failed with bad response: ${callSignature(rs.req, node)}, response ${respSignature(response.http)}")
         node.cb.execute[Unit](_.fail("response failed"))
 
         if (retry)
           discoverStep(rs.copy(attemptsLeft = rs.attemptsLeft - 1), Some(\/-(response)))
-        else rs.promise.complete(response)
+        else if (!rs.promise.isComplete) rs.promise.complete(response)
     }
 
   private def finishWithLastResponse(promise: Future[ClientResponse], lastResult: Option[Throwable \/ ClientResponse], req: Request): Unit =

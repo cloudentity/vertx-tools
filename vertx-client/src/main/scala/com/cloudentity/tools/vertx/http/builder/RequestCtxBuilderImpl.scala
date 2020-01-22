@@ -8,7 +8,7 @@ import io.vertx.core.http.{HttpClientResponse, HttpMethod}
 import RequestCtxBuilderImpl.{RequestCtx, _}
 import com.cloudentity.tools.vertx.http.builder.SmartHttpClientBuilderImpl.EvaluateResponseCallStatus
 import com.cloudentity.tools.vertx.tracing.TracingContext
-import io.vertx.core.streams.Pipe
+import io.vertx.core.streams.ReadStream
 
 object RequestCtxBuilderImpl {
   case class RequestCtxValues(req: RequestValues, call: CallValues)
@@ -17,16 +17,16 @@ object RequestCtxBuilderImpl {
     method: HttpMethod,
     uri: Option[String] = None,
     body: Option[Buffer] = None,
-    bodyStream: Option[Pipe[Buffer]] = None,
-    headers: List[SmartHttp.HttpHeader] = Nil
+    bodyStream: Option[ReadStream[Buffer]] = None,
+    headers: Headers = Headers()
   )
 
   case class Request(
     method: HttpMethod,
     uri: String,
     body: Option[Buffer],
-    bodyPipe: Option[Pipe[Buffer]],
-    headers: List[SmartHttp.HttpHeader]
+    bodyStream: Option[ReadStream[Buffer]],
+    headers: Headers
   )
 
   case class RequestCtx(
@@ -62,11 +62,14 @@ class RequestCtxBuilderImpl(executor: RequestExecution, ctx: RequestCtxValues) e
   private def body(m: Buffer): RequestCtxBuilderImpl =
     copy(ctx.copy(req = ctx.req.copy(body = Some(m))))
 
-  private def body(m: Pipe[Buffer]): RequestCtxBuilderImpl =
+  private def body(m: ReadStream[Buffer]): RequestCtxBuilderImpl =
     copy(ctx.copy(req = ctx.req.copy(bodyStream = Some(m))))
 
   def putHeader(key: String, value: String): RequestCtxBuilderImpl =
-    copy(ctx.copy(req = ctx.req.copy(headers = HttpHeader(key, value) :: ctx.req.headers)))
+    copy(ctx.copy(req = ctx.req.copy(headers = ctx.req.headers.set(key, value))))
+
+  def addHeader(key: String, value: String): RequestCtxBuilderImpl =
+    copy(ctx.copy(req = ctx.req.copy(headers = ctx.req.headers.add(key, value))))
 
   private def build(): RequestCtx =
     RequestCtx(
@@ -74,7 +77,7 @@ class RequestCtxBuilderImpl(executor: RequestExecution, ctx: RequestCtxValues) e
         method = ctx.req.method,
         uri = ctx.req.uri.getOrElse(""),
         body = ctx.req.body,
-        bodyPipe = ctx.req.bodyStream,
+        bodyStream = ctx.req.bodyStream,
         headers = ctx.req.headers
       ),
       evalResponseFailure = buildResponseFailureEvaluatorOpt(ctx.call),
@@ -153,22 +156,22 @@ class RequestCtxBuilderImpl(executor: RequestExecution, ctx: RequestCtxValues) e
   override def endWithBody(tracingContext: TracingContext, b: String): Future[SmartHttpResponse] =
     executor.executeWithBody(tracingContext, body(b).build())
 
-  override def end(s: Pipe[Buffer]): Future[HttpClientResponse] =
+  override def end(s: ReadStream[Buffer]): Future[HttpClientResponse] =
     executor.execute(body(s).build())
 
-  override def end(s: Pipe[Buffer], bodyHandler: Handler[Buffer]): Future[HttpClientResponse] =
+  override def end(s: ReadStream[Buffer], bodyHandler: Handler[Buffer]): Future[HttpClientResponse] =
     executor.execute(body(s).build(), bodyHandler)
 
-  override def endWithBody(s: Pipe[Buffer]): Future[SmartHttpResponse] =
+  override def endWithBody(s: ReadStream[Buffer]): Future[SmartHttpResponse] =
     executor.executeWithBody(body(s).build())
 
-  override def end(tracingContext: TracingContext, s: Pipe[Buffer]): Future[HttpClientResponse] =
+  override def end(tracingContext: TracingContext, s: ReadStream[Buffer]): Future[HttpClientResponse] =
     executor.execute(tracingContext, body(s).build())
 
-  override def end(tracingContext: TracingContext, s: Pipe[Buffer], bodyHandler: Handler[Buffer]): Future[HttpClientResponse] =
+  override def end(tracingContext: TracingContext, s: ReadStream[Buffer], bodyHandler: Handler[Buffer]): Future[HttpClientResponse] =
     executor.execute(tracingContext, body(s).build(), bodyHandler)
 
-  override def endWithBody(tracingContext: TracingContext, s: Pipe[Buffer]): Future[SmartHttpResponse] =
+  override def endWithBody(tracingContext: TracingContext, s: ReadStream[Buffer]): Future[SmartHttpResponse] =
     executor.executeWithBody(tracingContext, body(s).build())
 }
 

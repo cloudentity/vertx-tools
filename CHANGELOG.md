@@ -1,7 +1,7 @@
 ## [Unreleased]
 ### Added
 - module instance support
-- smart http client body piping
+- smart http client body streaming and addHeader method
 
 ### Changed
 - registry logger name contains registry type
