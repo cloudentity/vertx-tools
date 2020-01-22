@@ -8,6 +8,7 @@ import io.vertx.core.http.{HttpClientResponse, HttpMethod}
 import RequestCtxBuilderImpl.{RequestCtx, _}
 import com.cloudentity.tools.vertx.http.builder.SmartHttpClientBuilderImpl.EvaluateResponseCallStatus
 import com.cloudentity.tools.vertx.tracing.TracingContext
+import io.vertx.core.streams.Pipe
 
 object RequestCtxBuilderImpl {
   case class RequestCtxValues(req: RequestValues, call: CallValues)
@@ -16,6 +17,7 @@ object RequestCtxBuilderImpl {
     method: HttpMethod,
     uri: Option[String] = None,
     body: Option[Buffer] = None,
+    bodyStream: Option[Pipe[Buffer]] = None,
     headers: List[SmartHttp.HttpHeader] = Nil
   )
 
@@ -23,6 +25,7 @@ object RequestCtxBuilderImpl {
     method: HttpMethod,
     uri: String,
     body: Option[Buffer],
+    bodyPipe: Option[Pipe[Buffer]],
     headers: List[SmartHttp.HttpHeader]
   )
 
@@ -59,6 +62,9 @@ class RequestCtxBuilderImpl(executor: RequestExecution, ctx: RequestCtxValues) e
   private def body(m: Buffer): RequestCtxBuilderImpl =
     copy(ctx.copy(req = ctx.req.copy(body = Some(m))))
 
+  private def body(m: Pipe[Buffer]): RequestCtxBuilderImpl =
+    copy(ctx.copy(req = ctx.req.copy(bodyStream = Some(m))))
+
   def putHeader(key: String, value: String): RequestCtxBuilderImpl =
     copy(ctx.copy(req = ctx.req.copy(headers = HttpHeader(key, value) :: ctx.req.headers)))
 
@@ -68,6 +74,7 @@ class RequestCtxBuilderImpl(executor: RequestExecution, ctx: RequestCtxValues) e
         method = ctx.req.method,
         uri = ctx.req.uri.getOrElse(""),
         body = ctx.req.body,
+        bodyPipe = ctx.req.bodyStream,
         headers = ctx.req.headers
       ),
       evalResponseFailure = buildResponseFailureEvaluatorOpt(ctx.call),
@@ -145,6 +152,24 @@ class RequestCtxBuilderImpl(executor: RequestExecution, ctx: RequestCtxValues) e
 
   override def endWithBody(tracingContext: TracingContext, b: String): Future[SmartHttpResponse] =
     executor.executeWithBody(tracingContext, body(b).build())
+
+  override def end(s: Pipe[Buffer]): Future[HttpClientResponse] =
+    executor.execute(body(s).build())
+
+  override def end(s: Pipe[Buffer], bodyHandler: Handler[Buffer]): Future[HttpClientResponse] =
+    executor.execute(body(s).build(), bodyHandler)
+
+  override def endWithBody(s: Pipe[Buffer]): Future[SmartHttpResponse] =
+    executor.executeWithBody(body(s).build())
+
+  override def end(tracingContext: TracingContext, s: Pipe[Buffer]): Future[HttpClientResponse] =
+    executor.execute(tracingContext, body(s).build())
+
+  override def end(tracingContext: TracingContext, s: Pipe[Buffer], bodyHandler: Handler[Buffer]): Future[HttpClientResponse] =
+    executor.execute(tracingContext, body(s).build(), bodyHandler)
+
+  override def endWithBody(tracingContext: TracingContext, s: Pipe[Buffer]): Future[SmartHttpResponse] =
+    executor.executeWithBody(tracingContext, body(s).build())
 }
 
 object RequestCtxValues {

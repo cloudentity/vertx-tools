@@ -9,7 +9,7 @@ import com.cloudentity.tools.vertx.sd.Node
 import com.cloudentity.tools.vertx.tracing.{LoggingWithTracing, TracingContext}
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.http.{HttpClient, HttpClientResponse, HttpMethod, RequestOptions}
-import io.vertx.core.{Future, Handler}
+import io.vertx.core.{AsyncResult, Future, Handler}
 import scalaz.{-\/, \/, \/-}
 
 case class ClientResponse(body: Option[Buffer], http: HttpClientResponse)
@@ -120,8 +120,14 @@ class SmartHttpClientImpl(
       rs.req.headers.foreach(header => r.putHeader(header.key, header.value))
 
       rs.req.body match {
-        case Some(body) => r.end(body)
-        case None       => r.end()
+        case Some(body) =>
+          r.end(body)
+        case None =>
+          rs.req.bodyPipe match {
+            case Some(bodyPipe) => bodyPipe.to(r)
+            case None           => r.end()
+          }
+
       }
     } else {
       log.error(rs.tracing, s"Request failed. No more retries left. Returning last result. ${reqSignature(rs.req)}")
