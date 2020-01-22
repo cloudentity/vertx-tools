@@ -144,21 +144,21 @@ class SmartHttpClientImpl(
 
     if (rs.evalExceptionRetry(ex))
       discoverStep(rs.copy(attemptsLeft = rs.attemptsLeft - 1), Some(-\/(ex)))
-    else if (!rs.promise.isComplete) rs.promise.fail(ex)
+    else rs.promise.fail(ex)
   }
 
   private def step(rs: RequestStep, node: Node, response: ClientResponse): Unit =
     rs.evalResponse(new SmartHttpResponseImpl(response.body.getOrElse(Buffer.buffer()), response.http)) match {
       case CallOk =>
         log.debug(rs.tracing, s"Request succeeded: ${callSignature(rs.req, node)}, response ${respSignature(response.http)}")
-        if (!rs.promise.isComplete) rs.promise.complete(response)
+        rs.promise.complete(response)
       case CallFailed(retry) =>
         log.error(rs.tracing, s"Call failed with bad response: ${callSignature(rs.req, node)}, response ${respSignature(response.http)}")
         node.cb.execute[Unit](_.fail("response failed"))
 
         if (retry)
           discoverStep(rs.copy(attemptsLeft = rs.attemptsLeft - 1), Some(\/-(response)))
-        else if (!rs.promise.isComplete) rs.promise.complete(response)
+        else rs.promise.complete(response)
     }
 
   private def finishWithLastResponse(promise: Future[ClientResponse], lastResult: Option[Throwable \/ ClientResponse], req: Request): Unit =
