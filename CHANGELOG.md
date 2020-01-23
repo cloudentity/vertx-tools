@@ -2,6 +2,7 @@
 ### Added
 - module instance support
 - smart http client body streaming and addHeader method
+- 'enabled' flag in verticle registry
 
 ### Changed
 - registry logger name contains registry type
