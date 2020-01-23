@@ -127,8 +127,13 @@ class SmartHttpClientImpl(
           r.end(body)
         case None =>
           rs.req.bodyStream match {
-            case Some(bodyStream) => bodyStream.exceptionHandler(rs.promise.fail).pipeTo(r)
-            case None             => r.end()
+            case Some(bodyStream) =>
+              bodyStream.exceptionHandler { ex =>
+                r.reset()
+                rs.promise.fail(ex)
+              }.pipeTo(r)
+            case None =>
+              r.end()
           }
 
       }
