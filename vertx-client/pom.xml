@@ -20,6 +20,10 @@
       <artifactId>vertx-sd</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.cloudentity.tools.vertx</groupId>
+      <artifactId>vertx-http-common</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
