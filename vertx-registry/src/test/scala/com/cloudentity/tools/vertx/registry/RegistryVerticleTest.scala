@@ -40,9 +40,29 @@ class RegistryVerticleTest() extends VertxUnitTest with FutureConversions {
   }
 
   @Test
-  def shouldNotDeployDisabledVerticle(context: TestContext): Unit = {
+  def shouldNotDeployDisabledTrueVerticle(context: TestContext): Unit = {
     // given
     val configFile = copyDescriptorsToTempFile("src/test/resources/registry/disabled-healthy.json")
+    val typ = RegistryType("test")
+
+    val client = ServiceClientFactory.make(vertx.eventBus(), classOf[RegistryService], Optional.of(typ.value))
+    // when
+    ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath)
+      .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
+      .compose { _ => client.getVerticleIds }
+      .compose { (ids: java.util.List[String]) =>
+        // then
+        context.assertEquals(1, ids.size)
+        context.assertTrue(ids.contains("healthy1-verticle"))
+
+        Future.succeededFuture(())
+      }.setHandler(context.asyncAssertSuccess())
+  }
+
+  @Test
+  def shouldNotDeployEnabledFalseVerticle(context: TestContext): Unit = {
+    // given
+    val configFile = copyDescriptorsToTempFile("src/test/resources/registry/enabled-false-healthy.json")
     val typ = RegistryType("test")
 
     val client = ServiceClientFactory.make(vertx.eventBus(), classOf[RegistryService], Optional.of(typ.value))

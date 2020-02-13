@@ -1839,7 +1839,7 @@ For example, let's deploy 4 instances ServiceVerticleA:
 
 <a id="di-disable"></a>
 ### Disabling verticle
-You can skip deployment of a verticle defined in registry. To do so, set `disabled` flag to true.
+You can skip deployment of a verticle defined in registry. To do so, set `enabled` flag to false.
 
 E.g.
 ```
@@ -1847,11 +1847,14 @@ E.g.
   "registry:components": {
     "verticle-a-id": {
       "main": "com.example.ServiceVerticleA",
-      "disabled": true
+      "enabled": false
     }
   }
 }
 ```
+
+> NOTE<br/>
+> For backward compatibility you can use 'disabled' flag. Set it to true to skip verticle deployment.
 
 <a id="server"></a>
 ## Serving HTTP requests and ApiServer
