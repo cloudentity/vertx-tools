@@ -23,7 +23,7 @@ object RegistryVerticle {
 
   case class VerticleDescriptor(
     main: String,
-    disabled: Option[Boolean],
+    enabled: Boolean,
     options: JsonObject,
     configPath: Option[String],
     verticleConfig: Option[JsonObject],
@@ -175,13 +175,17 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
 
     for {
       main              <- Try(Option(obj.getString("main"))).toOption.flatten.toRight("Could not read 'main' attribute")
-      disabledOpt       <- Try(Option[Boolean](obj.getBoolean("disabled"))).toEither.left.map(_ => "Could not read 'disabled' attribute")
+      disabledOpt       <- Try(Option(obj.getValue("disabled")).map(_.asInstanceOf[Boolean])).toEither.left.map(_ => "Could not read 'disabled' attribute")
+      enabledOpt        <- Try(Option(obj.getValue("enabled")).map(_.asInstanceOf[Boolean])).toEither.left.map(_ => "Could not read 'enabled' attribute")
+      enabled           <- if (enabledOpt.isDefined && disabledOpt.isDefined && enabledOpt == disabledOpt)
+                             Left("Both 'enabled' and 'disabled' cannot be set")
+                           else Right(enabledOpt.orElse(disabledOpt.map(!_)).getOrElse(true))
       optionsOpt        <- Try(Option(obj.getJsonObject("options"))).toEither.left.map(_ => "Could not read 'options' attribute")
       configPathOpt     <- Try(Option(obj.getString("configPath"))).toEither.left.map(_ => "Could not read 'configPath' attribute")
       verticleConfigOpt <- Try(Option(obj.getJsonObject("verticleConfig"))).toEither.left.map(_ => "Could not read 'verticleConfig' attribute")
       prefixOpt         <- readAddressPrefix()
       deployStrategy    <- readDeploymentStrategy()
-    } yield VerticleDescriptor(main, disabledOpt, optionsOpt.getOrElse(new JsonObject()), configPathOpt, verticleConfigOpt, prefixOpt, deployStrategy)
+    } yield VerticleDescriptor(main, enabled, optionsOpt.getOrElse(new JsonObject()), configPathOpt, verticleConfigOpt, prefixOpt, deployStrategy)
   }.map(VerticleId(name) -> _).left.map(error => s"Error decoding descriptor of verticle '$name': $error")
 
   private def decodeDeploymentStrategy(deployStrategyOpt: Option[String]): Either[String, DeploymentStrategy] =
@@ -223,7 +227,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
   }
 
   private def disabledVerticle(id: VerticleId, descriptor: VerticleDescriptor): Boolean =
-    descriptor.disabled.getOrElse(false)
+    !descriptor.enabled
 
   private def setupChangeListener(): Unit =
     registerConfChangeConsumer { change =>
