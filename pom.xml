@@ -37,7 +37,7 @@
     <scala.version>2.12.9</scala.version>
     <scalaz.version>7.3.0-M10</scalaz.version>
     <circe.version>0.11.1</circe.version>
-    <jaeger.version>0.35.5</jaeger.version>
+    <jaeger.version>1.2.0</jaeger.version>
     <embedded-consul.version>1.0.2</embedded-consul.version>
     <slf4j.version>1.7.21</slf4j.version>
     <owaspdt.url>https://owaspdt.int.cloudentity.com</owaspdt.url>

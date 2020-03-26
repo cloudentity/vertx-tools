@@ -24,6 +24,8 @@
 - [CVE-2019-17531](https://nvd.nist.gov/vuln/detail/CVE-2019-17531) - Fixed by upgrading jackson-databind 2.9.9.3 -> 2.9.10.3
 - [CVE-2019-20330](https://nvd.nist.gov/vuln/detail/CVE-2019-20330) - Fixed by upgrading jackson-databind 2.9.9.3 -> 2.9.10.3
 - [CVE-2020-8840](https://nvd.nist.gov/vuln/detail/CVE-2020-8840) - Fixed by upgrading jackson-databind 2.9.9.3 -> 2.9.10.3
+- [CVE-2019-0205](https://nvd.nist.gov/vuln/detail/CVE-2019-0205) - Fixed by upgrading jaeger 0.35.5 -> 1.2.0
+- [CVE-2019-0210](https://nvd.nist.gov/vuln/detail/CVE-2019-0210) - Fixed by upgrading jaeger 0.35.5 -> 1.2.0
 
 ## [1.0.0] - 2019-11-27
 ### Added
