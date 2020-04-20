@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.1.0] - 2019-04-20
 ### Added
 - module instance support
 - smart http client body streaming and addHeader method
