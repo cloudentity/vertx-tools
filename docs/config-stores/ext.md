@@ -21,6 +21,7 @@ ExtConfigStore config attributes:
 * `base64Encode` - optional, default false, if true then it base64-encodes the config value
 * `maskSecrets` - optional, default false, if true then config values are masked when printed in init log
 * `cache` - optional, default false, if true then config values are read only once and are not refreshed
+* `scheme` - optional, if 'https'/'http' then underlying config store has 'ssl' configuration flag set to true/false
 
 ##### Example - wrapping JsonObject configuration attribute:
 Let's use FileExtConfigStore that wraps FileConfigStore.
