@@ -1,10 +1,13 @@
+## [Unreleased]
+### Added
+- ext config stores can control 'ssl' flag of underlying store with 'scheme' attribute
+
 ## [1.1.0] - 2019-04-20
 ### Added
 - module instance support
 - smart http client body streaming and addHeader method
 - 'enabled' flag in verticle registry
 - plugins to build and upload BOM files
-- ext config stores can control 'ssl' flag of underlying store with 'scheme' attribute
 
 ### Changed
 - registry logger name contains registry type
