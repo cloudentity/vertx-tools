@@ -6,32 +6,40 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.streams.ReadStream;
 
 public interface RequestCtxBuilder extends CallValuesBuilder<RequestCtxBuilder> {
   RequestCtxBuilder method(HttpMethod m);
   RequestCtxBuilder putHeader(String key, String value);
+  RequestCtxBuilder addHeader(String key, String value);
 
   Future<HttpClientResponse> end();
   Future<HttpClientResponse> end(Buffer b);
   Future<HttpClientResponse> end(String b);
+  Future<HttpClientResponse> end(ReadStream<Buffer> s);
 
   Future<HttpClientResponse> end(Handler<Buffer> bodyHandler);
   Future<HttpClientResponse> end(Buffer b, Handler<Buffer> bodyHandler);
   Future<HttpClientResponse> end(String b, Handler<Buffer> bodyHandler);
+  Future<HttpClientResponse> end(ReadStream<Buffer> s, Handler<Buffer> bodyHandler);
 
   Future<SmartHttpResponse> endWithBody();
   Future<SmartHttpResponse> endWithBody(Buffer b);
   Future<SmartHttpResponse> endWithBody(String b);
+  Future<SmartHttpResponse> endWithBody(ReadStream<Buffer> s);
 
   Future<HttpClientResponse> end(TracingContext tracingContext);
   Future<HttpClientResponse> end(TracingContext tracingContext, Buffer b);
   Future<HttpClientResponse> end(TracingContext tracingContext, String b);
+  Future<HttpClientResponse> end(TracingContext tracingContext, ReadStream<Buffer> s);
 
   Future<HttpClientResponse> end(TracingContext tracingContext, Handler<Buffer> bodyHandler);
   Future<HttpClientResponse> end(TracingContext tracingContext, Buffer b, Handler<Buffer> bodyHandler);
   Future<HttpClientResponse> end(TracingContext tracingContext, String b, Handler<Buffer> bodyHandler);
+  Future<HttpClientResponse> end(TracingContext tracingContext, ReadStream<Buffer> s, Handler<Buffer> bodyHandler);
 
   Future<SmartHttpResponse> endWithBody(TracingContext tracingContext);
   Future<SmartHttpResponse> endWithBody(TracingContext tracingContext, Buffer b);
   Future<SmartHttpResponse> endWithBody(TracingContext tracingContext, String b);
+  Future<SmartHttpResponse> endWithBody(TracingContext tracingContext, ReadStream<Buffer> s);
 }

@@ -5,7 +5,6 @@ import java.util
 import RegistryVerticle._
 import com.cloudentity.tools.vertx.scala.bus.ScalaServiceVerticle
 import com.cloudentity.tools.vertx.verticles.VertxDeploy
-
 import io.vertx.core.impl.NoStackTraceThrowable
 import io.vertx.core.json.JsonObject
 import io.vertx.core.{AsyncResult, DeploymentOptions, Future => VxFuture}
@@ -24,7 +23,7 @@ object RegistryVerticle {
 
   case class VerticleDescriptor(
     main: String,
-    disabled: Option[Boolean],
+    enabled: Boolean,
     options: JsonObject,
     configPath: Option[String],
     verticleConfig: Option[JsonObject],
@@ -80,7 +79,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
     */
   def this() = this(null, true)
 
-  val log = LoggerFactory.getLogger(this.getClass)
+  lazy val log = LoggerFactory.getLogger(this.getClass + Option(_registryType).map(":" + _.value).getOrElse(""))
   val initLog = InitLog.of(log)
 
   val internalConfigKey = "config"
@@ -176,13 +175,17 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
 
     for {
       main              <- Try(Option(obj.getString("main"))).toOption.flatten.toRight("Could not read 'main' attribute")
-      disabledOpt       <- Try(Option[Boolean](obj.getBoolean("disabled"))).toEither.left.map(_ => "Could not read 'disabled' attribute")
+      disabledOpt       <- Try(Option(obj.getValue("disabled")).map(_.asInstanceOf[Boolean])).toEither.left.map(_ => "Could not read 'disabled' attribute")
+      enabledOpt        <- Try(Option(obj.getValue("enabled")).map(_.asInstanceOf[Boolean])).toEither.left.map(_ => "Could not read 'enabled' attribute")
+      enabled           <- if (enabledOpt.isDefined && disabledOpt.isDefined && enabledOpt == disabledOpt)
+                             Left("Both 'enabled' and 'disabled' cannot be set")
+                           else Right(enabledOpt.orElse(disabledOpt.map(!_)).getOrElse(true))
       optionsOpt        <- Try(Option(obj.getJsonObject("options"))).toEither.left.map(_ => "Could not read 'options' attribute")
       configPathOpt     <- Try(Option(obj.getString("configPath"))).toEither.left.map(_ => "Could not read 'configPath' attribute")
       verticleConfigOpt <- Try(Option(obj.getJsonObject("verticleConfig"))).toEither.left.map(_ => "Could not read 'verticleConfig' attribute")
       prefixOpt         <- readAddressPrefix()
       deployStrategy    <- readDeploymentStrategy()
-    } yield VerticleDescriptor(main, disabledOpt, optionsOpt.getOrElse(new JsonObject()), configPathOpt, verticleConfigOpt, prefixOpt, deployStrategy)
+    } yield VerticleDescriptor(main, enabled, optionsOpt.getOrElse(new JsonObject()), configPathOpt, verticleConfigOpt, prefixOpt, deployStrategy)
   }.map(VerticleId(name) -> _).left.map(error => s"Error decoding descriptor of verticle '$name': $error")
 
   private def decodeDeploymentStrategy(deployStrategyOpt: Option[String]): Either[String, DeploymentStrategy] =
@@ -224,12 +227,12 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
   }
 
   private def disabledVerticle(id: VerticleId, descriptor: VerticleDescriptor): Boolean =
-    descriptor.disabled.getOrElse(false)
+    !descriptor.enabled
 
   private def setupChangeListener(): Unit =
     registerConfChangeConsumer { change =>
-      val prev = change.getPreviousConfiguration.getJsonObject(verticleId)
-      val next = change.getNewConfiguration.getJsonObject(verticleId)
+      val prev = change.getPreviousConfiguration.getJsonObject(verticleId, new JsonObject())
+      val next = change.getNewConfiguration.getJsonObject(verticleId, new JsonObject())
       log.debug(s"Verticle descriptors changed, prev=$prev, next=$next")
 
       val toRemoveNames = prev.fieldNames().asScala.toSet -- next.fieldNames().asScala.toSet
@@ -306,12 +309,8 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
       case Some(depl) =>
         log.info(s"Undeploying ${buildDeploymentLogObj(depl.verticleId.value, depl.descriptor)}")
         VertxDeploy.undeploy(vertx, depl.id.value).toScala
-          .map { _ =>
-            initLog.info(s"'${depl.verticleId.value}' undeployed")
-            \/-(id)
-          }
-          .recover { case ex: Throwable =>
-            -\/(new Exception(s"Could not undeploy '${depl.verticleId.value}", ex))
+          .map { _ => \/-(id) }.recover { case ex: Throwable =>
+            -\/(new Exception(s"Could not undeploy '${depl.verticleId.value}'", ex))
           }
       case None =>
         Future.successful(-\/(new Exception(s"Could not undeploy verticle '${id.value}'. Missing in registry")))

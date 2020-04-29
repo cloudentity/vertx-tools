@@ -4,7 +4,7 @@
 
   <groupId>com.cloudentity.tools.vertx</groupId>
   <artifactId>vertx-tools</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 
   <modules>
     <module>vertx-config-common</module>
@@ -32,14 +32,15 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vertx.version>3.8.0</vertx.version>
-    <jackson-databind.version>2.9.9.3</jackson-databind.version>
+    <jackson-databind.version>2.9.10.3</jackson-databind.version>
     <java.version>1.8</java.version>
     <scala.version>2.12.9</scala.version>
     <scalaz.version>7.3.0-M10</scalaz.version>
     <circe.version>0.11.1</circe.version>
-    <jaeger.version>0.35.5</jaeger.version>
+    <jaeger.version>1.2.0</jaeger.version>
     <embedded-consul.version>1.0.2</embedded-consul.version>
     <slf4j.version>1.7.21</slf4j.version>
+    <owaspdt.url>https://owaspdt.int.cloudentity.com</owaspdt.url>
   </properties>
 
   <scm>
@@ -163,22 +164,78 @@
           <plugin>
             <groupId>org.owasp</groupId>
             <artifactId>dependency-check-maven</artifactId>
-            <version>5.2.1</version>
+            <version>5.3.0</version>
             <configuration>
-              <skipProvidedScope>true</skipProvidedScope>
-              <skipRuntimeScope>true</skipRuntimeScope>
+              <skipProvidedScope>false</skipProvidedScope>
+              <skipRuntimeScope>false</skipRuntimeScope>
               <formats>
                 <format>HTML</format>
                 <format>JUNIT</format>
               </formats>
+              <cveUrlBase>https://nvdcve:MoKerviNeupTaTEr@nvdcve.artifactory.syntegrity.com/nvdcve-1.0-%d.json.gz</cveUrlBase>
+              <cveUrlModified>https://nvdcve:MoKerviNeupTaTEr@nvdcve.artifactory.syntegrity.com/nvdcve-1.0-modified.json.gz</cveUrlModified>
             </configuration>
             <executions>
               <execution>
                 <goals>
-                  <goal>check</goal>
+                  <goal>aggregate</goal>
                 </goals>
               </execution>
             </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <id>owasp-dependency-track</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.cyclonedx</groupId>
+            <artifactId>cyclonedx-maven-plugin</artifactId>
+            <version>1.6.4</version>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>makeAggregateBom</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <schemaVersion>1.1</schemaVersion>
+              <includeBomSerialNumber>true</includeBomSerialNumber>
+              <includeCompileScope>true</includeCompileScope>
+              <includeProvidedScope>true</includeProvidedScope>
+              <includeRuntimeScope>true</includeRuntimeScope>
+              <includeSystemScope>true</includeSystemScope>
+              <includeTestScope>false</includeTestScope>
+              <includeDependencyGraph>true</includeDependencyGraph>
+              <includeLicenseText>false</includeLicenseText>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>io.github.pmckeown</groupId>
+            <artifactId>dependency-track-maven-plugin</artifactId>
+            <version>0.8.1</version>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>delete-project</goal>
+                  <goal>upload-bom</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <dependencyTrackBaseUrl>${owaspdt.url}</dependencyTrackBaseUrl>
+              <apiKey>${owaspdt.api.key}</apiKey>
+            </configuration>
           </plugin>
         </plugins>
       </build>

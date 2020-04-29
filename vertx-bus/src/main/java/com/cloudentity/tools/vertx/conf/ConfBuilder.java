@@ -1,5 +1,8 @@
 package com.cloudentity.tools.vertx.conf;
 
+import com.cloudentity.tools.vertx.conf.modules.ModuleIdReference;
+import com.cloudentity.tools.vertx.conf.modules.ModulesReader;
+import com.cloudentity.tools.vertx.conf.modules.TreeModuleDefsCollector;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import io.vertx.core.json.JsonArray;
@@ -38,15 +41,18 @@ public class ConfBuilder {
 
   public static class ValidRawModule {
     public final String name;
+    public final Optional<String> id;
     public final JsonObject rawConfig;
 
-    public ValidRawModule(String name, JsonObject rawConfig) {
+    public ValidRawModule(String name, Optional<String> id, JsonObject rawConfig) {
       this.name = name;
+      this.id = id;
       this.rawConfig = rawConfig;
     }
   }
 
-  public static Either<List<MissingModule>, Config> buildFinalConfig(JsonObject rawRootConfig) {
+  public static Either<List<MissingModule>, Config> buildFinalConfig(JsonObject rawRootConfigOriginal) {
+    JsonObject rawRootConfig = rawRootConfigOriginal.copy();
     List<Either<MissingModule, ValidRawModule>> modules = readRawModulesConfigs(rawRootConfig);
 
     List<MissingModule> missingModules = modules.stream().filter(x -> x.isLeft()).map(x -> x.getLeft()).collect(Collectors.toList());
@@ -71,19 +77,57 @@ public class ConfBuilder {
   }
 
   public static List<Either<MissingModule, ValidRawModule>> readRawModulesConfigs(JsonObject rawRootConfig) {
+    JsonObject globalEnvFallback = Optional.ofNullable(rawRootConfig.getJsonObject("env")).orElse(new JsonObject());
     JsonArray requiredModuleNames = rawRootConfig.getJsonArray("requiredModules", new JsonArray());
     JsonArray defaultModuleNames  = rawRootConfig.getJsonArray("defaultModules", new JsonArray());
 
-    JsonArray moduleNames = requiredModuleNames.copy();
-    moduleNames.addAll(Optional.ofNullable(ConfReference.populateEnvRefs(rawRootConfig).getJsonArray("modules")).orElse(defaultModuleNames));
+    JsonArray moduleDefs = requiredModuleNames.copy();
+    moduleDefs.addAll(Optional.ofNullable(ConfReference.populateEnvRefs(rawRootConfig, globalEnvFallback).getJsonArray("modules")).orElse(defaultModuleNames));
 
     List<Either<MissingModule, ValidRawModule>> results = new ArrayList();
-    moduleNames.forEach(moduleName -> {
-      Try<JsonObject> result = ModulesReader.readModuleConfigFromClasspath(moduleName.toString());
-      if (result.isSuccess()) results.add(Either.right(new ValidRawModule(moduleName.toString(), result.get())));
-      else                    results.add(Either.left(new MissingModule(moduleName.toString(), result.getCause())));
+    moduleDefs.forEach(moduleDef -> {
+      if (moduleDef instanceof String){
+        results.add(resolveSimpleModule(moduleDef.toString()));
+      } else if (moduleDef instanceof JsonObject) {
+        JsonObject moduleDefJson = (JsonObject) moduleDef;
+        if ("tree".equals(moduleDefJson.getString("collect"))) {
+          results.addAll(TreeModuleDefsCollector.collect(rawRootConfig, moduleDefJson).stream().map(def -> resolveModuleInstance(globalEnvFallback, def)).collect(Collectors.toList()));
+        } else {
+          results.add(resolveModuleInstance(globalEnvFallback, (JsonObject) moduleDef));
+        }
+      }
     });
     return results;
+  }
+
+  private static Either<MissingModule, ValidRawModule> resolveSimpleModule(String moduleName) {
+    Try<JsonObject> result = ModulesReader.readModuleConfigFromClasspath(moduleName);
+    if (result.isSuccess()) {
+      JsonObject moduleConfig = result.get();
+      ModuleIdReference.populateModuleIdRefs(moduleConfig, Optional.empty()); // removes module-id references
+      return Either.right(new ValidRawModule(moduleName, Optional.empty(), moduleConfig));
+    } else {
+      return Either.left(new MissingModule(moduleName, result.getCause()));
+    }
+  }
+
+  private static Either<MissingModule, ValidRawModule> resolveModuleInstance(JsonObject globalEnv, JsonObject moduleDef) {
+    return buildModuleInstance(globalEnv, moduleDef, Optional.ofNullable(moduleDef.getString("id")));
+  }
+
+  private static Either<MissingModule, ValidRawModule> buildModuleInstance(JsonObject globalEnv, JsonObject moduleDef, Optional<String> moduleId) {
+    String moduleName = moduleDef.getString("module");
+    JsonObject envFallback = globalEnv.copy().mergeIn(Optional.ofNullable(moduleDef.getJsonObject("env")).orElse(new JsonObject()));
+
+    Try<JsonObject> result = ModulesReader.readModuleConfigFromClasspath(moduleName);
+    if (result.isSuccess()) {
+      JsonObject moduleWithIdResolved  = ModuleIdReference.populateModuleIdRefs(result.get(), moduleId);
+      JsonObject moduleWithEnvResolved = ConfReference.populateEnvRefs(moduleWithIdResolved, envFallback);
+
+      return Either.right(new ValidRawModule(moduleName, Optional.empty(), moduleWithEnvResolved));
+    } else {
+      return Either.left(new MissingModule(moduleName, result.getCause()));
+    }
   }
 
   private static JsonObject mergeRawClasspathModules(List<ValidRawModule> validRawModules) {

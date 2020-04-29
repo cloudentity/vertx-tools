@@ -3,7 +3,7 @@ package com.cloudentity.tools.vertx.server;
 import com.cloudentity.tools.vertx.bus.VertxBus;
 import com.cloudentity.tools.vertx.conf.ConfPrinter;
 import com.cloudentity.tools.vertx.conf.ConfVerticleDeploy;
-import com.cloudentity.tools.vertx.conf.ModulesReader;
+import com.cloudentity.tools.vertx.conf.modules.ModulesReader;
 import com.cloudentity.tools.vertx.json.VertxJson;
 import com.cloudentity.tools.vertx.launchers.OrchisCommandLauncher;
 import com.cloudentity.tools.vertx.logging.InitLog;
