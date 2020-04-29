@@ -1274,6 +1274,7 @@ With module instances you can overwrite env variables per instance.
 
 To do so configure module instances:
 
+```
 {
   "modules": [
     {
