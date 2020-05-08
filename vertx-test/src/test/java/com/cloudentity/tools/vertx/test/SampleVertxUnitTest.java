@@ -1,6 +1,6 @@
 package com.cloudentity.tools.vertx.test;
 
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 import io.vertx.core.Future;
 import io.vertx.core.Verticle;
 import io.vertx.core.json.JsonObject;
@@ -11,7 +11,7 @@ public class SampleVertxUnitTest extends VertxUnitTest {
 
   @Test
   public void testSampleVerticleMethod(TestContext ctx) throws Exception {
-    SampleService client = ServiceClientFactory.make(vertx().eventBus(), SampleService.class);
+    SampleService client = VertxEndpointClient.make(vertx(), SampleService.class);
 
     Verticle verticle = new SampleServiceVerticle();
     JsonObject config = new JsonObject().put("length", 3);

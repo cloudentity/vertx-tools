@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.cloudentity.tools.vertx.bus.ComponentVerticle;
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 import com.cloudentity.tools.vertx.sd.SdService;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -74,7 +74,7 @@ public class FixedSdProvider extends ComponentVerticle {
   public void start(Future promise) {
     toFuture(super::start)
       .compose(x -> {
-        SdService sd = ServiceClientFactory.make(vertx.eventBus(), SdService.class);
+        SdService sd = VertxEndpointClient.make(vertx, SdService.class);
 
         JsonObject conf = getConfig();
         List<JsonObject> records =

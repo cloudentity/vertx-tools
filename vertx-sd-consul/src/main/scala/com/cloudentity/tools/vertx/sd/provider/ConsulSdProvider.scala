@@ -1,6 +1,6 @@
 package com.cloudentity.tools.vertx.sd.provider
 
-import com.cloudentity.tools.vertx.bus.{ComponentVerticle, ServiceClientFactory}
+import com.cloudentity.tools.vertx.bus.{ComponentVerticle, VertxEndpointClient}
 import com.cloudentity.tools.vertx.sd.SdService
 import com.cloudentity.tools.vertx.sd.consul.ConsulConf._
 import com.cloudentity.tools.vertx.sd.consul.{ConsulConf, ConsulServiceImporter}
@@ -40,7 +40,7 @@ class ConsulSdProvider extends ComponentVerticle {
 
     superStart.compose { _ =>
       getConfService().getConf(ConsulConf.CONSUL_CONF_KEY).compose { defaultConsulConf =>
-        val sd = ServiceClientFactory.make(vertx.eventBus, classOf[SdService])
+        val sd = VertxEndpointClient.make(vertx, classOf[SdService])
 
         val discoveryOpt = Option(getConfig()).flatMap(c => Option(c.getJsonObject(DISCOVERY_CONF_KEY)))
         val consulConfOpt = Option(getConfig()).flatMap(c => Option(c.getJsonObject(CONSUL_CONF_KEY)))

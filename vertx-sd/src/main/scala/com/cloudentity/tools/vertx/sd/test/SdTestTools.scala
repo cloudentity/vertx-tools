@@ -1,6 +1,6 @@
 package com.cloudentity.tools.vertx.sd.test
 
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient
 import com.cloudentity.tools.vertx.conf.fixed.FixedConfVerticle
 import com.cloudentity.tools.vertx.sd.SdVerticle
 import com.cloudentity.tools.vertx.sd.provider.FixedSdProvider
@@ -20,5 +20,5 @@ object SdTestTools {
       .compose(_ => VertxDeploy.deploy(vertx, new EventBusSdProvider))
       .compose(_ => Future.succeededFuture(eventBusSdProvider(vertx)))
 
-  def eventBusSdProvider(vertx: Vertx): EventBusSdProviderService = ServiceClientFactory.make(vertx.eventBus(), classOf[EventBusSdProviderService])
+  def eventBusSdProvider(vertx: Vertx): EventBusSdProviderService = VertxEndpointClient.make(vertx, classOf[EventBusSdProviderService])
 }

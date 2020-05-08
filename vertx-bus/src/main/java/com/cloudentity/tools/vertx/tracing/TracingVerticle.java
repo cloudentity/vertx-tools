@@ -1,7 +1,8 @@
 package com.cloudentity.tools.vertx.tracing;
 
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 import com.cloudentity.tools.vertx.bus.ServiceVerticle;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 import com.cloudentity.tools.vertx.conf.ConfService;
 import com.cloudentity.tools.vertx.tracing.internals.JaegerTracing;
 import io.vertx.core.Future;
@@ -16,7 +17,7 @@ public class TracingVerticle extends ServiceVerticle implements TracingService {
 
   @Override
   public void start(Future<Void> start) {
-    confService = ServiceClientFactory.make(vertx.eventBus(), ConfService.class);
+    confService = VertxEndpointClient.make(vertx, ConfService.class);
     toFuture(super::start).compose(x -> JaegerTracing.getTracingConfiguration(confService)
       .compose(t -> {
         this.tracing = t;

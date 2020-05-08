@@ -1,7 +1,7 @@
 package com.cloudentity.tools.vertx.test;
 
 import com.google.common.collect.Lists;
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 import com.cloudentity.tools.vertx.conf.fixed.FixedConfVerticle;
 import com.cloudentity.tools.vertx.verticles.VertxDeploy;
 import io.vertx.core.DeploymentOptions;
@@ -19,11 +19,11 @@ import java.util.*;
  */
 abstract public class ServiceVerticleIntegrationTest extends VertxUnitTest {
   public <T> T client(Class<T> vertxService) {
-    return ServiceClientFactory.make(vertx().eventBus(), vertxService);
+    return VertxEndpointClient.make(vertx(), vertxService);
   }
 
   public <T> T client(Class<T> vertxService, String addressPrefix) {
-    return ServiceClientFactory.make(vertx().eventBus(), vertxService, Optional.ofNullable(addressPrefix));
+    return VertxEndpointClient.make(vertx(), vertxService, Optional.ofNullable(addressPrefix));
   }
 
   public JsonObject defaultConfig() {

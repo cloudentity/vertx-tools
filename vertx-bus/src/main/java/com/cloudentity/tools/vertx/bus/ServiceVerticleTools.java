@@ -10,10 +10,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.cloudentity.tools.vertx.bus.ServiceClientFactory.*;
 
 public class ServiceVerticleTools {
   private static final Logger log = LoggerFactory.getLogger(ServiceVerticleTools.class);
+
+  public static void init(Vertx vertx, ServiceVerticle verticle, Class vertxService, Optional<String> addressPrefixOpt) {
+    List<VertxEndpointInterface> vertxEndpoints = getVertxEndpoints(vertxService, addressPrefixOpt);
+    ServiceVerticleTools.assertVertxServiceInterfaceImplemented(vertxService, verticle);
+    ServiceVerticleTools.assertVertxEndpointsReturnFutureOrVoid(vertxService, vertxEndpoints);
+
+    ServiceVerticleTools.registerConsumers(vertx, verticle, vertxEndpoints);
+  }
 
   public static void assertVertxServiceInterfaceImplemented(Class vertxService, Object verticle) {
     if (!allInterfaces(verticle.getClass()).contains(vertxService)) {
@@ -36,8 +47,8 @@ public class ServiceVerticleTools {
     }
   }
 
-  public static void assertVertxEndpointsReturnFutureOrVoid(Class vertxService, List<ServiceClientFactory.VertxEndpointInterface> vertxEndpoints) {
-    List<ServiceClientFactory.VertxEndpointInterface> nonFutureMethods = vertxEndpoints.stream().filter(endpoint -> endpoint.method.getReturnType() != Future.class && endpoint.method.getReturnType() != Void.TYPE).collect(Collectors.toList());
+  public static void assertVertxEndpointsReturnFutureOrVoid(Class vertxService, List<VertxEndpointInterface> vertxEndpoints) {
+    List<VertxEndpointInterface> nonFutureMethods = vertxEndpoints.stream().filter(endpoint -> endpoint.method.getReturnType() != Future.class && endpoint.method.getReturnType() != Void.TYPE).collect(Collectors.toList());
     if (!nonFutureMethods.isEmpty()) {
       String errMsg = "Methods on ServiceVerticle.service()=" + vertxService.getName() + " interface annotated with @VertxEndpoint must return io.vertx.core.Future or void: " + nonFutureMethods;
       log.error(errMsg);
@@ -45,11 +56,11 @@ public class ServiceVerticleTools {
     }
   }
 
-  public static void registerConsumers(Vertx vertx, Object verticle, List<ServiceClientFactory.VertxEndpointInterface> vertxEndpoints) {
+  public static void registerConsumers(Vertx vertx, Object verticle, List<VertxEndpointInterface> vertxEndpoints) {
     vertxEndpoints.forEach(e -> registerConsumer(vertx, verticle, e));
   }
 
-  private static void registerConsumer(Vertx vertx, Object verticle, ServiceClientFactory.VertxEndpointInterface endpoint) {
+  private static void registerConsumer(Vertx vertx, Object verticle, VertxEndpointInterface endpoint) {
     // we will find the implementation because we executed `assertVertxServiceInterfaceImplemented`
     Method methodImpl = findMethodImpl(verticle, endpoint.method);
 
@@ -60,7 +71,7 @@ public class ServiceVerticleTools {
     }
   }
 
-  private static void registerPublishConsumer(Vertx vertx, Object verticle, ServiceClientFactory.VertxEndpointInterface endpoint, Method methodImpl) {
+  private static void registerPublishConsumer(Vertx vertx, Object verticle, VertxEndpointInterface endpoint, Method methodImpl) {
     VertxBus.consumePublished(vertx.eventBus(), endpoint.address, ServiceRequest.class, request -> {
       try {
         invoke(verticle, methodImpl, request);
@@ -70,7 +81,7 @@ public class ServiceVerticleTools {
     });
   }
 
-  private static void registerSendConsumer(Vertx vertx, Object verticle, ServiceClientFactory.VertxEndpointInterface endpoint, Method methodImpl) {
+  private static void registerSendConsumer(Vertx vertx, Object verticle, VertxEndpointInterface endpoint, Method methodImpl) {
     VertxBus.<ServiceRequest, ServiceResponse>consume(vertx.eventBus(), endpoint.address, ServiceRequest.class, request -> {
       try {
         // we can cast result to Future because we checked `methodImpl.getReturnType() == Future.class`

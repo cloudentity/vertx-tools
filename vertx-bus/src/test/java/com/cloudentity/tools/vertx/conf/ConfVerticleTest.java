@@ -1,6 +1,6 @@
 package com.cloudentity.tools.vertx.conf;
 
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 import com.cloudentity.tools.vertx.bus.ServiceVerticle;
 import com.cloudentity.tools.vertx.bus.VertxBus;
 import com.cloudentity.tools.vertx.bus.VertxEndpoint;
@@ -68,7 +68,7 @@ public class ConfVerticleTest {
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configPath)
       .compose(x -> VertxDeploy.deploy(vertx, new TestVerticle(verticleId)))
       .compose(x -> {
-        TestService client = ServiceClientFactory.make(vertx.eventBus(), TestService.class);
+        TestService client = VertxEndpointClient.make(vertx, TestService.class);
         return client.loadConfig();
       })
       .map(conf -> {
@@ -94,7 +94,7 @@ public class ConfVerticleTest {
         return VertxDeploy.deploy(vertx, new TestVerticle(verticleId), new DeploymentOptions().setConfig(new JsonObject().put("configPath", verticleConfigPath)));
       })
       .compose(x -> {
-        TestService client = ServiceClientFactory.make(vertx.eventBus(), TestService.class);
+        TestService client = VertxEndpointClient.make(vertx, TestService.class);
         return client.loadConfig();
       })
       .map(conf -> {
@@ -134,7 +134,7 @@ public class ConfVerticleTest {
         return delay;
       })
       .compose(x -> {
-        TestService client = ServiceClientFactory.make(vertx.eventBus(), TestService.class);
+        TestService client = VertxEndpointClient.make(vertx, TestService.class);
         return client.loadConfig();
       })
       .map(conf -> {
@@ -158,7 +158,7 @@ public class ConfVerticleTest {
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configPath)
       .compose(x -> VertxDeploy.deploy(vertx, new TestVerticle(verticleId)))
       .compose(x -> {
-        TestService client = ServiceClientFactory.make(vertx.eventBus(), TestService.class);
+        TestService client = VertxEndpointClient.make(vertx, TestService.class);
         return client.loadConfig();
       })
       .map(conf -> {
@@ -176,7 +176,7 @@ public class ConfVerticleTest {
 
     // when
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configPath)
-    .map(x -> ServiceClientFactory.make(vertx.eventBus(), ConfService.class))
+    .map(x -> VertxEndpointClient.make(vertx, ConfService.class))
     .compose((ConfService conf) -> {
       return conf.getGlobalConf().map(global -> {
         ctx.assertTrue(global.getBoolean("x"));
@@ -196,7 +196,7 @@ public class ConfVerticleTest {
 
     // when
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configPath)
-    .map(x -> ServiceClientFactory.make(vertx.eventBus(), ConfService.class))
+    .map(x -> VertxEndpointClient.make(vertx, ConfService.class))
     .compose((ConfService conf) -> {
       return conf.getGlobalConf().map(global -> {
         ctx.assertTrue(global.getBoolean("env-a"));

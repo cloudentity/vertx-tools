@@ -87,7 +87,7 @@ public class ShutdownTest extends VertxUnitTest {
   public void shouldPerformShutdownActionWhenUndeployingBootstrap(TestContext ctx) {
     deployBootstrap(SuccessfulVerticle.class)
       .compose(this::unDeploy)
-      .compose(x -> ServiceClientFactory.make(vertx().eventBus(), FlagService.class).getFlag())
+      .compose(x -> VertxEndpointClient.make(vertx(), FlagService.class).getFlag())
       .compose(flag -> {
         ctx.assertEquals(true, flag);
         return Future.succeededFuture();
@@ -97,7 +97,7 @@ public class ShutdownTest extends VertxUnitTest {
   @Test
   public void shouldNotPerformShutdownActionWhenNotUndeployingBootstrap(TestContext ctx) {
     deployBootstrap(SuccessfulVerticle.class)
-      .compose(x -> ServiceClientFactory.make(vertx().eventBus(), FlagService.class).getFlag())
+      .compose(x -> VertxEndpointClient.make(vertx(), FlagService.class).getFlag())
       .compose(flag -> {
         ctx.assertEquals(false, flag);
         return Future.succeededFuture();
@@ -108,7 +108,7 @@ public class ShutdownTest extends VertxUnitTest {
   public void shouldPerformShutdownActionWhenBootstrapFailedOnStartup(TestContext ctx) {
     deployBootstrap(FailingVerticle.class)
       .recover(ex -> Future.succeededFuture())
-      .compose(x -> ServiceClientFactory.make(vertx().eventBus(), FlagService.class).getFlag())
+      .compose(x -> VertxEndpointClient.make(vertx(), FlagService.class).getFlag())
       .compose(flag -> {
         ctx.assertEquals(true, flag);
         return Future.succeededFuture();

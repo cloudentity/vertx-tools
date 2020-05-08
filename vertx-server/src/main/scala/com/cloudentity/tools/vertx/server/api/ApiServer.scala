@@ -2,7 +2,7 @@ package com.cloudentity.tools.vertx.server.api
 
 import java.util.Optional
 
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient
 import com.cloudentity.tools.vertx.scala.{FutureConversions, VertxExecutionContext}
 import com.cloudentity.tools.vertx.server.api.conf.{ApiServerConf, RouteConf}
 import com.cloudentity.tools.vertx.server.api.filters.RouteFilter
@@ -48,11 +48,11 @@ class ApiServer(serverConf: ApiServerConf) extends AbstractVerticle with FutureC
   }
 
   private def makeRouteServiceClient(routeId: String) = {
-    ServiceClientFactory.make(vertx.eventBus(), classOf[RouteService], Optional.of(routeId))
+    VertxEndpointClient.make(vertx, classOf[RouteService], Optional.of(routeId))
   }
 
   private def makeFilterServiceClient(filterName: String) = {
-    ServiceClientFactory.make(vertx.eventBus(), classOf[RouteFilter], Optional.of(filterName))
+    VertxEndpointClient.make(vertx, classOf[RouteFilter], Optional.of(filterName))
   }
 
   private def registerRouteHandler(router: Router, routeConf: RouteConf, routeClient: RouteService): Unit = {

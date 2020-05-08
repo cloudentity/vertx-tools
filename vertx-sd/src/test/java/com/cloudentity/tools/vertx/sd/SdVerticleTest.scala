@@ -2,9 +2,9 @@ package com.cloudentity.tools.vertx.sd
 
 import java.util.{List => JList}
 
-import com.cloudentity.tools.vertx.bus.{ServiceClientFactory, VertxBus}
+import com.cloudentity.tools.vertx.bus.{VertxBus, VertxEndpointClient}
 import com.cloudentity.tools.vertx.sd.test.SdTestTools._
-import io.vertx.core.json.{JsonObject}
+import io.vertx.core.json.JsonObject
 import io.vertx.core.{Future, Vertx}
 import io.vertx.ext.unit.junit.{RunTestOnContext, VertxUnitRunner}
 import io.vertx.ext.unit.{Async, TestContext}
@@ -30,7 +30,7 @@ class SdVerticleTest extends MustMatchers {
     val conf: JsonObject = new JsonObject().put("name", serviceName).put("location", new JsonObject().put("host", host).put("port", port))
     // when
     deployStaticDiscovery(vertx, conf).compose((x: String) => {
-      val sd: SdService = ServiceClientFactory.make(vertx.eventBus, classOf[SdService])
+      val sd: SdService = VertxEndpointClient.make(vertx, classOf[SdService])
       sd.discover(serviceName)
     }).compose((x: JList[Record]) => {
       // then
@@ -49,7 +49,7 @@ class SdVerticleTest extends MustMatchers {
 
     val serviceName = "service-a"
     val sdProvider = eventBusSdProvider(vertx)
-    val sd = ServiceClientFactory.make(vertx.eventBus(), classOf[SdService])
+    val sd = VertxEndpointClient.make(vertx, classOf[SdService])
 
     deployEventBusDiscovery(vertx)
       .compose { _ =>
@@ -85,7 +85,7 @@ class SdVerticleTest extends MustMatchers {
 
     val serviceName = "service-a"
     val sdProvider = eventBusSdProvider(vertx)
-    val sd = ServiceClientFactory.make(vertx.eventBus(), classOf[SdService])
+    val sd = VertxEndpointClient.make(vertx, classOf[SdService])
 
     var registrationId: String = ""
     deployEventBusDiscovery(vertx)

@@ -1485,12 +1485,12 @@ public class NotifierVerticle extends ServiceVerticle implements NotifierService
 ```java
 import io.vertx.core.Future;
 import com.cloudentity.tools.vertx.bus.VertxBus;
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 
 public class ClientVerticle extends AbstractVerticle {
   public void start() {
     VertxBus.registerPayloadCodec(vertx.eventBus()); // you don't need this line if you use VertxBootstrap in your project
-    UpperCaseService client = ServiceClientFactory.make(vertx.eventBus(), UpperCaseService.class); // when extending ComponentVerticle use: createClient(UpperCaseService.class);
+    UpperCaseService client = VertxEndpointClient.make(vertx, UpperCaseService.class); // when extending ComponentVerticle use: createClient(UpperCaseService.class);
 
     Future<String> response = client.toUpperCase("hello world!");
     response.setHandler(async -> {
@@ -1502,14 +1502,14 @@ public class ClientVerticle extends AbstractVerticle {
 }
 ```
 
-`ServiceClientFactory.make()` builds a proxy object using reflection. The proxy uses event-bus to send messages on addresses defined
+`VertxEndpointClient.make()` builds a proxy object using reflection. The proxy uses event-bus to send messages on addresses defined
 in the `VertxEndpoint` annotation on `UpperCaseService` interface. If you are extending `ServiceVerticle` or `ComponentVerticle` then instead of using
-`ServiceClientFactory` use `ComponentVerticle.createClient` method.
+`VertxEndpointClient` use `ComponentVerticle.createClient` method.
 
 ```java
 import io.vertx.core.Future;
 import com.cloudentity.tools.vertx.bus.VertxBus;
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 
 public class ClientVerticle extends ComponentVerticle {
   @Override
@@ -1529,9 +1529,9 @@ public class ClientVerticle extends ComponentVerticle {
 <a id="bus-timeout"></a>
 ### Service client timeout
 
-When you create a client using `ServiceClientFactory` or `createClient` then by default all the calls timeout after 30 seconds.
+When you create a client using `VertxEndpointClient` or `createClient` then by default all the calls timeout after 30 seconds.
 You can change that timeout by setting `VERTX_SERVICE_CLIENT_TIMEOUT` system or environment variable (in milliseconds).
-It applies to all clients unless they are created using `ServiceClientFactory` and `DeliveryOptions` as argument.
+It applies to all clients unless they are created using `VertxEndpointClient` and `DeliveryOptions` as argument.
 `DeliveryOptions` should have `sendTimeout` property set.
 
 <a id="bus-verticle-init"></a>
