@@ -1,6 +1,6 @@
 package com.cloudentity.tools.vertx.test;
 
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 import com.cloudentity.tools.vertx.bus.ServiceVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -19,7 +19,7 @@ abstract public class ServiceVerticleUnitTest<B extends ServiceVerticle, A> exte
   }
 
   public A client() {
-    return (A) ServiceClientFactory.make(vertx().eventBus(), createVerticle().vertxServices().get(0));
+    return (A) VertxEndpointClient.make(vertx(), createVerticle().vertxServices().get(0));
   }
 
   public Future<String> deployVerticle() {

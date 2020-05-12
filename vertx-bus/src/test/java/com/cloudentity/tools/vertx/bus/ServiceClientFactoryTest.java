@@ -53,7 +53,7 @@ public class ServiceClientFactoryTest {
       });
 
     // when
-    MyService client = ServiceClientFactory.make(vertx.eventBus(), MyService.class, addressPrefix);
+    MyService client = VertxEndpointClient.make(vertx, MyService.class, addressPrefix);
 
     // then
     client.doStuff(x, y).setHandler(result -> {
@@ -67,7 +67,7 @@ public class ServiceClientFactoryTest {
   public void clientShouldReturnFailedFutureWhenNoServiceProviderConsumingRequests(TestContext ctx) {
     Async async = ctx.async();
     // given
-    MyService client = ServiceClientFactory.make(vertx.eventBus(), MyService.class);
+    MyService client = VertxEndpointClient.make(vertx, MyService.class);
 
     // when
     Future<String> future = client.doStuff("x", 3);
@@ -86,7 +86,7 @@ public class ServiceClientFactoryTest {
 
   @Test(expected = IllegalStateException.class)
   public void makeShouldThrowExceptionWhenSomeInterfaceMethodsDoesNotReturnFuture() {
-    ServiceClientFactory.make(vertx.eventBus(), NonFutureService.class);
+    VertxEndpointClient.make(vertx, NonFutureService.class);
   }
 
   interface NonVertxEndpointService {
@@ -98,6 +98,6 @@ public class ServiceClientFactoryTest {
 
   @Test(expected = IllegalStateException.class)
   public void makeShouldThrowExceptionWhenSomeInterfaceMethodsAreNotVertxEndpoints() {
-    ServiceClientFactory.make(vertx.eventBus(), NonVertxEndpointService.class);
+    VertxEndpointClient.make(vertx, NonVertxEndpointService.class);
   }
 }

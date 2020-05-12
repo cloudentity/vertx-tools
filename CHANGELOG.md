@@ -2,6 +2,9 @@
 ### Added
 - ext config stores can control 'ssl' flag of underlying store with 'scheme' attribute
 
+### Changed
+- ServiceClientFactory deprecated by VertxEndpointClient
+
 ## [1.1.0] - 2019-04-20
 ### Added
 - module instance support

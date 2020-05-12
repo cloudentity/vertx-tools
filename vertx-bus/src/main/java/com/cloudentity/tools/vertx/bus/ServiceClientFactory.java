@@ -17,6 +17,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Deprecated, use com.cloudentity.tools.vertx.bus.VertxEndpointClient static methods.
+ */
+@Deprecated()
 public class ServiceClientFactory {
   private static final Logger log = LoggerFactory.getLogger(ServiceClientFactory.class);
 
