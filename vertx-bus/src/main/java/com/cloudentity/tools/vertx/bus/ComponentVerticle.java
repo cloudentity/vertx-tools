@@ -5,6 +5,7 @@ import com.cloudentity.tools.vertx.conf.ConfService;
 import com.cloudentity.tools.vertx.conf.ConfVerticle;
 import com.cloudentity.tools.vertx.tracing.TracingManager;
 import com.cloudentity.tools.vertx.tracing.TracingService;
+import com.cloudentity.tools.vertx.tracing.TracingVerticle;
 import com.cloudentity.tools.vertx.tracing.internals.JaegerTracing;
 import io.vertx.config.ConfigChange;
 import io.vertx.core.AbstractVerticle;
@@ -180,7 +181,7 @@ public abstract class ComponentVerticle extends AbstractVerticle {
    * Overwrite this method to disable tracing initialization
    */
   protected boolean tracingEnabled() {
-    return true;
+    return TracingVerticle.isTracingEnabled(vertx);
   }
 
   public TracingManager getTracing() {
