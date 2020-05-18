@@ -416,6 +416,40 @@ After resolution, we end up with the following configuration:
 }
 ```
 
+##### Replacing sensitive environment variable with configuration reference
+
+If an environment variable contains sensitive value (e.g. database password) we should read it from secure storage like Vault.
+Sensitive environment variable might be referenced in multiple places, so trying to overwrite it is cumbersome task.
+Instead, we can put configuration reference as a value of environment variable fallback.
+
+>NOTE<br/>
+> We still should use environment variable in this case. It creates separation between low-level configuration structure and deployment options.
+
+For example let's have following reference to `POSTGRES_PASSWORD` environment variable and secrets from secure storage:
+
+```
+{
+  "postgres-password": "$env:POSTGRES_PASSWORD:string",
+  "secrets": {
+    "postgres": {
+      "password": "#@!"
+    }
+  },
+  "env": {
+    "POSTGRES_PASSWORD": "$ref:secrets.postgres.password"
+  }
+}
+```
+
+After resolution, we end up with the following configuration:
+
+```
+{
+  "postgres-password": "#@!",
+  ...
+}
+```
+
 ##### Property value expression
 
 Property value can be used as a part of value expression.

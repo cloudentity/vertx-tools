@@ -96,4 +96,19 @@ public class ConfBuilderTest {
     assertEquals(expectedResolved, result.get().resolvedConfig);
 
   }
+
+  @Test
+  public void shouldSubstituteEnvFallbackWithReference() {
+    JsonObject raw =
+      new JsonObject()
+        .put("env", new JsonObject().put("Y", "$ref:reference"))
+        .put("reference", "value")
+        .put("y", "$env:Y:string");
+
+    Either<List<ConfBuilder.MissingModule>, ConfBuilder.Config> result = ConfBuilder.buildFinalConfig(raw);
+
+    assertTrue(result.isRight());
+    ConfBuilder.Config config = result.get();
+    assertEquals("value", config.resolvedConfig.getString("y"));
+  }
 }
