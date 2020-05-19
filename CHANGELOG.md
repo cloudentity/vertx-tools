@@ -2,6 +2,7 @@
 ### Added
 - ext config stores can control 'ssl' flag of underlying store with 'scheme' attribute
 - env fallback reference
+- VertxModuleTest
 
 ### Changed
 - ServiceClientFactory deprecated by VertxEndpointClient

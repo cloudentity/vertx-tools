@@ -19,7 +19,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
 | vertx-config-ext                | Wrappers for Vertx config-stores providing extra functionality                                    |
 | vertx-test                      | Testing tools for vertx-bus                                                                       |
 | vertx-test-scala                | Testing tools for vertx-bus-scala                                                                 |
-| vertx-server-test               | Testing tools for vertx-server                                                                    |
+| vertx-server-test               | Testing tools for vertx-server and modules                                                        |
 
 ## Contents
 
@@ -48,6 +48,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
   * [Shared modules dependency](#modules-shared)
   * [Required modules](#modules-required)
   * [Module instances](#module-instances)
+  * [Testing modules](#module-testing)
 * [Event bus communication](#bus)
   * [Define service interface](#bus-define)
   * [Implement ServiceVerticle](#bus-implement)
@@ -1435,6 +1436,58 @@ then single module instance will be collected and deployed (note `id` prepended 
     "X": "def"
   }
 }
+```
+
+<a id="modules-testing"></a>
+### Testing modules
+
+In order to test modules you can use `VertxModuleTest` from `vertx-server-test`. `VertxModuleTest` provides methods
+that load the module configuration and deploy verticle registries.
+
+Given configuration module stored in classpath at `modules/path/some-module.json`:
+
+```
+{
+  "registry:some": {
+    "x-service": {
+      "main": "com.example.AVerticle",
+    }
+  },
+  "registry:other": {
+    "y-service": {
+      "main": "com.example.BVerticle"
+    }
+  },
+  "x-service": {
+    "url": "example.com/test"
+  }
+}
+```
+
+you can test the module like this:
+
+
+```
+public class SomeModuleTest extends VertxModuleTest {
+  @Test
+  public void test(TestContext ctx) {
+    // deploys config verticle with 'path/some-module' module configuration
+    // then deploys 'some' and 'other' registries
+    deployModule("path/some-module", "some", "other")
+      .compose(x -> {
+        // implement test logic
+      }).onComplete(ctx.asyncAssertSuccess());
+    ;
+  }
+}
+```
+
+`VertxModuleTest` defines additional methods that you can use to deploy module with extra test configuration,
+either providing JsonObject or path to file with JSON object format.
+
+```
+deployModule("path/some-module", new JsonObject().put("x-service", ...), "some", "other")
+deployModuleWithFileConfig("path/some-module", "path/to/test/configuration.json", "some", "other")
 ```
 
 <a id="bus"></a>
