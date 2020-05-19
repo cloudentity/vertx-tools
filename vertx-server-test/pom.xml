@@ -33,6 +33,10 @@
       <artifactId>junit</artifactId>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>com.cloudentity.tools.vertx</groupId>
+      <artifactId>vertx-test</artifactId>
+    </dependency>
   </dependencies>
 
 </project>
