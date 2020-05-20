@@ -1,0 +1,26 @@
+{
+  "registry:test": {
+    "a": {
+      "main": "com.cloudentity.tools.vertx.registry.DependsOnVerticle",
+      "verticleConfig": {
+        "ready": "b"
+      },
+      "dependsOn": ["b"]
+    },
+    "b": {
+      "main": "com.cloudentity.tools.vertx.registry.DependsOnVerticle",
+      "prefix": true,
+      "verticleConfig": {
+        "ready": "c"
+      },
+      "dependsOn": ["c"]
+    },
+    "c": {
+      "main": "com.cloudentity.tools.vertx.registry.DependsOnVerticle",
+      "prefix": true,
+      "verticleConfig": {
+        "fail": true
+      }
+    }
+  }
+}

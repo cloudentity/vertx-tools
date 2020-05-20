@@ -3,6 +3,7 @@
 - ext config stores can control 'ssl' flag of underlying store with 'scheme' attribute
 - env fallback reference
 - VertxModuleTest
+- registry deploys verticles applying 'dependsOn' attribute
 
 ### Changed
 - ServiceClientFactory deprecated by VertxEndpointClient

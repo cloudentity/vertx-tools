@@ -28,7 +28,8 @@ object RegistryVerticle {
     configPath: Option[String],
     verticleConfig: Option[JsonObject],
     prefix: Option[AddressPrefix],
-    deploymentStrategy: DeploymentStrategy
+    deploymentStrategy: DeploymentStrategy,
+    dependsOn: List[VerticleId]
   )
 
   case class RegistryType(value: String)
@@ -90,14 +91,14 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
   }
 
   import scala.collection.JavaConverters._
-  val registry = new java.util.concurrent.ConcurrentHashMap[VerticleId, Deployment]
+  var registry = Map[VerticleId, Deployment]()
 
   override def initServiceAsyncS(): Future[Unit] = {
     if (registryType.value == null) Future.failed(new Exception("Registry type not configured properly"))
     else if (getConfig() == null) abortInit()
     else {
       val activeDescriptors = getActiveDescriptors().get
-      val deployment: Future[List[Throwable \/ Deployment]] = deployVerticles(activeDescriptors)
+      val deployment: Future[List[Throwable \/ Deployment]] = deployVerticles(activeDescriptors, registry.keys)
 
       handleDeploymentResult(deployment)
 
@@ -185,7 +186,8 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
       verticleConfigOpt <- Try(Option(obj.getJsonObject("verticleConfig"))).toEither.left.map(_ => "Could not read 'verticleConfig' attribute")
       prefixOpt         <- readAddressPrefix()
       deployStrategy    <- readDeploymentStrategy()
-    } yield VerticleDescriptor(main, enabled, optionsOpt.getOrElse(new JsonObject()), configPathOpt, verticleConfigOpt, prefixOpt, deployStrategy)
+      dependsOn         <- Try(Option(obj.getJsonArray("dependsOn")).map(_.getList.asScala.toList.map(id => VerticleId(id.toString))).getOrElse(Nil)).toEither.left.map(_ => "Could not read 'verticleConfig' attribute")
+    } yield VerticleDescriptor(main, enabled, optionsOpt.getOrElse(new JsonObject()), configPathOpt, verticleConfigOpt, prefixOpt, deployStrategy, dependsOn)
   }.map(VerticleId(name) -> _).left.map(error => s"Error decoding descriptor of verticle '$name': $error")
 
   private def decodeDeploymentStrategy(deployStrategyOpt: Option[String]): Either[String, DeploymentStrategy] =
@@ -242,17 +244,43 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
 
       toAddNames.map(name => readDescriptor(name, next.getJsonObject(name))).toList.sequenceU match {
         case Right(toAdd) =>
-          handleDeploymentResult(deployVerticles(toAdd.toMap))
+          handleDeploymentResult(deployVerticles(toAdd.toMap, registry.keys))
           handleUndeploymentResult(undeployVerticles(toRemove))
         case Left(error) =>
           log.error(s"Could not refresh '${registryType.value}' verticle registry. Malformed verticle descriptor: $error")
       }
     }
 
-  def deployVerticles(verticles: Map[VerticleId, VerticleDescriptor]): Future[List[Throwable \/ Deployment]] =
-    Future.sequence {
-      verticles.map { case (verticleId, descriptor) => deployVerticle(verticleId, descriptor) }.toList
-    }
+  def deployVerticles(verticles: Map[VerticleId, VerticleDescriptor], alreadyDeployed: Iterable[VerticleId]): Future[List[Throwable \/ Deployment]] = {
+    def relaxDependsOn(desc: VerticleDescriptor, deployed: Iterable[VerticleId]): VerticleDescriptor =
+      desc.copy(dependsOn = (desc.dependsOn.toSet -- deployed).toList)
+
+    def rec(toDeploy: Map[VerticleId, VerticleDescriptor], agg: Future[List[Throwable \/ Deployment]]): Future[List[Throwable \/ Deployment]] =
+      if (toDeploy.isEmpty) {
+        agg
+      } else {
+        val free = toDeploy.filter { case (_, desc) => desc.dependsOn.isEmpty }
+        if (free.isEmpty) {
+          Future.failed(new Exception(s"Could not deploy verticles in ${registryType} registry due unfulfilled dependencies: ${toDeploy.mapValues(_.dependsOn)}"))
+        } else {
+          val next =
+            agg.flatMap { results =>
+              if (results.find(_.isLeft).isDefined) {
+                Future.successful(results) // skipping deployment of next verticles, because some previous deployments failed
+              } else {
+                Future.sequence {
+                  free.map { case (verticleId, descriptor) => deployVerticle(verticleId, descriptor) }.toList
+                }.map(results ::: _)
+              }
+            }
+
+          rec((toDeploy -- free.keys).mapValues(desc => relaxDependsOn(desc, free.keys)), next)
+        }
+
+      }
+
+    rec(verticles.mapValues(relaxDependsOn(_, alreadyDeployed)), Future.successful(Nil))
+  }
 
   def deployVerticle(verticleId: VerticleId, descriptor: VerticleDescriptor): Future[Throwable \/ Deployment] = {
     val opts = descriptor.options.put("config", buildConfig(verticleId, descriptor))
@@ -305,7 +333,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
     Future.sequence(verticles.map(undeployVerticle))
 
   private def undeployVerticle(id: VerticleId): Future[Throwable \/ VerticleId] =
-    Option(registry.get(id)) match {
+    registry.get(id) match {
       case Some(depl) =>
         log.info(s"Undeploying ${buildDeploymentLogObj(depl.verticleId.value, depl.descriptor)}")
         VertxDeploy.undeploy(vertx, depl.id.value).toScala
@@ -334,7 +362,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
           val logObj = buildDeploymentLogObj(depl.verticleId.value, depl.descriptor)
           initLog.debug(s"Successfully deployed verticle $logObj")
           initLog.info(s"Successfully deployed verticle ${depl.verticleId.value}")
-          registry.put(depl.verticleId, depl)
+          registry += (depl.verticleId -> depl)
         }
       case Failure(ex) => {
         initLog.error("Unexpected error on verticles deployment", ex)
@@ -365,7 +393,7 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
         oks.foreach { id =>
           val message = s"Successfully undeployed verticle '${id.value}'"
           initLog.info(message)
-          registry.remove(id)
+          registry -= id
         }
       case Failure(ex) => {
         initLog.error("Unexpected error on verticles undeployment", ex)
@@ -376,8 +404,8 @@ class RegistryVerticle(_registryType: RegistryType, isConfRequired: Boolean) ext
   override protected def vertxService(): Class[_] = classOf[RegistryService]
 
   override def getVerticleIds: VxFuture[util.List[String]] = {
-    val verticles = registry.keys().asScala.toList.map(_.value)
-    VxFuture.succeededFuture(verticles.asJava)
+    val verticles = registry.keys.map(_.value)
+    VxFuture.succeededFuture(verticles.toList.asJava)
   }
 
   override def verticleId: String = s"registry:${registryType.value}"

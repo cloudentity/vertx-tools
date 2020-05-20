@@ -64,6 +64,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
   * [Deploying multiple implementations of VertxEndpoint](#di-impls)
   * [Defining custom DeploymentOptions](#di-deployment-opts)
   * [Disabling verticle](#di-disable)
+  * [Defining deployment order](#di-order)
 * [HTTP server](#server)
   * [Routes configuration](#server-routes)
   * [HTTP filters](#server-filters)
@@ -1943,6 +1944,32 @@ E.g.
 
 > NOTE<br/>
 > For backward compatibility you can use 'disabled' flag. Set it to true to skip verticle deployment.
+
+<a id="di-order"></a>
+### Defining deployment order
+
+By default, registry deploys verticles in undefined order. You can enforce ordering of verticles deployment using 'dependsOn' attribute.
+
+E.g.
+```
+{
+  "registry:components": {
+    "verticle-a": {
+      "main": "com.example.ServiceVerticleA",
+      "dependsOn": ["verticle-b", "verticle-c"]
+    },
+    "verticle-b": {
+      "main": "com.example.ServiceVerticleB"
+    },
+    "verticle-c": {
+      "main": "com.example.ServiceVerticleC"
+    }
+  }
+}
+```
+
+Using above configuration, registry 'components' deploys verticles 'verticle-b' and 'verticle-c' first and when they are up then it deploys 'verticle-a'.
+
 
 <a id="server"></a>
 ## Serving HTTP requests and ApiServer
