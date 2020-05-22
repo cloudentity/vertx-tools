@@ -4,10 +4,12 @@
 - env fallback reference
 - VertxModuleTest
 - registry deploys verticles applying 'dependsOn' attribute
+- VertxExecutionContext extends Executor
 
 ### Changed
 - ServiceClientFactory deprecated by VertxEndpointClient
 - ComponentVerticle does not print stacktrace when TracingVerticle not available
+- vertx upgraded to 3.9.1
 
 ## [1.1.0] - 2019-04-20
 ### Added

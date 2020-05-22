@@ -9,7 +9,7 @@ import com.cloudentity.tools.vertx.sd.Node
 import com.cloudentity.tools.vertx.tracing.{LoggingWithTracing, TracingContext}
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.http.{HttpClient, HttpClientResponse, HttpMethod, RequestOptions}
-import io.vertx.core.{AsyncResult, Future, Handler}
+import io.vertx.core.{AsyncResult, Future, Handler, Promise}
 import scalaz.{-\/, \/, \/-}
 
 case class ClientResponse(body: Option[Buffer], http: HttpClientResponse)
@@ -145,7 +145,9 @@ class SmartHttpClientImpl(
 
   private def retryRun(rs: RequestStep, node: Node, ex: Throwable) = {
     log.error(rs.tracing, s"Call failed with exception: ${callSignature(rs.req, node)}", ex)
-    node.cb.execute[Unit](_.fail(ex))
+    node.cb.execute(new Handler[Promise[Unit]] {
+      override def handle(e: Promise[Unit]): Unit = e.fail(ex)
+    })
 
     if (rs.evalExceptionRetry(ex))
       discoverStep(rs.copy(attemptsLeft = rs.attemptsLeft - 1), Some(-\/(ex)))
@@ -159,7 +161,9 @@ class SmartHttpClientImpl(
         if (!rs.promise.isComplete) rs.promise.complete(response)
       case CallFailed(retry) =>
         log.error(rs.tracing, s"Call failed with bad response: ${callSignature(rs.req, node)}, response ${respSignature(response.http)}")
-        node.cb.execute[Unit](_.fail("response failed"))
+        node.cb.execute(new Handler[Promise[Unit]] {
+          override def handle(e: Promise[Unit]): Unit = e.fail("response failed")
+        })
 
         if (retry)
           discoverStep(rs.copy(attemptsLeft = rs.attemptsLeft - 1), Some(\/-(response)))
