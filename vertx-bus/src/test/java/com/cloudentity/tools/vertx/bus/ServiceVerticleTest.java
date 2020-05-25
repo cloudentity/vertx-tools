@@ -84,22 +84,6 @@ public class ServiceVerticleTest {
   }
 
   @Test
-  public void shouldFailDeploymentWhenNoDeclaredVertxServices(TestContext ctx) {
-    Async async = ctx.async();
-
-    // given
-    class MyVerticle extends ServiceVerticle {
-    }
-
-    // when
-    vertx.deployVerticle(new MyVerticle(), deployResult -> {
-      // then
-      ctx.assertTrue(deployResult.failed());
-      async.complete();
-    });
-  }
-
-  @Test
   public void shouldFailUndeploymentWhenSyncCleanupThrowsException(TestContext ctx) {
     Async async = ctx.async();
 

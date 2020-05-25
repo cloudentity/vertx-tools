@@ -13,20 +13,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.cloudentity.tools.vertx.bus.ServiceClientFactory.*;
+import static com.cloudentity.tools.vertx.bus.VertxEndpointClient.*;
 
-public class ServiceVerticleTools {
-  private static final Logger log = LoggerFactory.getLogger(ServiceVerticleTools.class);
+public class VertxEndpointServer {
+  private static final Logger log = LoggerFactory.getLogger(VertxEndpointServer.class);
 
-  public static void init(Vertx vertx, ServiceVerticle verticle, Class vertxService, Optional<String> addressPrefixOpt) {
-    List<VertxEndpointInterface> vertxEndpoints = getVertxEndpoints(vertxService, addressPrefixOpt);
-    ServiceVerticleTools.assertVertxServiceInterfaceImplemented(vertxService, verticle);
-    ServiceVerticleTools.assertVertxEndpointsReturnFutureOrVoid(vertxService, vertxEndpoints);
+  public static void init(Vertx vertx, Object verticle, Optional<String> addressPrefixOpt) {
+    List<Class> interfaces = VertxEndpointServer.allInterfaces(verticle.getClass());
 
-    ServiceVerticleTools.registerConsumers(vertx, verticle, vertxEndpoints);
+    interfaces.stream().filter(i -> {
+      List<Method> methods = Lists.newArrayList(i.getMethods());
+      return methods.stream().filter(m -> m.getAnnotation(VertxEndpoint.class) != null).findAny().isPresent();
+    }).forEach(vertxService -> init(vertx, verticle, vertxService, addressPrefixOpt));
   }
 
-  public static void assertVertxServiceInterfaceImplemented(Class vertxService, Object verticle) {
+  private static void init(Vertx vertx, Object verticle, Class vertxService, Optional<String> addressPrefixOpt) {
+    List<VertxEndpointInterface> vertxEndpoints = getVertxEndpoints(vertxService, addressPrefixOpt);
+    VertxEndpointServer.assertVertxServiceInterfaceImplemented(vertxService, verticle);
+    VertxEndpointServer.assertVertxEndpointsReturnFutureOrVoid(vertxService, vertxEndpoints);
+
+    VertxEndpointServer.registerConsumers(vertx, verticle, vertxEndpoints);
+  }
+
+  private static void assertVertxServiceInterfaceImplemented(Class vertxService, Object verticle) {
     if (!allInterfaces(verticle.getClass()).contains(vertxService)) {
       String errMsg = "Declared ServiceVerticle.service()=" + vertxService.getName() +" interface is not implemented by this class=" + verticle.getClass().getName();
       log.error(errMsg);
@@ -34,7 +43,7 @@ public class ServiceVerticleTools {
     }
   }
 
-  public static List<Class> allInterfaces(Class clazz) {
+  private static List<Class> allInterfaces(Class clazz) {
     return allInterfaces(clazz, Lists.newLinkedList());
   }
 
@@ -47,7 +56,7 @@ public class ServiceVerticleTools {
     }
   }
 
-  public static void assertVertxEndpointsReturnFutureOrVoid(Class vertxService, List<VertxEndpointInterface> vertxEndpoints) {
+  private static void assertVertxEndpointsReturnFutureOrVoid(Class vertxService, List<VertxEndpointInterface> vertxEndpoints) {
     List<VertxEndpointInterface> nonFutureMethods = vertxEndpoints.stream().filter(endpoint -> endpoint.method.getReturnType() != Future.class && endpoint.method.getReturnType() != Void.TYPE).collect(Collectors.toList());
     if (!nonFutureMethods.isEmpty()) {
       String errMsg = "Methods on ServiceVerticle.service()=" + vertxService.getName() + " interface annotated with @VertxEndpoint must return io.vertx.core.Future or void: " + nonFutureMethods;
@@ -56,7 +65,7 @@ public class ServiceVerticleTools {
     }
   }
 
-  public static void registerConsumers(Vertx vertx, Object verticle, List<VertxEndpointInterface> vertxEndpoints) {
+  private static void registerConsumers(Vertx vertx, Object verticle, List<VertxEndpointInterface> vertxEndpoints) {
     vertxEndpoints.forEach(e -> registerConsumer(vertx, verticle, e));
   }
 

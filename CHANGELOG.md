@@ -11,6 +11,8 @@
 - ComponentVerticle does not print stacktrace when TracingVerticle not available
 - vertx upgraded to 3.9.1
 - jackson upgraded to 2.10.2
+- vertx-endpoint-related logic moved from ServiceVerticle to helper class
+- ServiceVerticle does not throw exception if implementing no VertxEndpoint method
 
 ## [1.1.0] - 2019-04-20
 ### Added

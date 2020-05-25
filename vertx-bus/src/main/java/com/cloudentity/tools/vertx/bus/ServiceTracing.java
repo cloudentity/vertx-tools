@@ -5,7 +5,7 @@ import com.cloudentity.tools.vertx.tracing.TracingManager;
 
 public class ServiceTracing {
   public static ObjectsWithContext createNewSpanForTracingContext(TracingManager tracing,
-                                                                   ServiceClientFactory.VertxEndpointInterface endpoint,
+                                                                   VertxEndpointClient.VertxEndpointInterface endpoint,
                                                                    Object[] objects) {
     return new ObjectsWithContext(tracing, endpoint, objects);
   }
@@ -14,7 +14,7 @@ public class ServiceTracing {
     private Object[] objects;
     private TracingContext ctx;
 
-    public ObjectsWithContext(TracingManager tracing, ServiceClientFactory.VertxEndpointInterface endpoint, Object[] obj) {
+    public ObjectsWithContext(TracingManager tracing, VertxEndpointClient.VertxEndpointInterface endpoint, Object[] obj) {
       objects = obj;
       for (int i = 0; i < objects.length; i++) {
         if (objects[i] instanceof TracingContext) {
@@ -45,7 +45,7 @@ public class ServiceTracing {
     }
   }
 
-  public static String getShortEndpointName(ServiceClientFactory.VertxEndpointInterface endpoint) {
+  public static String getShortEndpointName(VertxEndpointClient.VertxEndpointInterface endpoint) {
     return endpoint.method.getDeclaringClass().getSimpleName() + "." + endpoint.method.getName();
   }
 }
