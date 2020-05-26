@@ -10,7 +10,7 @@
 - ServiceClientFactory deprecated by VertxEndpointClient
 - ComponentVerticle does not print stacktrace when TracingVerticle not available
 - vertx upgraded to 3.9.1
-- jackson upgraded to 2.10.2
+- jackson upgraded to 2.10.2 (databind cleanup)
 
 ## [1.1.0] - 2019-04-20
 ### Added
