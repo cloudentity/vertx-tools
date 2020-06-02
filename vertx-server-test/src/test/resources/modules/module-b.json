@@ -1,0 +1,8 @@
+{
+  "registry:components": {
+    "b": {
+      "main": "com.cloudentity.tools.vertx.test.SampleVerticle",
+      "prefix": true
+    }
+  }
+}

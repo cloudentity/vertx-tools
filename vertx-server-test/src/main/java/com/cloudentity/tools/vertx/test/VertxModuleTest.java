@@ -4,6 +4,8 @@ import com.cloudentity.tools.vertx.conf.ConfVerticleDeploy;
 import com.cloudentity.tools.vertx.futures.FutureUtils;
 import com.cloudentity.tools.vertx.json.VertxJson;
 import com.cloudentity.tools.vertx.registry.RegistryVerticle;
+import com.cloudentity.tools.vertx.shutdown.ShutdownVerticle;
+import com.cloudentity.tools.vertx.verticles.VertxDeploy;
 import com.google.common.collect.Lists;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -15,6 +17,7 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +26,16 @@ abstract public class VertxModuleTest extends VertxUnitTest {
   @BeforeClass
   public static void initVertxModuleTest() {
     VertxJson.registerJsonObjectDeserializer();
+  }
+
+  /**
+   * Return true if verticles you are testing depend on ShutdownVerticle. Otherwise false.
+   *
+   * If true ShutdownVerticle will be deployed before verticle registries.
+   * @return flag controlling ShutdownVerticle deployment
+   */
+  protected boolean withShutdown() {
+    return false;
   }
 
   /**
@@ -37,6 +50,17 @@ abstract public class VertxModuleTest extends VertxUnitTest {
   }
 
   /**
+   * Deploys configuration verticle with given multiple modules configuration and starts verticle registries.
+   *
+   * @param modules configuration modules to load
+   * @param registries types of registries to deploy
+   * @return
+   */
+  public Future<List<String>> deployModules(List<String> modules, String... registries) {
+    return deployModules(modules, new JsonObject(), registries);
+  }
+
+  /**
    * Deploys configuration verticle with given module and extra configuration and starts verticle registries.
    *
    * @param module configuration module to load
@@ -45,27 +69,56 @@ abstract public class VertxModuleTest extends VertxUnitTest {
    * @return
    */
   public Future<List<String>> deployModule(String module, JsonObject extraConfig, String... registries) {
-    JsonObject config = extraConfig.copy().put("modules", new JsonArray().add(module));
-    JsonArray configStores = new JsonArray().add(new JsonObject().put("type", "json").put("format", "json").put("config", config));
-    JsonObject metaConfig = new JsonObject().put("scanPeriod", 100).put("stores", configStores);
-
-    return ConfVerticleDeploy.deployVerticleFromMetaConfig(vertx(), metaConfig)
-      .compose(x -> FutureUtils.sequence(Lists.newArrayList(registries).stream().map(r -> RegistryVerticle.deploy(vertx(), r)).collect(Collectors.toList())));
+    return deployModules(Arrays.asList(module), extraConfig, registries);
   }
 
   /**
    * Deploys configuration verticle with given module configuration and extra configuration from file and starts verticle registries.
    *
    * @param module configuration module to load
+   * @param configPath path to extra config json file
    * @param registries types of registries to deploy
    * @return
    */
   public Future<List<String>> deployModuleWithFileConfig(String module, String configPath, String... registries) {
+    return deployModulesWithFileConfig(Arrays.asList(module), configPath, registries);
+  }
+
+  /**
+   * Deploys configuration verticle with given multiple modules configuration and extra configuration from file and starts verticle registries.
+   *
+   * @param modules configuration modules to load
+   * @param configPath path to extra config json file
+   * @param registries types of registries to deploy
+   * @return
+   */
+  public Future<List<String>> deployModulesWithFileConfig(List<String> modules, String configPath, String... registries) {
     try {
       JsonObject extraConfig = new JsonObject(new String(Files.readAllBytes(Paths.get(configPath))));
-      return deployModule(module, extraConfig, registries);
+      return deployModules(modules, extraConfig, registries);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * Deploys configuration verticle with given multiple modules and extra configuration and starts verticle registries.
+   *
+   * @param modules configuration module to load
+   * @param extraConfig extra configuration object
+   * @param registries types of registries to deploy
+   * @return
+   */
+  public Future<List<String>> deployModules(List<String> modules, JsonObject extraConfig, String... registries) {
+    JsonObject config = extraConfig.copy().put("modules", new JsonArray(modules));
+    JsonArray configStores = new JsonArray().add(new JsonObject().put("type", "json").put("format", "json").put("config", config));
+    JsonObject metaConfig = new JsonObject().put("scanPeriod", 100).put("stores", configStores);
+
+    return ConfVerticleDeploy.deployVerticleFromMetaConfig(vertx(), metaConfig)
+      .compose(x -> {
+        if (withShutdown()) return VertxDeploy.deploy(vertx(), new ShutdownVerticle());
+        else return Future.succeededFuture();
+      })
+      .compose(x -> FutureUtils.sequence(Lists.newArrayList(registries).stream().map(r -> RegistryVerticle.deploy(vertx(), r)).collect(Collectors.toList())));
   }
 }
