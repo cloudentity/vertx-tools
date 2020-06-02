@@ -37,6 +37,11 @@
       <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-test</artifactId>
     </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>
