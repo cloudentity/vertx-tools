@@ -25,6 +25,7 @@
     <module>vertx-config-consul-json</module>
     <module>vertx-config-classpath</module>
     <module>vertx-config-vault-keycerts</module>
+    <module>vertx-config-shared-data</module>
     <module>vertx-config-all</module>
   </modules>
   <packaging>pom</packaging>
@@ -383,6 +384,11 @@
       <dependency>
         <groupId>com.cloudentity.tools.vertx</groupId>
         <artifactId>vertx-config-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cloudentity.tools.vertx</groupId>
+        <artifactId>vertx-config-shared-data</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

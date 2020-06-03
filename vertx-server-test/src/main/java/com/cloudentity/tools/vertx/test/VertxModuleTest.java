@@ -110,8 +110,16 @@ abstract public class VertxModuleTest extends VertxUnitTest {
    * @return
    */
   public Future<List<String>> deployModules(List<String> modules, JsonObject extraConfig, String... registries) {
-    JsonObject config = extraConfig.copy().put("modules", new JsonArray(modules));
-    JsonArray configStores = new JsonArray().add(new JsonObject().put("type", "json").put("format", "json").put("config", config));
+    vertx().sharedData().getLocalMap("module-test").put("config", extraConfig);
+
+    JsonObject modulesConfig = new JsonObject().put("modules", new JsonArray(modules));
+    JsonObject localMapExtraConfig = new JsonObject().put("name", "module-test").put("key", "config");
+
+    JsonArray configStores =
+      new JsonArray()
+        .add(new JsonObject().put("type", "json").put("format", "json").put("config", modulesConfig))
+        .add(new JsonObject().put("type", "shared-local-map").put("format", "json").put("config", localMapExtraConfig));
+
     JsonObject metaConfig = new JsonObject().put("scanPeriod", 100).put("stores", configStores);
 
     return ConfVerticleDeploy.deployVerticleFromMetaConfig(vertx(), metaConfig)
