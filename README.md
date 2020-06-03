@@ -40,6 +40,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
     * [classpath](docs/config-stores/classpath.md)
     * [consul-json](docs/config-stores/consul-json.md)
     * [vault-keycerts](docs/config-stores/vault-keycerts.md)
+    * [shared-local-map](docs/config-stores/shared-local-map.md)
     * [ext](docs/config-stores/ext.md)
 * [Modules configuration](#modules-config)
   * [How modules configuration is resolved](#modules-how)
@@ -921,6 +922,7 @@ When configuration references have been resolved then "my-service-verticle" stor
 * [classpath](docs/config-stores/classpath.md)
 * [consul-json](docs/config-stores/consul-json.md)
 * [vault-keycerts](docs/config-stores/vault-keycerts.md)
+* [shared-local-map](docs/config-stores/shared-local-map.md)
 * [ext](docs/config-stores/ext.md)
 
 <a id="modules-config"></a>

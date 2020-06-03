@@ -28,5 +28,9 @@
       <groupId>com.cloudentity.tools.vertx</groupId>
       <artifactId>vertx-config-vault-keycerts</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.cloudentity.tools.vertx</groupId>
+      <artifactId>vertx-config-shared-data</artifactId>
+    </dependency>
   </dependencies>
 </project>

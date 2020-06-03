@@ -5,6 +5,7 @@
 - VertxModuleTest
 - registry deploys verticles applying 'dependsOn' attribute
 - VertxExecutionContext extends Executor
+- shared-local-map config store
 
 ### Changed
 - ServiceClientFactory deprecated by VertxEndpointClient
