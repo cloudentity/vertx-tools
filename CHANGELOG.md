@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.2.0] - 2020-06-09
 ### Added
 - ext config stores can control 'ssl' flag of underlying store with 'scheme' attribute
 - env fallback reference
@@ -13,7 +13,7 @@
 - vertx upgraded to 3.9.1
 - jackson upgraded to 2.10.2 (jackson-databind exclusions removed)
 
-## [1.1.0] - 2019-04-20
+## [1.1.0] - 2020-04-20
 ### Added
 - module instance support
 - smart http client body streaming and addHeader method
