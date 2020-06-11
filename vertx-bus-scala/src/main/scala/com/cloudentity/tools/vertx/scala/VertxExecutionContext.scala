@@ -3,7 +3,7 @@ package com.cloudentity.tools.vertx.scala
 import io.vertx.core.Context
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContextExecutor
 
 /**
   * A scala [[scala.concurrent.ExecutionContext]] binds [[scala.concurrent.Promise]]/[[scala.concurrent.Future]] to a thread.
@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext
   * https://github.com/vert-x/mod-lang-scala/blob/master/src/main/scala/org/vertx/scala/core/VertxExecutionContext.scala
   *
   */
-class VertxExecutionContext(val ctx:Context) extends ExecutionContext{
+class VertxExecutionContext(val ctx:Context) extends ExecutionContextExecutor {
   private val Log = LoggerFactory.getLogger(classOf[VertxExecutionContext].getName)
 
   override def execute(runnable: Runnable): Unit = {
@@ -23,7 +23,7 @@ class VertxExecutionContext(val ctx:Context) extends ExecutionContext{
   }
 
   override def reportFailure(cause: Throwable): Unit = {
-    Log.error("Failed executing on contet", cause)
+    Log.error("Failed executing on context", cause)
   }
 }
 

@@ -2,7 +2,7 @@ package com.cloudentity.tools.vertx.http
 
 import java.util.{List => JList}
 
-import com.cloudentity.tools.vertx.bus.{ServiceClientFactory, VertxBus}
+import com.cloudentity.tools.vertx.bus.{VertxEndpointClient, VertxBus}
 import com.cloudentity.tools.vertx.http.circuit._
 import com.cloudentity.tools.vertx.http.loadBalancing.LoadBalancingStrategy
 import com.cloudentity.tools.vertx.sd.{Location, Node, NodeId, SdService, SdVerticle, ServiceName, SmartRecord}
@@ -73,7 +73,7 @@ object Sd {
 case class SmartSd(vertx: Vertx, serviceName: ServiceName, serviceTags: List[String], cbFactory: NodeId => CircuitBreaker, lb: LoadBalancingStrategy) extends Sd {
   val log = LoggerFactory.getLogger(this.getClass.getName + ": " + serviceName.value)
 
-  val sdClient = ServiceClientFactory.make(vertx.eventBus, classOf[SdService])
+  val sdClient = VertxEndpointClient.make(vertx, classOf[SdService])
   var nodes = Vector[Node]()
 
   val nodesConsumer =

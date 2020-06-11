@@ -1,6 +1,6 @@
 package com.cloudentity.tools.vertx.test
 
-import com.cloudentity.tools.vertx.bus.{ServiceClientFactory, ServiceVerticle, VertxEndpoint}
+import com.cloudentity.tools.vertx.bus.{ServiceVerticle, VertxEndpoint, VertxEndpointClient}
 import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.unit.TestContext
@@ -28,7 +28,7 @@ class SampleVertxUnitTest extends ScalaVertxUnitTest {
 
   @Test
   def testSampleVerticleMethodWithScalaFuture(ctx: TestContext): Unit = {
-    val client = ServiceClientFactory.make(vertx.eventBus, classOf[SampleService])
+    val client = VertxEndpointClient.make(vertx, classOf[SampleService])
     val verticle = new SampleServiceVerticle
     val config = new JsonObject().put("length", 3)
 
@@ -41,7 +41,7 @@ class SampleVertxUnitTest extends ScalaVertxUnitTest {
 
   @Test
   def testSampleVerticleMethodWithVertx(ctx: TestContext): Unit = {
-    val client = ServiceClientFactory.make(vertx.eventBus, classOf[SampleService])
+    val client = VertxEndpointClient.make(vertx, classOf[SampleService])
     val verticle = new SampleServiceVerticle
     val config = new JsonObject().put("length", 3)
 

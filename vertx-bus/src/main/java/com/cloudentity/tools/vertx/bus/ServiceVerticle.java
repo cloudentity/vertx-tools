@@ -1,7 +1,6 @@
 package com.cloudentity.tools.vertx.bus;
 
 import com.google.common.collect.Lists;
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory.VertxEndpointInterface;
 import io.vertx.core.Future;
 
 import java.lang.reflect.Method;
@@ -56,11 +55,7 @@ public abstract class ServiceVerticle extends ComponentVerticle {
       List<Class> vertxServices = vertxServices();
       if (!vertxServices.isEmpty()) {
         vertxServices.forEach(vertxService -> {
-          List<VertxEndpointInterface> vertxEndpoints = ServiceClientFactory.getVertxEndpoints(vertxService, vertxServiceAddressPrefix());
-          ServiceVerticleTools.assertVertxServiceInterfaceImplemented(vertxService, this);
-          ServiceVerticleTools.assertVertxEndpointsReturnFutureOrVoid(vertxService, vertxEndpoints);
-
-          ServiceVerticleTools.registerConsumers(vertx, this, vertxEndpoints);
+          ServiceVerticleTools.init(vertx, this, vertxService, vertxServiceAddressPrefix());
         });
         return Future.succeededFuture();
       } else {

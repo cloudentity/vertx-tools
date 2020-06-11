@@ -19,7 +19,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
 | vertx-config-ext                | Wrappers for Vertx config-stores providing extra functionality                                    |
 | vertx-test                      | Testing tools for vertx-bus                                                                       |
 | vertx-test-scala                | Testing tools for vertx-bus-scala                                                                 |
-| vertx-server-test               | Testing tools for vertx-server                                                                    |
+| vertx-server-test               | Testing tools for vertx-server and modules                                                        |
 
 ## Contents
 
@@ -40,6 +40,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
     * [classpath](docs/config-stores/classpath.md)
     * [consul-json](docs/config-stores/consul-json.md)
     * [vault-keycerts](docs/config-stores/vault-keycerts.md)
+    * [shared-local-map](docs/config-stores/shared-local-map.md)
     * [ext](docs/config-stores/ext.md)
 * [Modules configuration](#modules-config)
   * [How modules configuration is resolved](#modules-how)
@@ -48,6 +49,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
   * [Shared modules dependency](#modules-shared)
   * [Required modules](#modules-required)
   * [Module instances](#module-instances)
+  * [Testing modules](#module-testing)
 * [Event bus communication](#bus)
   * [Define service interface](#bus-define)
   * [Implement ServiceVerticle](#bus-implement)
@@ -63,6 +65,7 @@ The key element is `ServiceVerticle`, a `io.vertx.core.Verticle` implementation 
   * [Deploying multiple implementations of VertxEndpoint](#di-impls)
   * [Defining custom DeploymentOptions](#di-deployment-opts)
   * [Disabling verticle](#di-disable)
+  * [Defining deployment order](#di-order)
 * [HTTP server](#server)
   * [Routes configuration](#server-routes)
   * [HTTP filters](#server-filters)
@@ -413,6 +416,40 @@ After resolution, we end up with the following configuration:
   "env": {
     "CASSANDRA_PORT": 9000
   }
+}
+```
+
+##### Replacing sensitive environment variable with configuration reference
+
+If an environment variable contains sensitive value (e.g. database password) we should read it from secure storage like Vault.
+Sensitive environment variable might be referenced in multiple places, so trying to overwrite it is cumbersome task.
+Instead, we can put configuration reference as a value of environment variable fallback.
+
+>NOTE<br/>
+> We still should use environment variable in this case. It creates separation between low-level configuration structure and deployment options.
+
+For example let's have following reference to `POSTGRES_PASSWORD` environment variable and secrets from secure storage:
+
+```
+{
+  "postgres-password": "$env:POSTGRES_PASSWORD:string",
+  "secrets": {
+    "postgres": {
+      "password": "#@!"
+    }
+  },
+  "env": {
+    "POSTGRES_PASSWORD": "$ref:secrets.postgres.password"
+  }
+}
+```
+
+After resolution, we end up with the following configuration:
+
+```
+{
+  "postgres-password": "#@!",
+  ...
 }
 ```
 
@@ -885,6 +922,7 @@ When configuration references have been resolved then "my-service-verticle" stor
 * [classpath](docs/config-stores/classpath.md)
 * [consul-json](docs/config-stores/consul-json.md)
 * [vault-keycerts](docs/config-stores/vault-keycerts.md)
+* [shared-local-map](docs/config-stores/shared-local-map.md)
 * [ext](docs/config-stores/ext.md)
 
 <a id="modules-config"></a>
@@ -1274,6 +1312,7 @@ With module instances you can overwrite env variables per instance.
 
 To do so configure module instances:
 
+```
 {
   "modules": [
     {
@@ -1402,6 +1441,58 @@ then single module instance will be collected and deployed (note `id` prepended 
 }
 ```
 
+<a id="modules-testing"></a>
+### Testing modules
+
+In order to test modules you can use `VertxModuleTest` from `vertx-server-test`. `VertxModuleTest` provides methods
+that load the module configuration and deploy verticle registries.
+
+Given configuration module stored in classpath at `modules/path/some-module.json`:
+
+```
+{
+  "registry:some": {
+    "x-service": {
+      "main": "com.example.AVerticle",
+    }
+  },
+  "registry:other": {
+    "y-service": {
+      "main": "com.example.BVerticle"
+    }
+  },
+  "x-service": {
+    "url": "example.com/test"
+  }
+}
+```
+
+you can test the module like this:
+
+
+```
+public class SomeModuleTest extends VertxModuleTest {
+  @Test
+  public void test(TestContext ctx) {
+    // deploys config verticle with 'path/some-module' module configuration
+    // then deploys 'some' and 'other' registries
+    deployModule("path/some-module", "some", "other")
+      .compose(x -> {
+        // implement test logic
+      }).onComplete(ctx.asyncAssertSuccess());
+    ;
+  }
+}
+```
+
+`VertxModuleTest` defines additional methods that you can use to deploy module with extra test configuration,
+either providing JsonObject or path to file with JSON object format.
+
+```
+deployModule("path/some-module", new JsonObject().put("x-service", ...), "some", "other")
+deployModuleWithFileConfig("path/some-module", "path/to/test/configuration.json", "some", "other")
+```
+
 <a id="bus"></a>
 ## Event bus communication and ServiceVerticle
 
@@ -1484,12 +1575,12 @@ public class NotifierVerticle extends ServiceVerticle implements NotifierService
 ```java
 import io.vertx.core.Future;
 import com.cloudentity.tools.vertx.bus.VertxBus;
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 
 public class ClientVerticle extends AbstractVerticle {
   public void start() {
     VertxBus.registerPayloadCodec(vertx.eventBus()); // you don't need this line if you use VertxBootstrap in your project
-    UpperCaseService client = ServiceClientFactory.make(vertx.eventBus(), UpperCaseService.class); // when extending ComponentVerticle use: createClient(UpperCaseService.class);
+    UpperCaseService client = VertxEndpointClient.make(vertx, UpperCaseService.class); // when extending ComponentVerticle use: createClient(UpperCaseService.class);
 
     Future<String> response = client.toUpperCase("hello world!");
     response.setHandler(async -> {
@@ -1501,14 +1592,14 @@ public class ClientVerticle extends AbstractVerticle {
 }
 ```
 
-`ServiceClientFactory.make()` builds a proxy object using reflection. The proxy uses event-bus to send messages on addresses defined
+`VertxEndpointClient.make()` builds a proxy object using reflection. The proxy uses event-bus to send messages on addresses defined
 in the `VertxEndpoint` annotation on `UpperCaseService` interface. If you are extending `ServiceVerticle` or `ComponentVerticle` then instead of using
-`ServiceClientFactory` use `ComponentVerticle.createClient` method.
+`VertxEndpointClient` use `ComponentVerticle.createClient` method.
 
 ```java
 import io.vertx.core.Future;
 import com.cloudentity.tools.vertx.bus.VertxBus;
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 
 public class ClientVerticle extends ComponentVerticle {
   @Override
@@ -1528,9 +1619,9 @@ public class ClientVerticle extends ComponentVerticle {
 <a id="bus-timeout"></a>
 ### Service client timeout
 
-When you create a client using `ServiceClientFactory` or `createClient` then by default all the calls timeout after 30 seconds.
+When you create a client using `VertxEndpointClient` or `createClient` then by default all the calls timeout after 30 seconds.
 You can change that timeout by setting `VERTX_SERVICE_CLIENT_TIMEOUT` system or environment variable (in milliseconds).
-It applies to all clients unless they are created using `ServiceClientFactory` and `DeliveryOptions` as argument.
+It applies to all clients unless they are created using `VertxEndpointClient` and `DeliveryOptions` as argument.
 `DeliveryOptions` should have `sendTimeout` property set.
 
 <a id="bus-verticle-init"></a>
@@ -1855,6 +1946,32 @@ E.g.
 
 > NOTE<br/>
 > For backward compatibility you can use 'disabled' flag. Set it to true to skip verticle deployment.
+
+<a id="di-order"></a>
+### Defining deployment order
+
+By default, registry deploys verticles in undefined order. You can enforce ordering of verticles deployment using 'dependsOn' attribute.
+
+E.g.
+```
+{
+  "registry:components": {
+    "verticle-a": {
+      "main": "com.example.ServiceVerticleA",
+      "dependsOn": ["verticle-b", "verticle-c"]
+    },
+    "verticle-b": {
+      "main": "com.example.ServiceVerticleB"
+    },
+    "verticle-c": {
+      "main": "com.example.ServiceVerticleC"
+    }
+  }
+}
+```
+
+Using above configuration, registry 'components' deploys verticles 'verticle-b' and 'verticle-c' first and when they are up then it deploys 'verticle-a'.
+
 
 <a id="server"></a>
 ## Serving HTTP requests and ApiServer

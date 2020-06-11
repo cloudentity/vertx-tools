@@ -1,4 +1,19 @@
-## [1.1.0] - 2019-04-20
+## [1.2.0] - 2020-06-09
+### Added
+- ext config stores can control 'ssl' flag of underlying store with 'scheme' attribute
+- env fallback reference
+- VertxModuleTest
+- registry deploys verticles applying 'dependsOn' attribute
+- VertxExecutionContext extends Executor
+- shared-local-map config store
+
+### Changed
+- ServiceClientFactory deprecated by VertxEndpointClient
+- ComponentVerticle does not print stacktrace when TracingVerticle not available
+- vertx upgraded to 3.9.1
+- jackson upgraded to 2.10.2 (jackson-databind exclusions removed)
+
+## [1.1.0] - 2020-04-20
 ### Added
 - module instance support
 - smart http client body streaming and addHeader method

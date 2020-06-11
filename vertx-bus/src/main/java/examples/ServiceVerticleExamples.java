@@ -1,6 +1,6 @@
 package examples;
 
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory;
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient;
 import com.cloudentity.tools.vertx.bus.ServiceVerticle;
 import com.cloudentity.tools.vertx.bus.VertxBus;
 import com.cloudentity.tools.vertx.bus.VertxEndpoint;
@@ -22,7 +22,7 @@ public class ServiceVerticleExamples {
 
   public void example1(Vertx vertx) {
     VertxBus.registerPayloadCodec(vertx.eventBus());
-    Validator client = ServiceClientFactory.make(vertx.eventBus(), Validator.class);
+    Validator client = VertxEndpointClient.make(vertx, Validator.class);
 
     vertx.deployVerticle(new ValidatorVerticle(), result -> {
       if (result.succeeded()) {

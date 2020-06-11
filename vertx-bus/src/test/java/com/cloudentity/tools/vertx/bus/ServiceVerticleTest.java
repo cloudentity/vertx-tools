@@ -68,7 +68,7 @@ public class ServiceVerticleTest {
     VertxBus.registerPayloadCodec(vertx.eventBus());
 
     // given
-    MyService client = ServiceClientFactory.make(vertx.eventBus(), MyService.class, addressPrefixOpt);
+    MyService client = VertxEndpointClient.make(vertx, MyService.class, addressPrefixOpt);
 
     vertx.deployVerticle(new MyVerticle(addressPrefixOpt), deployResult -> {
       // when
@@ -178,7 +178,7 @@ public class ServiceVerticleTest {
     VertxBus.registerPayloadCodec(vertx.eventBus());
 
     // given
-    MyPublishService client = ServiceClientFactory.make(vertx.eventBus(), MyPublishService.class);
+    MyPublishService client = VertxEndpointClient.make(vertx, MyPublishService.class);
 
     // when
     vertx.deployVerticle(new MyPublishVerticle(), deployResult -> {
@@ -318,8 +318,8 @@ public class ServiceVerticleTest {
     VertxBus.registerPayloadCodec(vertx.eventBus());
 
     // given
-    MyService client = ServiceClientFactory.make(vertx.eventBus(), MyService.class);
-    MyAnotherService anotherClient = ServiceClientFactory.make(vertx.eventBus(), MyAnotherService.class);
+    MyService client = VertxEndpointClient.make(vertx, MyService.class);
+    MyAnotherService anotherClient = VertxEndpointClient.make(vertx, MyAnotherService.class);
 
     vertx.deployVerticle(new MyAnotherVerticle(), deployResult -> {
       // when
@@ -379,7 +379,7 @@ public class ServiceVerticleTest {
     VertxBus.registerPayloadCodec(vertx.eventBus());
 
     // given
-    MyServiceWithoutAddress client = ServiceClientFactory.make(vertx.eventBus(), MyServiceWithoutAddress.class, addressPrefixOpt);
+    MyServiceWithoutAddress client = VertxEndpointClient.make(vertx, MyServiceWithoutAddress.class, addressPrefixOpt);
 
     vertx.deployVerticle(new MyVerticleWithoutAddress(addressPrefixOpt), deployResult -> {
       // when
@@ -399,7 +399,7 @@ public class ServiceVerticleTest {
     VertxBus.registerPayloadCodec(vertx.eventBus());
 
     // given
-    MyService client = ServiceClientFactory.make(vertx.eventBus(), MyService.class, Optional.of("address-prefix"));
+    MyService client = VertxEndpointClient.make(vertx, MyService.class, Optional.of("address-prefix"));
     DeploymentOptions opts = new DeploymentOptions().setConfig(new JsonObject().put("prefix", "address-prefix"));
 
     vertx.deployVerticle(new MyVerticleWithoutAddressPrefixOverwrite(), opts, deployResult -> {
@@ -419,7 +419,7 @@ public class ServiceVerticleTest {
     VertxBus.registerPayloadCodec(vertx.eventBus());
 
     // given
-    MyService client = ServiceClientFactory.make(vertx.eventBus(), MyService.class, Optional.of("my-verticle"));
+    MyService client = VertxEndpointClient.make(vertx, MyService.class, Optional.of("my-verticle"));
     DeploymentOptions opts = new DeploymentOptions().setConfig(new JsonObject().put("verticleId", "my-verticle").put("prefix", true));
 
     vertx.deployVerticle(new MyVerticleWithoutAddressPrefixOverwrite(), opts, deployResult -> {
@@ -499,7 +499,7 @@ public class ServiceVerticleTest {
     VertxBus.registerPayloadCodec(vertx.eventBus());
 
     // given
-    MyService client = ServiceClientFactory.make(vertx.eventBus(), MyService.class);
+    MyService client = VertxEndpointClient.make(vertx, MyService.class);
 
     vertx.deployVerticle(new MyVerticleThrowingException(verticleThrowsExceptionInsteadOfFail), deployResult -> {
       // when
@@ -554,7 +554,7 @@ public class ServiceVerticleTest {
       .compose(x -> VertxDeploy.deploy(vertx, new MyVerticleSelfConfChangeListener())) // deploy ServiceVerticle
       .map(x -> vertx.eventBus().publish(confStoreAddress, changedGlobalConf)) // change configuration
       .compose(x -> wait(vertx, 200)) // wait for configuration to be propagated
-      .compose(x -> ServiceClientFactory.make(vertx.eventBus(), ConfListener.class).changedConfig()) // get changed configuration from ServiceVerticle
+      .compose(x -> VertxEndpointClient.make(vertx, ConfListener.class).changedConfig()) // get changed configuration from ServiceVerticle
       .map(changedConf -> ctx.assertEquals(true, ((JsonObject)changedConf).getBoolean("changed"))) // assert
       .setHandler(ctx.asyncAssertSuccess());
   }

@@ -5,6 +5,7 @@ import com.cloudentity.tools.vertx.conf.ConfService;
 import com.cloudentity.tools.vertx.conf.ConfVerticle;
 import com.cloudentity.tools.vertx.tracing.TracingManager;
 import com.cloudentity.tools.vertx.tracing.TracingService;
+import com.cloudentity.tools.vertx.tracing.TracingVerticle;
 import com.cloudentity.tools.vertx.tracing.internals.JaegerTracing;
 import io.vertx.config.ConfigChange;
 import io.vertx.core.AbstractVerticle;
@@ -34,8 +35,8 @@ public abstract class ComponentVerticle extends AbstractVerticle {
 
   @Override
   public void start(Future<Void> start) {
-    confService = ServiceClientFactory.make(vertx.eventBus(), ConfService.class);
-    tracingService = ServiceClientFactory.make(vertx.eventBus(), TracingService.class);
+    confService = VertxEndpointClient.make(vertx, ConfService.class);
+    tracingService = VertxEndpointClient.make(vertx, TracingService.class);
 
     getConfigAsync()
       .map(this::setConf)
@@ -180,7 +181,7 @@ public abstract class ComponentVerticle extends AbstractVerticle {
    * Overwrite this method to disable tracing initialization
    */
   protected boolean tracingEnabled() {
-    return true;
+    return TracingVerticle.isTracingEnabled(vertx);
   }
 
   public TracingManager getTracing() {
@@ -264,26 +265,26 @@ public abstract class ComponentVerticle extends AbstractVerticle {
   }
 
   public <T> T createClient(Class<T> clazz) {
-    return ServiceClientFactory.makeWithTracing(vertx.eventBus(), tracing, clazz);
+    return VertxEndpointClient.makeWithTracing(vertx, tracing, clazz);
   }
 
   public <T> T createClient(Class<T> clazz, Optional<String> addressPrefixOpt) {
-    return ServiceClientFactory.makeWithTracing(vertx.eventBus(), tracing, clazz, addressPrefixOpt);
+    return VertxEndpointClient.makeWithTracing(vertx, tracing, clazz, addressPrefixOpt);
   }
 
   public <T> T createClient(Class<T> clazz, String addressPrefix) {
-    return ServiceClientFactory.makeWithTracing(vertx.eventBus(), tracing, clazz, Optional.ofNullable(addressPrefix));
+    return VertxEndpointClient.makeWithTracing(vertx, tracing, clazz, Optional.ofNullable(addressPrefix));
   }
 
   public <T> T createClient(Class<T> clazz, DeliveryOptions opts) {
-    return ServiceClientFactory.makeWithTracing(vertx.eventBus(), tracing, clazz, Optional.empty(), opts);
+    return VertxEndpointClient.makeWithTracing(vertx, tracing, clazz, Optional.empty(), opts);
   }
 
   public <T> T createClient(Class<T> clazz, Optional<String> addressPrefixOpt, DeliveryOptions opts) {
-    return ServiceClientFactory.makeWithTracing(vertx.eventBus(), tracing, clazz, addressPrefixOpt, opts);
+    return VertxEndpointClient.makeWithTracing(vertx, tracing, clazz, addressPrefixOpt, opts);
   }
 
   public <T> T createClient(Class<T> clazz, String addressPrefix, DeliveryOptions opts) {
-    return ServiceClientFactory.makeWithTracing(vertx.eventBus(), tracing, clazz, Optional.ofNullable(addressPrefix), opts);
+    return VertxEndpointClient.makeWithTracing(vertx, tracing, clazz, Optional.ofNullable(addressPrefix), opts);
   }
 }

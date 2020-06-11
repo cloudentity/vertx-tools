@@ -4,7 +4,7 @@ import java.io.File
 import java.util.Optional
 
 import com.google.common.io.Files
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory
+import com.cloudentity.tools.vertx.bus.{VertxEndpoint, VertxEndpointClient}
 import com.cloudentity.tools.vertx.conf.ConfVerticleDeploy
 import com.cloudentity.tools.vertx.registry.RegistryVerticle.RegistryType
 import com.cloudentity.tools.vertx.scala.{FutureConversions, Futures}
@@ -14,6 +14,8 @@ import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.core.{AbstractVerticle, Future}
 import io.vertx.ext.unit.TestContext
 import com.cloudentity.tools.vertx.scala.VertxExecutionContext
+import com.cloudentity.tools.vertx.scala.bus.ScalaServiceVerticle
+import io.vertx.core.json.JsonObject
 import org.junit.{Assert, Test}
 
 import scala.concurrent.duration._
@@ -25,7 +27,7 @@ class RegistryVerticleTest() extends VertxUnitTest with FutureConversions {
     val configFile = copyDescriptorsToTempFile("src/test/resources/registry/one-healthy.json")
     val typ = RegistryType("test")
 
-    val client = ServiceClientFactory.make(vertx.eventBus(), classOf[RegistryService], Optional.of(typ.value))
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
     // when
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath)
       .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
@@ -45,7 +47,7 @@ class RegistryVerticleTest() extends VertxUnitTest with FutureConversions {
     val configFile = copyDescriptorsToTempFile("src/test/resources/registry/disabled-healthy.json")
     val typ = RegistryType("test")
 
-    val client = ServiceClientFactory.make(vertx.eventBus(), classOf[RegistryService], Optional.of(typ.value))
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
     // when
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath)
       .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
@@ -65,7 +67,7 @@ class RegistryVerticleTest() extends VertxUnitTest with FutureConversions {
     val configFile = copyDescriptorsToTempFile("src/test/resources/registry/enabled-false-healthy.json")
     val typ = RegistryType("test")
 
-    val client = ServiceClientFactory.make(vertx.eventBus(), classOf[RegistryService], Optional.of(typ.value))
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
     // when
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath)
       .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
@@ -85,7 +87,7 @@ class RegistryVerticleTest() extends VertxUnitTest with FutureConversions {
     val configFile = copyDescriptorsToTempFile("src/test/resources/registry/registry-in-registry.json")
     val typ = RegistryType("test")
 
-    val client = ServiceClientFactory.make(vertx.eventBus(), classOf[RegistryService], Optional.of(typ.value))
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
     // when
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath)
       .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(RegistryType("super"))) }
@@ -118,7 +120,7 @@ class RegistryVerticleTest() extends VertxUnitTest with FutureConversions {
     val configFile = copyDescriptorsToTempFile("src/test/resources/registry/one-healthy.json")
     val typ = RegistryType("test")
 
-    val client = ServiceClientFactory.make(vertx.eventBus(), classOf[RegistryService], Optional.of(typ.value))
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
     // when
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath, new ConfigRetrieverOptions().setScanPeriod(100))
       .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
@@ -144,7 +146,7 @@ class RegistryVerticleTest() extends VertxUnitTest with FutureConversions {
     val configFile = copyDescriptorsToTempFile("src/test/resources/registry/two-healthy.json")
     val typ = RegistryType("test")
 
-    val client = ServiceClientFactory.make(vertx.eventBus(), classOf[RegistryService], Optional.of(typ.value))
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
 
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath, new ConfigRetrieverOptions().setScanPeriod(100))
       .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
@@ -175,7 +177,7 @@ class RegistryVerticleTest() extends VertxUnitTest with FutureConversions {
     val configFile = copyDescriptorsToTempFile("src/test/resources/registry/verticle-config.json")
     val typ = RegistryType("test")
 
-    val client = ServiceClientFactory.make(vertx.eventBus(), classOf[RegistryService], Optional.of(typ.value))
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
     // when
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath)
       .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
@@ -195,7 +197,7 @@ class RegistryVerticleTest() extends VertxUnitTest with FutureConversions {
     val configFile = copyDescriptorsToTempFile("src/test/resources/registry/verticle-prefix.json")
     val typ = RegistryType("test")
 
-    val client = ServiceClientFactory.make(vertx.eventBus(), classOf[RegistryService], Optional.of(typ.value))
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
     // when
     ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath)
       .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
@@ -253,6 +255,54 @@ class RegistryVerticleTest() extends VertxUnitTest with FutureConversions {
       }.setHandler(context.asyncAssertSuccess())
   }
 
+  @Test
+  def shouldDeployHonoringDependsOnOnStartup(context: TestContext): Unit = {
+    // given
+    val configFile = copyDescriptorsToTempFile("src/test/resources/registry/depends-on-ok.json")
+    val typ = RegistryType("test")
+
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
+    // when
+    ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath)
+      .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
+      .compose { _ => client.getVerticleIds }
+      .compose { (ids: java.util.List[String]) =>
+        // then
+        context.assertEquals(3, ids.size)
+        context.assertTrue(ids.contains("a"))
+        context.assertTrue(ids.contains("b"))
+        context.assertTrue(ids.contains("c"))
+
+        Future.succeededFuture(())
+      }.setHandler(context.asyncAssertSuccess())
+  }
+
+  @Test
+  def shouldFailDeployWhenDependencyMissingStartup(context: TestContext): Unit = {
+    // given
+    val configFile = copyDescriptorsToTempFile("src/test/resources/registry/depends-on-missing.json")
+    val typ = RegistryType("test")
+
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
+    // when
+    ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath)
+      .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
+      .setHandler(context.asyncAssertFailure())
+  }
+
+  @Test
+  def shouldFailDeployWhenDependencyFailedStartup(context: TestContext): Unit = {
+    // given
+    val configFile = copyDescriptorsToTempFile("src/test/resources/registry/depends-on-fail.json")
+    val typ = RegistryType("test")
+
+    val client = VertxEndpointClient.make(vertx, classOf[RegistryService], Optional.of(typ.value))
+    // when
+    ConfVerticleDeploy.deployFileConfVerticle(vertx, configFile.getAbsolutePath)
+      .compose { _ => VertxDeploy.deploy(vertx, new RegistryVerticle(typ)) }
+      .setHandler(context.asyncAssertFailure())
+  }
+
   def copyDescriptorsToTempFile(sourceConfigPath: String): File = {
     val tempDir = Files.createTempDir()
     val from = new File(sourceConfigPath)
@@ -295,4 +345,24 @@ class StatefulVerticle extends AbstractVerticle {
       StatefulVerticle.counter += 1
     }
   }
+}
+
+trait DependsOn {
+  @VertxEndpoint
+  def ready(): Future[Boolean]
+}
+
+class DependsOnVerticle extends ScalaServiceVerticle with DependsOn {
+  override def initServiceAsync(): Future[Void] = {
+    val cfg = Option(getConfig()).getOrElse(new JsonObject())
+
+    if (cfg.getBoolean("fail", false)) throw new RuntimeException("failure")
+
+    val readyCheck = Optional.ofNullable(cfg.getString("ready"))
+    if (readyCheck.isPresent) createClient(classOf[DependsOn], readyCheck).ready().compose { _ => Future.succeededFuture(null) }
+    else Future.succeededFuture(null)
+  }
+
+  override def ready(): VxFuture[Boolean] =
+    Future.succeededFuture(true)
 }

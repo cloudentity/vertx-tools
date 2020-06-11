@@ -3,7 +3,7 @@ package com.cloudentity.tools.vertx.server.api.filters
 import java.util.Optional
 
 import io.circe.{Decoder, Json}
-import com.cloudentity.tools.vertx.bus.ServiceClientFactory
+import com.cloudentity.tools.vertx.bus.VertxEndpointClient
 import com.cloudentity.tools.vertx.test.VertxUnitTest
 import com.cloudentity.tools.vertx.verticles.VertxDeploy
 import io.vertx.core.{DeploymentOptions, Future}
@@ -72,6 +72,6 @@ class ScalaRouteFilterTest extends VertxUnitTest with FutureConversions {
       .compose { _ =>
         VertxDeploy.deploy(vertx, new StringConfigFilter(true), new DeploymentOptions().setConfig(new JsonObject().put("verticleId", "test")))
       }.compose { _ =>
-        Future.succeededFuture(ServiceClientFactory.make(vertx.eventBus(), classOf[RouteFilter], Optional.of("test")))
+        Future.succeededFuture(VertxEndpointClient.make(vertx, classOf[RouteFilter], Optional.of("test")))
       }
 }
