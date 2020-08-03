@@ -1,3 +1,7 @@
+## [Unreleased]
+### Fixed
+- sd-provider/consul and sd-provider/static modules deployment race condition
+
 ## [1.2.0] - 2020-06-09
 ### Added
 - ext config stores can control 'ssl' flag of underlying store with 'scheme' attribute
