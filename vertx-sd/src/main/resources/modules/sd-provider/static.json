@@ -8,6 +8,7 @@
     },
     "fixed-sd-provider": {
       "main": "com.cloudentity.tools.vertx.sd.provider.FixedSdProvider",
+      "dependsOn": ["service-discovery"],
       "verticleConfig": {
         "records": "$ref:sd-records"
       }
