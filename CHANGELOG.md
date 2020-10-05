@@ -1,4 +1,6 @@
 ## [Unreleased]
+### Added
+- spring-like conf reference
 ### Fixed
 - sd-provider/consul and sd-provider/static modules deployment race condition
 

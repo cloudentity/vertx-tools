@@ -43,7 +43,8 @@ public class ConfReference {
 
     JsonObject withSysRefs = ConfReference.populateSysRefs(withConfRefs, sysFallback);
     JsonObject withEnvRefs = ConfReference.populateEnvRefs(withSysRefs, envFallback);
-    return withEnvRefs;
+    JsonObject withSpringlikeRefs = ConfSpringlikeReference.populateRefs(withEnvRefs);
+    return withSpringlikeRefs;
   }
 
   /**
