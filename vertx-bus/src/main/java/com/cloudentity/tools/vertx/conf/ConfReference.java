@@ -43,7 +43,8 @@ public class ConfReference {
 
     JsonObject withSysRefs = ConfReference.populateSysRefs(withConfRefs, sysFallback);
     JsonObject withEnvRefs = ConfReference.populateEnvRefs(withSysRefs, envFallback);
-    return withEnvRefs;
+    JsonObject withSpringlikeRefs = ConfSpringlikeReference.populateRefs(withEnvRefs);
+    return withSpringlikeRefs;
   }
 
   /**
@@ -73,7 +74,15 @@ public class ConfReference {
 
     refs.forEach(ref -> {
       final Object defaultValue = defaultInnerReferenceValue(ref);
-      Optional<Object> resolvedValue = JsonExtractor.resolveValue(globalConf, ref.path);
+      Optional<Object> resolvedValue =
+        JsonExtractor.resolveValue(globalConf, ref.path)
+          .map(value -> {
+            if (ref.valueType.isPresent()) {
+              return convertValue(value, ref.valueType.get(), ref, "$ref");
+            } else {
+              return value;
+            }
+          });
       if (resolvedValue.isPresent()) {
         resolvedRefs.add(new ResolvedRef(ref, resolvedValue.get()));
       } else {
@@ -90,7 +99,6 @@ public class ConfReference {
     } else if (ref.defaultValue.isPresent() && ref.valueType.isPresent()) {
       return convertValue(ref.defaultValue.get(), ref.valueType.get(), ref, "$ref");
     } else {
-      log.error("Invalid configuration reference format. Should be $ref:{ref-path} or $ref:{ref-path}:{default-value-type}:{default-value} was $ref:{}", ref);
       return null;
     }
   }

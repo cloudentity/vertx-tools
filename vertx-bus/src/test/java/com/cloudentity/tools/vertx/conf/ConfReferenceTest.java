@@ -149,6 +149,26 @@ public class ConfReferenceTest {
   }
 
   @Test
+  public void shouldCastConfReference() {
+    // given
+    JsonObject conf =
+      new JsonObject()
+        .put("xInt", "$ref:yStringInt:int").put("yStringInt", "100")
+        .put("xStringInt", "$ref:yInt:string").put("yInt", 100)
+        .put("xBoolean", "$ref:yStringBoolean:boolean").put("yStringBoolean", "true")
+        .put("xStringBoolean", "$ref:yBoolean:string").put("yBoolean", true);
+
+    // when
+    JsonObject result = ConfReference.populateInnerRefs(conf, conf);
+
+    // then
+    assertEquals(new Integer(100), result.getInteger("xInt"));
+    assertEquals("100", result.getString("xStringInt"));
+    assertEquals(true, result.getBoolean("xBoolean"));
+    assertEquals("true", result.getString("xStringBoolean"));
+  }
+
+  @Test
   public void shouldReplaceReferenceInArray() {
     // given
     JsonObject conf =
