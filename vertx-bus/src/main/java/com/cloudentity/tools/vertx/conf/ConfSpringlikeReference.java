@@ -15,6 +15,10 @@ public class ConfSpringlikeReference {
     return traverse(root, replaceSpringlikeRef(root));
   }
 
+  public static JsonArray populateRefs(JsonArray root, JsonObject refs) {
+    return traverse(root, replaceSpringlikeRef(refs));
+  }
+
   private static Pattern springRefPlaceholder = Pattern.compile(".*(\\$\\{[^}]+?\\}).*");
   private static Function<String, String> replaceSpringlikeRef(JsonObject root) {
     return in -> {

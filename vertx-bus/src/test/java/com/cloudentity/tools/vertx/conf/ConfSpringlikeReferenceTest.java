@@ -1,5 +1,6 @@
 package com.cloudentity.tools.vertx.conf;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;
 
@@ -113,5 +114,17 @@ public class ConfSpringlikeReferenceTest {
 
     // then
     assertEquals("localhost:8080", result.getValue("x"));
+  }
+
+  @Test
+  public void shouldReplaceSimpleSingleSpringlikeReferenceInArrayWithoutDefaultValue() {
+    // given
+    JsonObject conf = new JsonObject().put("x", new JsonArray().add("${y}")).put("y", 100);
+
+    // when
+    JsonObject result = ConfSpringlikeReference.populateRefs(conf);
+
+    // then
+    assertEquals("100", result.getJsonArray("x").getValue(0));
   }
 }

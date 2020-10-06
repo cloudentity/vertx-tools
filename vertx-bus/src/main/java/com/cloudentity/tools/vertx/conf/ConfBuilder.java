@@ -82,7 +82,8 @@ public class ConfBuilder {
     JsonArray defaultModuleNames  = rawRootConfig.getJsonArray("defaultModules", new JsonArray());
 
     JsonArray moduleDefs = requiredModuleNames.copy();
-    moduleDefs.addAll(Optional.ofNullable(ConfReference.populateEnvRefs(rawRootConfig, globalEnvFallback).getJsonArray("modules")).orElse(defaultModuleNames));
+    JsonArray modules = Optional.ofNullable(ConfReference.populateEnvRefs(rawRootConfig, globalEnvFallback).getJsonArray("modules")).orElse(defaultModuleNames);
+    moduleDefs.addAll(ConfSpringlikeReference.populateRefs(modules, rawRootConfig));
 
     List<Either<MissingModule, ValidRawModule>> results = new ArrayList();
     moduleDefs.forEach(moduleDef -> {
