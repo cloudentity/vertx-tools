@@ -1,6 +1,7 @@
 ## [Unreleased]
 ### Added
 - spring-like conf reference
+- optional casting in configuration reference
 ### Fixed
 - sd-provider/consul and sd-provider/static modules deployment race condition
 
