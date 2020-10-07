@@ -431,6 +431,22 @@ In above example `address` is resolved to `localhost:8080`.
 >NOTE<br/>
 > Spring-like configuration reference value is always converted to string. Use `$ref` to preserve or convert the type.
 
+>NOTE<br/>
+> Spring-like configuration reference are resolved before $ref, $env and $sys references.
+
+##### Environment variable in Spring-like configuration reference
+
+If referenced value is not found in the configuration then it is searched in environment variables.
+
+E.g.:
+```
+{
+  "address": "${HOST:localhost}:${PORT:8080}"
+}
+```
+
+In above example `HOST` and `PORT` environment variables will be checked - if they are missing then `localhost` and `8080` default values are used.
+
 <a id="override-envsys"></a>
 #### Overriding system properties and environment variables
 

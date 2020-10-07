@@ -6,6 +6,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,7 +35,8 @@ public class ConfSpringlikeReference {
           defaultValue = refParts[1];
         }
 
-        String refValue = JsonExtractor.resolveValue(root, refPath).map(x -> x.toString()).orElse(defaultValue);
+        String refValue = JsonExtractor.resolveValue(root, refPath).map(x -> x.toString())
+          .orElseGet(() -> Optional.ofNullable(System.getenv(refPath)).orElse(defaultValue));
         return replaceSpringlikeRef(root).apply(in.replace(placeholder, refValue));
       } else {
         return in;
