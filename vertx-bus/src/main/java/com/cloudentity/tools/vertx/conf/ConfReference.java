@@ -36,15 +36,18 @@ public class ConfReference {
    * {@see ConfReference#populateInnerRefs}, {@see ConfReference#populateSysRefs}, {@see ConfReference#populateEnvRefs}.
    */
   public static JsonObject populateRefs(JsonObject conf, JsonObject globalConf) {
-    JsonObject withConfRefs = ConfReference.populateInnerRefs(conf, globalConf);
+    JsonObject withConfRefs =
+      ConfReference.populateInnerRefs(
+        ConfSpringlikeReference.populateRefs(conf),
+        ConfSpringlikeReference.populateRefs((globalConf))
+      );
 
     JsonObject envFallback = withConfRefs.getJsonObject("env", new JsonObject());
     JsonObject sysFallback = withConfRefs.getJsonObject("sys", new JsonObject());
 
     JsonObject withSysRefs = ConfReference.populateSysRefs(withConfRefs, sysFallback);
     JsonObject withEnvRefs = ConfReference.populateEnvRefs(withSysRefs, envFallback);
-    JsonObject withSpringlikeRefs = ConfSpringlikeReference.populateRefs(withEnvRefs);
-    return withSpringlikeRefs;
+    return withEnvRefs;
   }
 
   /**
