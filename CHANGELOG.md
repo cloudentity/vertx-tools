@@ -4,6 +4,8 @@
 - optional casting in configuration reference
 ### Fixed
 - sd-provider/consul and sd-provider/static modules deployment race condition
+### Changed
+- default for SD registration params
 
 ## [1.2.0] - 2020-06-09
 ### Added
