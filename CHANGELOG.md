@@ -2,8 +2,11 @@
 ### Added
 - spring-like conf reference
 - optional casting in configuration reference
+- For VertxModuleTest, added new deployment method which includes classpath-folder config store
+
 ### Fixed
 - sd-provider/consul and sd-provider/static modules deployment race condition
+
 ### Changed
 - default for SD registration params
 
