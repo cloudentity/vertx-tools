@@ -95,7 +95,7 @@ abstract public class VertxModuleTest extends VertxUnitTest {
   public Future<List<String>> deployModulesWithFileConfig(List<String> modules, String configPath, String... registries) {
     try {
       JsonObject extraConfig = new JsonObject(new String(Files.readAllBytes(Paths.get(configPath))));
-      return deployModulesWithClasspathFolderConfig(modules, extraConfig, null, registries);
+      return deployModules(modules, extraConfig, registries);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -110,19 +110,6 @@ abstract public class VertxModuleTest extends VertxUnitTest {
    * @return
    */
   public Future<List<String>> deployModules(List<String> modules, JsonObject extraConfig, String... registries) {
-    return deployModulesWithClasspathFolderConfig(modules, extraConfig, null, registries);
-  }
-
-  /**
-   * Deploys configuration verticle with given multiple modules, classpath folder configuration, and extra configuration and starts verticle registries.
-   *
-   * @param modules configuration module to load
-   * @param extraConfig extra configuration object
-   * @param classpathFolderConfig configuration for classpath folder
-   * @param registries types of registries to deploy
-   * @return
-   */
-  public Future<List<String>> deployModulesWithClasspathFolderConfig(List<String> modules, JsonObject extraConfig, JsonObject classpathFolderConfig, String... registries) {
     vertx().sharedData().getLocalMap("module-test").put("config", extraConfig);
 
     JsonObject modulesConfig = new JsonObject().put("modules", new JsonArray(modules));
@@ -133,9 +120,17 @@ abstract public class VertxModuleTest extends VertxUnitTest {
         .add(new JsonObject().put("type", "json").put("format", "json").put("config", modulesConfig))
         .add(new JsonObject().put("type", "shared-local-map").put("format", "json").put("config", localMapExtraConfig));
 
-    if(classpathFolderConfig != null && !classpathFolderConfig.isEmpty())
-        configStores = configStores.add(new JsonObject().put("type", "classpath-folder").put("format", "json").put("config", classpathFolderConfig));
+    return deployModulesWithConfigStores(configStores, registries);
+  }
 
+  /**
+   * Deploys configuration verticle with given config stores and starts verticle registries.
+   *
+   * @param configStores config stores to load
+   * @param registries types of registries to deploy
+   * @return
+   */
+  public Future<List<String>> deployModulesWithConfigStores(JsonArray configStores, String... registries) {
     JsonObject metaConfig = new JsonObject().put("scanPeriod", 100).put("stores", configStores);
 
     return ConfVerticleDeploy.deployVerticleFromMetaConfig(vertx(), metaConfig)
