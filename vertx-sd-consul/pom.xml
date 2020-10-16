@@ -43,6 +43,11 @@
       <artifactId>circe-generic_2.12</artifactId>
       <version>${circe.version}</version>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 
