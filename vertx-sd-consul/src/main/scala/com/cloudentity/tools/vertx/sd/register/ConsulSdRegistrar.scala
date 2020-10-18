@@ -1,5 +1,7 @@
 package com.cloudentity.tools.vertx.sd.register
 
+import java.net.NetworkInterface
+
 import io.circe.generic.auto._
 import io.circe.syntax._
 import com.cloudentity.tools.vertx.bus.ComponentVerticle
@@ -16,6 +18,7 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 import scalaz._
 import Scalaz._
+
 import scala.collection.mutable.ListBuffer
 
 object ConsulSdRegistrar {
@@ -58,6 +61,14 @@ object ConsulSdRegistrar {
   * }
   *
   * If 'consul' attribute is missing there is an attempt to read it from ConfVerticle under 'consul' key.
+  *
+  * If 'register.host' attribute is missing and 'register.preferredIp' or 'register.preferredHost' or 'register.preferredNetwork' is configured then there is an attempt to discover ip/hostname.
+  * The discovery works in two steps. In the first step we filter all available java.net.NetworkInterfaces by name using 'register.preferredNetwork' regex (default '.*').
+  * Then all the InetAddresses of matching network interfaces are used in the second step. The second step tries to find first InetAddress matching its host using 'register.preferredHost' regex (default '.*') and matching its IP using 'register.preferredIp' prefix (default '').
+  * By default 'register.host' is set to the matching InetAddress host name, unless 'register.preferIp' is set to 'true' (in that case 'register.host' is set to IP address).
+  *
+  * Similarly for 'register.healthCheckHost', the same logic applies with 'preferredHealthCheckIp', 'preferredHealthCheckHost', 'preferredHealthCheckNetwork' and 'prefereHealthCheckIp'.
+  *
   * If 'register.[host|port\ssl]' attribute is missing there is an attempt to read it from ConfVerticle under 'apiServer.http.[host|port|ssl]' key.
   *
   * 'root' attribute is optional
@@ -135,17 +146,34 @@ class ConsulSdRegistrar extends ComponentVerticle {
     val defaultServicePort = apiServerHttpConf.flatMap(c => Option(c.getInteger("port")))
     val defaultServiceSsl = apiServerHttpConf.flatMap(c => Option(c.getBoolean("ssl")))
 
+    val resolveHost = SdHostResolver.resolve(SdHostResolver.convert(NetworkInterface.getNetworkInterfaces.asScala.toList)) _
+
     for {
       consulConfOpt       <- consulConfEither
 
+      preferIp            = registerConf.getBoolean("preferIp", false)
+      preferredNetwork    = Option(registerConf.getString("preferredNetwork"))
+      preferredIp         = Option(registerConf.getString("preferredIp"))
+      preferredHost       = Option(registerConf.getString("preferredHost"))
+
+      preferHcIp            = registerConf.getBoolean("preferHealthCheckIp", false)
+      preferredHcNetwork    = Option(registerConf.getString("preferredHealthCheckNetwork"))
+      preferredHcIp         = Option(registerConf.getString("preferredHealthCheckIp"))
+      preferredHcHost       = Option(registerConf.getString("preferredHealthCheckHost"))
+
       consulConf          <- consulConfOpt.orElse(defaultConsulConfOpt).toRight(missingAttr(s"$CONSUL_CONF_KEY"))
-      host                <- Option(registerConf.getString("host")).orElse(defaultServiceHost).toRight(missingAttr(s"$REGISTER_CONF_KEY.host"))
+      host                <- Option(registerConf.getString("host"))
+                               .orElse(resolveHost(preferIp, preferredNetwork, preferredIp, preferredHost))
+                               .orElse(defaultServiceHost)
+                               .toRight(missingAttr(s"$REGISTER_CONF_KEY.host"))
       port                <- Option(registerConf.getInteger("port")).orElse(defaultServicePort).toRight(missingAttr(s"$REGISTER_CONF_KEY.port"))
       ssl                 <- Option(registerConf.getBoolean("ssl")).orElse(defaultServiceSsl).toRight(missingAttr(s"$REGISTER_CONF_KEY.ssl"))
       rootPathOpt          = Option(registerConf.getString("rootPath"))
 
       serviceName         <- Option(registerConf.getString("serviceName")).toRight(missingAttr(s"$REGISTER_CONF_KEY.serviceName"))
-      healthCheckHost      = Option(registerConf.getString("healthCheckHost")).getOrElse(host)
+      healthCheckHost      = Option(registerConf.getString("healthCheckHost"))
+                               .orElse(resolveHost(preferHcIp, preferredHcNetwork, preferredHcIp, preferredHcHost))
+                               .getOrElse(host)
       healthCheckPort      = Option(registerConf.getInteger("healthCheckPort")).getOrElse(port)
       healthCheckPath     <- Option(registerConf.getString("healthCheckPath")).toRight(missingAttr(s"$REGISTER_CONF_KEY.healthCheckPath"))
       healthCheckInterval  = registerConf.getString("healthCheckInterval", "3s")
