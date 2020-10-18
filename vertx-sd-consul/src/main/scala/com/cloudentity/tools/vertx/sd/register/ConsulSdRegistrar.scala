@@ -163,8 +163,8 @@ class ConsulSdRegistrar extends ComponentVerticle {
 
       consulConf          <- consulConfOpt.orElse(defaultConsulConfOpt).toRight(missingAttr(s"$CONSUL_CONF_KEY"))
       host                <- Option(registerConf.getString("host"))
-                               .orElse(defaultServiceHost)
                                .orElse(resolveHost(preferIp, preferredNetwork, preferredIp, preferredHost))
+                               .orElse(defaultServiceHost)
                                .toRight(missingAttr(s"$REGISTER_CONF_KEY.host"))
       port                <- Option(registerConf.getInteger("port")).orElse(defaultServicePort).toRight(missingAttr(s"$REGISTER_CONF_KEY.port"))
       ssl                 <- Option(registerConf.getBoolean("ssl")).orElse(defaultServiceSsl).toRight(missingAttr(s"$REGISTER_CONF_KEY.ssl"))
