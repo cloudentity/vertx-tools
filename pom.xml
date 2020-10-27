@@ -270,6 +270,18 @@
         <artifactId>vertx-config-vault</artifactId>
         <version>${vertx.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-micrometer-metrics</artifactId>
+        <version>3.9.1</version>
+      </dependency>
+      <dependency>
+        <groupId>io.micrometer</groupId>
+        <artifactId>micrometer-registry-prometheus</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+
       <dependency>
         <groupId>io.vertx</groupId>
         <artifactId>vertx-config-consul</artifactId>
