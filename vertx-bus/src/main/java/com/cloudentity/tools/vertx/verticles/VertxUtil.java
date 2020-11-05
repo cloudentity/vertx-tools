@@ -14,7 +14,7 @@ public class VertxUtil {
       } catch (Throwable t){
         s.fail(t);
       }
-    }, result -> f.handle(result));
+    }, false, result -> f.handle(result));
     return f;
   }
 }
