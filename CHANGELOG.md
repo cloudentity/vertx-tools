@@ -10,6 +10,7 @@
 
 ### Changed
 - default for SD registration params
+- switch to unordered blocking execution
 
 ## [1.2.0] - 2020-06-09
 ### Added
