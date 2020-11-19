@@ -127,4 +127,38 @@ public class ConfSpringlikeReferenceTest {
     // then
     assertEquals("100", result.getJsonArray("x").getValue(0));
   }
+
+  @Test
+  public void shouldIgnoreSimplePath() {
+    // given
+    JsonObject ignoredPaths = new JsonObject().put("some-paths", new JsonArray().add("x"));
+    JsonObject conf = new JsonObject()
+      .put("x", new JsonArray().add("${y}"))
+      .put("y", 100)
+      .put(ConfSpringlikeReference.IGNORED_PATHS_KEY, ignoredPaths);
+
+    // when
+    JsonObject result = ConfSpringlikeReference.populateRefs(conf);
+
+    // then
+    assertEquals("${y}", result.getJsonArray("x").getValue(0));
+  }
+
+  @Test
+  public void shouldIgnoreNestedPath() {
+    // given
+    JsonObject ignoredPaths = new JsonObject().put("some-paths", new JsonArray().add("x.a")).put("some-other", new JsonArray().add("x.b"));
+    JsonObject conf = new JsonObject().
+      put("x", new JsonObject().put("a", "${y}").put("b", "${y}").put("c", "${y}"))
+      .put("y", 100)
+      .put(ConfSpringlikeReference.IGNORED_PATHS_KEY, ignoredPaths);
+
+    // when
+    JsonObject result = ConfSpringlikeReference.populateRefs(conf);
+
+    // then
+    assertEquals("${y}", result.getJsonObject("x").getString("a"));
+    assertEquals("${y}", result.getJsonObject("x").getString("b"));
+    assertEquals("100", result.getJsonObject("x").getString("c"));
+  }
 }

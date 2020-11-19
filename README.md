@@ -447,6 +447,46 @@ E.g.:
 
 In above example `HOST` and `PORT` environment variables will be checked - if they are missing then `localhost` and `8080` default values are used.
 
+##### Ignoring spring-like references
+
+It might be the case, that spring-like references should not be resolved (e.g. some mapping uses spring-like references syntax).
+To disable spring-like reference resolution configure `_ignoreSpringRefPaths` attributes.
+It contains a map from a string to array of paths at which spring-like references should not be resolved.
+
+For example, given following configuration:
+
+{
+  "_ignoreSpringRefPaths": {
+    "ingore-a": ["x.a"],
+    "ingore-b": ["x.b"]
+  },
+  "y": 100,
+  "x": {
+    "a": {
+      "flag": true
+      "value": "${y}"
+    },
+    "b": "${y}",
+    "c": "${y}"
+  }
+}
+
+the resolution of all spring-like references at `x.a` and `x.b` paths are kept intact. The final configuration is following:
+{
+  "y": 100,
+  "x": {
+    "a": {
+      "flag": true
+      "value": "${y}"
+    },
+    "b": "${y}",
+    "c": "100"
+  }
+}
+
+The reason why `_ignoreSpringRefPaths` is a map is that different modules/config-stores can provide their own paths for
+which spring-like references should be ignored.
+
 <a id="override-envsys"></a>
 #### Overriding system properties and environment variables
 
