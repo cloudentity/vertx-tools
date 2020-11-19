@@ -1,10 +1,8 @@
 package com.cloudentity.tools.vertx.configs;
 
 import io.vertx.core.VertxOptions;
-import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
-import io.vertx.micrometer.MicrometerMetricsOptions;
-import io.vertx.micrometer.VertxPrometheusOptions;
+import io.vertx.micrometer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +11,8 @@ public class VertxOptionsExtensionImpl implements VertxOptionsExtension {
   
   @Override
   public VertxOptions extendVertxOptions(JsonObject conf, VertxOptions opts) {
+
+    log.info("Within extend Vertx options:  {} {}", conf, opts);
 
     if (conf.getJsonObject("vertx") != null && conf.getJsonObject("vertx").getJsonObject("options") != null) {
       JsonObject ext = conf.getJsonObject("vertx").getJsonObject("options");
@@ -68,23 +68,7 @@ public class VertxOptionsExtensionImpl implements VertxOptionsExtension {
         opts.setMaxWorkerExecuteTime(extOpts.getMaxWorkerExecuteTime());
       }
       if (ext.getValue("metricsOptions") != null) {
-
-        // Deploy with embedded server: prometheus metrics will be automatically exposed,
-        // independently from any other HTTP server defined
-        //https://vertx.io/docs/vertx-micrometer-metrics/java/
-
-        //TODO: Add flag to disable/enable
-        MicrometerMetricsOptions options = new MicrometerMetricsOptions()
-            .setPrometheusOptions(new VertxPrometheusOptions()
-                .setStartEmbeddedServer(true)
-                .setEmbeddedServerOptions(new HttpServerOptions().setPort(8881))
-                .setEnabled(true))
-            .setEnabled(true);
-
-        log.warn("Enabling promethus metrics options with: " + options);
-        opts.setMetricsOptions(options);
-
-        //opts.setMetricsOptions(extOpts.getMetricsOptions());
+        opts.setMetricsOptions(micrometerMetricsOpts(extOpts));
       }
       if (ext.getValue("quorumSize") != null) {
         opts.setQuorumSize(extOpts.getQuorumSize());
@@ -99,5 +83,48 @@ public class VertxOptionsExtensionImpl implements VertxOptionsExtension {
       log.info("Extended Vertx options: " + opts.toString());
     }
     return opts;
+  }
+
+  //projects requiring any of the metrics module should include the artifact as well as the configs
+  //https://github.com/vert-x3/vertx-examples/blob/master/micrometer-metrics-examples/pom.xml
+  private MicrometerMetricsOptions micrometerMetricsOpts(VertxOptions extOpts) {
+    MicrometerMetricsOptions options = new MicrometerMetricsOptions();
+    options.setEnabled(false);
+    if(extOpts.getMetricsOptions().isEnabled()){
+      options.setEnabled(true);
+      configurePrometheusOpts(extOpts, options);
+      configureJmxMetricsOpts(extOpts, options);
+      configureInfluxDbOpts(extOpts, options);
+    }
+
+    return options;
+  }
+
+  private boolean isMetricsTypeEnabled(VertxOptions extOpts, String type) {
+    return  extOpts.getMetricsOptions().toJson().getJsonObject(type,
+        new JsonObject()).getBoolean("enabled", Boolean.valueOf(false));
+  }
+
+  private JsonObject metricsConfig(VertxOptions extOpts, String type) {
+    return  extOpts.getMetricsOptions().toJson().getJsonObject(type,
+        new JsonObject());
+  }
+
+  private void configurePrometheusOpts(VertxOptions extOpts, MicrometerMetricsOptions options) {
+    if(isMetricsTypeEnabled(extOpts, "prometheus")) {
+      options.setPrometheusOptions(new VertxPrometheusOptions(metricsConfig(extOpts, "prometheus")));
+    }
+  }
+
+  private void configureJmxMetricsOpts(VertxOptions extOpts, MicrometerMetricsOptions options) {
+    if(isMetricsTypeEnabled(extOpts, "jmx")) {
+      options.setJmxMetricsOptions(new VertxJmxMetricsOptions(metricsConfig(extOpts, "jmx")));
+    }
+  }
+
+  private void configureInfluxDbOpts(VertxOptions extOpts, MicrometerMetricsOptions options) {
+    if(isMetricsTypeEnabled(extOpts, "influx")) {
+      options.setInfluxDbOptions(new VertxInfluxDbOptions(metricsConfig(extOpts, "influx")));
+    }
   }
 }
