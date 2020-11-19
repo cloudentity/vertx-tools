@@ -40,6 +40,7 @@
     <jaeger.version>1.2.0</jaeger.version>
     <embedded-consul.version>1.0.2</embedded-consul.version>
     <slf4j.version>1.7.21</slf4j.version>
+    <junit.version>4.13.1</junit.version>
     <owaspdt.url>https://owaspdt.int.cloudentity.com</owaspdt.url>
   </properties>
 
@@ -272,6 +273,11 @@
       </dependency>
       <dependency>
         <groupId>io.vertx</groupId>
+        <artifactId>vertx-micrometer-metrics</artifactId>
+        <version>${vertx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.vertx</groupId>
         <artifactId>vertx-config-consul</artifactId>
         <version>${vertx.version}</version>
       </dependency>
@@ -465,7 +471,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>

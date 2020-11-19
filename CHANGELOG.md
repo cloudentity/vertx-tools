@@ -1,5 +1,6 @@
 ## [Unreleased]
 ### Added
+- capability to enable micrometrics configs for jmx, influx and prometheus
 - spring-like conf reference
 - optional casting in configuration reference
 - For VertxModuleTest, added new deployment method which allows supplying custom set of config stores
