@@ -12,12 +12,11 @@ public class VertxOptionsExtensionImpl implements VertxOptionsExtension {
   @Override
   public VertxOptions extendVertxOptions(JsonObject conf, VertxOptions opts) {
 
-    log.info("Within extend Vertx options:  {} {}", conf, opts);
+    log.info("Extend Vertx options:  {} {}", conf, opts);
 
     if (conf.getJsonObject("vertx") != null && conf.getJsonObject("vertx").getJsonObject("options") != null) {
       JsonObject ext = conf.getJsonObject("vertx").getJsonObject("options");
       VertxOptions extOpts = new VertxOptions(ext);
-
 
       if (ext.getValue("addressResolverOptions") != null) {
         opts.setAddressResolverOptions(extOpts.getAddressResolverOptions());
@@ -96,7 +95,6 @@ public class VertxOptionsExtensionImpl implements VertxOptionsExtension {
       configureJmxMetricsOpts(extOpts, options);
       configureInfluxDbOpts(extOpts, options);
     }
-
     return options;
   }
 
