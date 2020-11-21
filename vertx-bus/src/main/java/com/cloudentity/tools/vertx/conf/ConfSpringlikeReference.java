@@ -1,19 +1,68 @@
 package com.cloudentity.tools.vertx.conf;
 
 import com.cloudentity.tools.vertx.json.JsonExtractor;
+import com.google.common.collect.Lists;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ConfSpringlikeReference {
+  public static final String IGNORED_PATHS_KEY = "_ignoreSpringRefPaths";
+
   public static JsonObject populateRefs(JsonObject root) {
-    return traverse(root, replaceSpringlikeRef(root));
+    JsonObject filteredRoot = filterOutIgnoredPaths(root);
+    JsonObject traversedRoot = traverse(filteredRoot, replaceSpringlikeRef(root));
+    return root.mergeIn(traversedRoot, true);
+  }
+
+  public static List<String> collectIgnoredPaths(JsonObject root) {
+    JsonObject obj = root.getJsonObject(IGNORED_PATHS_KEY, new JsonObject());
+    return obj.getMap().values().stream().flatMap(paths -> {
+      if (paths instanceof List) {
+        Stream<String> stream = ((List) paths).stream().map(x -> x.toString());
+        return stream;
+      } else if (paths instanceof JsonArray) {
+        Stream<String> stream = ((JsonArray) paths).getList().stream().map(x -> x.toString());
+        return stream;
+      } else {
+        Stream<String> stream = Stream.empty();
+        return stream;
+      }
+    }).collect(Collectors.toList());
+  }
+
+  public static JsonObject filterOutIgnoredPaths(JsonObject root) {
+    List<String> ignoredPaths = collectIgnoredPaths(root);
+    JsonObject out = root.copy();
+    ignoredPaths.forEach(ignoredPath -> {
+      LinkedList<String> path = new LinkedList<>(Lists.newArrayList(ignoredPath.split("\\.")));
+      remove(out, path);
+    });
+    return out;
+  }
+
+  public static void remove(JsonObject root, Queue<String> path) {
+    if (path.isEmpty()) return;
+    else {
+      String key = path.poll();
+      if (root.containsKey(key)) {
+        if (path.isEmpty()) root.remove(key);
+        else {
+          Object newRoot = root.getValue(key);
+          if (newRoot instanceof JsonObject) {
+            remove((JsonObject) newRoot, path);
+          } else if (newRoot instanceof Map) {
+            remove(new JsonObject((Map<String, Object>) newRoot), path);
+          } else return;
+        }
+      } else return;
+    }
   }
 
   public static JsonArray populateRefs(JsonArray root, JsonObject refs) {
