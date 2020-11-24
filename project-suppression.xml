@@ -83,6 +83,47 @@
     <packageUrl regex="true">^ pkg:maven/com\.github\.jasync-sql/jasync-postgresql@.*$</packageUrl>
     <cve>CVE-2019-10211</cve>
   </suppress>
+  <suppress>
+    <notes>
+      The CVE is for postgresql, but is being reported against vertx-pgclient, which is a
+      different project.
+    </notes>
+    <packageUrl regex="true">^ pkg:maven/io\.vertx\.vertx-pg-client@.*$</packageUrl>
+    <cve>CVE-2015-0244</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      The CVE is for postgresql, but is being reported against vertx-pgclient, which is a
+      different project.
+    </notes>
+    <packageUrl regex="true">^ pkg:maven/io\.vertx\.vertx-pg-client@.*$</packageUrl>
+    <cve>CVE-2015-3166</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      The CVE is for postgresql, but is being reported against vertx-pgclient, which is a
+      different project.
+    </notes>
+    <packageUrl regex="true">^ pkg:maven/io\.vertx\.vertx-pg-client@.*$</packageUrl>
+    <cve>CVE-2016-0766</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      The CVE is for postgresql, but is being reported against vertx-pgclient, which is a
+      different project.
+    </notes>
+    <packageUrl regex="true">^ pkg:maven/io\.vertx\.vertx-pg-client@.*$</packageUrl>
+    <cve>CVE-2016-7048</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      The CVE is for postgresql, but is being reported against vertx-pgclient, which is a
+      different project.
+    </notes>
+    <packageUrl regex="true">^ pkg:maven/io\.vertx\.vertx-pg-client@.*$</packageUrl>
+    <cve>CVE-2019-10211</cve>
+  </suppress>
+
 
 
   <suppress>
