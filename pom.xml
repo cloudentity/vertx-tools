@@ -32,15 +32,18 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vertx.version>3.9.1</vertx.version>
+    <vertx.version>3.9.4</vertx.version>
     <java.version>1.8</java.version>
     <scala.version>2.12.9</scala.version>
     <scalaz.version>7.3.0-M10</scalaz.version>
     <circe.version>0.11.1</circe.version>
     <jaeger.version>1.2.0</jaeger.version>
     <embedded-consul.version>1.0.2</embedded-consul.version>
-    <slf4j.version>1.7.21</slf4j.version>
+    <slf4j.version>1.7.30</slf4j.version>
     <junit.version>4.13.1</junit.version>
+    <okhttp3.mockserver.version>3.14.9</okhttp3.mockserver.version>
+    <rest.assured.version>3.3.0</rest.assured.version>
+    <logback.classic.version>1.2.0</logback.classic.version>
     <owaspdt.url>https://owaspdt.int.cloudentity.com</owaspdt.url>
   </properties>
 
@@ -158,7 +161,7 @@
     <profile>
       <id>check-deps</id>
       <activation>
-        <activeByDefault>false</activeByDefault>
+        <activeByDefault>true</activeByDefault>
       </activation>
       <build>
         <plugins>
@@ -175,6 +178,9 @@
               </formats>
               <cveUrlBase>https://nvdcve:MoKerviNeupTaTEr@nvdcve.artifactory.syntegrity.com/nvdcve-1.0-%d.json.gz</cveUrlBase>
               <cveUrlModified>https://nvdcve:MoKerviNeupTaTEr@nvdcve.artifactory.syntegrity.com/nvdcve-1.0-modified.json.gz</cveUrlModified>
+              <suppressionFiles>
+                <suppressionFile>project-suppression.xml</suppressionFile>
+              </suppressionFiles>
             </configuration>
             <executions>
               <execution>
@@ -483,13 +489,13 @@
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>mockwebserver</artifactId>
-        <version>3.8.1</version>
+        <version>${okhttp3.mockserver.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
-        <version>3.3.0</version>
+        <version>${rest.assured.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -501,7 +507,7 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.2.0</version>
+        <version>${logback.classic.version}</version>
         <scope>test</scope>
       </dependency>
       <!-- TEST SCALA -->
