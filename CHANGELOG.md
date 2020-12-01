@@ -13,6 +13,7 @@
 - default for SD registration params
 - switch to unordered blocking execution
 - Version upgrade (vertx 3.9.1 -> 3.9.4) and other supporting libs
+- switched to generic project suppression file and updated dependency check plugin version
 
 ### Security
 - [CVE-2017-18640](https://nvd.nist.gov/vuln/detail/CVE-2017-18640) - Fixed by upgrading vertx to 3.9.4
