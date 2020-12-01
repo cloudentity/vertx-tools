@@ -168,7 +168,7 @@
           <plugin>
             <groupId>org.owasp</groupId>
             <artifactId>dependency-check-maven</artifactId>
-            <version>5.3.0</version>
+            <version>6.0.3</version>
             <configuration>
               <skipProvidedScope>false</skipProvidedScope>
               <skipRuntimeScope>false</skipRuntimeScope>
@@ -176,10 +176,10 @@
                 <format>HTML</format>
                 <format>JUNIT</format>
               </formats>
-              <cveUrlBase>https://nvdcve:MoKerviNeupTaTEr@nvdcve.artifactory.syntegrity.com/nvdcve-1.0-%d.json.gz</cveUrlBase>
-              <cveUrlModified>https://nvdcve:MoKerviNeupTaTEr@nvdcve.artifactory.syntegrity.com/nvdcve-1.0-modified.json.gz</cveUrlModified>
+              <cveUrlBase>https://nvdcve:MoKerviNeupTaTEr@nvdcve.artifactory.syntegrity.com/nvdcve-1.1-%d.json.gz</cveUrlBase>
+              <cveUrlModified>https://nvdcve:MoKerviNeupTaTEr@nvdcve.artifactory.syntegrity.com/nvdcve-1.1-modified.json.gz</cveUrlModified>
               <suppressionFiles>
-                <suppressionFile>project-suppression.xml</suppressionFile>
+                <suppressionFile>https://raw.githubusercontent.com/cloudentity/security-gate/dev/owasp/dependency-check/project-suppression.xml</suppressionFile>
               </suppressionFiles>
             </configuration>
             <executions>
