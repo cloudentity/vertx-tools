@@ -120,6 +120,17 @@ abstract public class VertxModuleTest extends VertxUnitTest {
         .add(new JsonObject().put("type", "json").put("format", "json").put("config", modulesConfig))
         .add(new JsonObject().put("type", "shared-local-map").put("format", "json").put("config", localMapExtraConfig));
 
+    return deployModulesWithConfigStores(configStores, registries);
+  }
+
+  /**
+   * Deploys configuration verticle with given config stores and starts verticle registries.
+   *
+   * @param configStores config stores to load
+   * @param registries types of registries to deploy
+   * @return
+   */
+  public Future<List<String>> deployModulesWithConfigStores(JsonArray configStores, String... registries) {
     JsonObject metaConfig = new JsonObject().put("scanPeriod", 100).put("stores", configStores);
 
     return ConfVerticleDeploy.deployVerticleFromMetaConfig(vertx(), metaConfig)

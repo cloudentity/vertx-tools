@@ -1,3 +1,24 @@
+## [1.3.0] - 2020-12-01
+### Added
+- capability to enable micrometrics configs for jmx, influx and prometheus
+- spring-like conf reference
+- optional casting in configuration reference
+- For VertxModuleTest, added new deployment method which allows supplying custom set of config stores
+- consul-sd-registrar support IP/hostname discovery
+
+### Fixed
+- sd-provider/consul and sd-provider/static modules deployment race condition
+
+### Changed
+- default for SD registration params
+- switch to unordered blocking execution
+- Version upgrade (vertx 3.9.1 -> 3.9.4) and other supporting libs
+- switched to generic project suppression file and updated dependency check plugin version
+
+### Security
+- [CVE-2017-18640](https://nvd.nist.gov/vuln/detail/CVE-2017-18640) - Fixed by upgrading vertx to 3.9.4
+- [CVE-2018-20200](https://nvd.nist.gov/vuln/detail/CVE-2018-20200) - Fixed by upgrading okhttp3 version to 3.14.9
+
 ## [1.2.0] - 2020-06-09
 ### Added
 - ext config stores can control 'ssl' flag of underlying store with 'scheme' attribute

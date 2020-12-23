@@ -13,14 +13,22 @@
         },
         "register": {
           "serviceName": "$env:REGISTER_SD_SERVICE_NAME:string",
-          "host": "$env:REGISTER_SD_HOST:string",
+          "host": "$env:?REGISTER_SD_HOST:string",
           "port": "$env:REGISTER_SD_PORT:int",
           "ssl": "$env:REGISTER_SD_SSL:boolean:false",
+          "preferIp": "$env:?REGISTER_SD_PREFER_IP:boolean",
+          "preferredIp": "$env:?REGISTER_SD_PREFERRED_IP:string",
+          "preferredHost": "$env:?REGISTER_SD_PREFERRED_HOST:string",
+          "preferredNetwork": "$env:?REGISTER_SD_PREFERRED_NETWORK:string",
           "healthCheckHost": "$env:?REGISTER_SD_HEALTHCHECK_HOST:string",
           "healthCheckPort": "$env:?REGISTER_SD_HEALTHCHECK_PORT:int",
           "healthCheckPath": "$env:REGISTER_SD_HEALTHCHECK_PATH:string:/alive",
-          "healthCheckInterval": "$env:REGISTER_SD_HEALTHCHECK_INTERVAL:string:3s",
-          "deregisterAfter": "$env:REGISTER_SD_DEREGISTER_AFTER:string:600s",
+          "healthCheckInterval": "$env:REGISTER_SD_HEALTHCHECK_INTERVAL:string:5s",
+          "preferHealthCheckIp": "$env:?REGISTER_SD_HEALTHCHECK_PREFER_IP:boolean",
+          "preferredHealtCheckIp": "$env:?REGISTER_SD_HEALTHCHECK_PREFERRED_IP:string",
+          "preferredHealthCheckHost": "$env:?REGISTER_SD_HEALTHCHECK_PREFERRED_HOST:string",
+          "preferredHealtCheckNetwork": "$env:?REGISTER_SD_HEALTHCHECK_PREFERRED_NETWORK:string",
+          "deregisterAfter": "$env:REGISTER_SD_DEREGISTER_AFTER:string:60s",
           "tags": "$env:REGISTER_SD_TAGS:array:[]"
         }
       }

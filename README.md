@@ -350,6 +350,20 @@ E.g. following config resolves server.port to 8080:
 }
 ```
 
+##### Casting configuration reference
+If we want to cast the referenced value to "string", "int", "double" or "boolean" we should provide it in the following format: `"$ref:{reference-path}:{cast-type}"`.
+
+E.g. following config resolves server.port to 80:
+
+```
+{
+  "server": {
+    "port": "$ref:port:int"
+  },
+  "port": "80"
+}
+```
+
 #### System and environment property reference
 In similar manner we can make reference to system or environment property. The reference for system property has following format
 `"$sys:{property-name}:{property-type}:{default-value}"` and for environment property `"$env:{property-name}:{property-type}:{default-value}"`.
@@ -387,6 +401,91 @@ Default value is optional, so we can have following configuration:
   "cassandra-port": "$env:CASSANDRA_PORT:int"
 }
 ```
+
+#### Spring-like configuration reference
+
+It is possible to use Spring-like property placeholder `${path.to.value:default-value}`.
+
+E.g. following config resolves `address` to `localhost:8080`:
+
+```
+{
+  "server": {
+    "host": "localhost"
+    "port": 8080
+  },
+  "address": "${server.host}:${server.port}"
+}
+```
+
+You can use default value if referenced value is missing:
+
+```
+{
+  "address": "${server.host:localhost}:${server.port:8080}"
+}
+```
+
+In above example `address` is resolved to `localhost:8080`.
+
+>NOTE<br/>
+> Spring-like configuration reference value is always converted to string. Use `$ref` to preserve or convert the type.
+
+>NOTE<br/>
+> Spring-like configuration reference are resolved before $ref, $env and $sys references.
+
+##### Environment variable in Spring-like configuration reference
+
+If referenced value is not found in the configuration then it is searched in environment variables.
+
+E.g.:
+```
+{
+  "address": "${HOST:localhost}:${PORT:8080}"
+}
+```
+
+In above example `HOST` and `PORT` environment variables will be checked - if they are missing then `localhost` and `8080` default values are used.
+
+##### Ignoring spring-like references
+
+It might be the case, that spring-like references should not be resolved (e.g. some mapping uses spring-like references syntax).
+To disable spring-like reference resolution configure `_ignoreSpringRefPaths` attributes.
+It contains a map from a string to array of paths at which spring-like references should not be resolved.
+
+For example, given following configuration:
+
+{
+  "_ignoreSpringRefPaths": {
+    "ingore-a": ["x.a"],
+    "ingore-b": ["x.b"]
+  },
+  "y": 100,
+  "x": {
+    "a": {
+      "flag": true
+      "value": "${y}"
+    },
+    "b": "${y}",
+    "c": "${y}"
+  }
+}
+
+the resolution of all spring-like references at `x.a` and `x.b` paths are kept intact. The final configuration is following:
+{
+  "y": 100,
+  "x": {
+    "a": {
+      "flag": true
+      "value": "${y}"
+    },
+    "b": "${y}",
+    "c": "100"
+  }
+}
+
+The reason why `_ignoreSpringRefPaths` is a map is that different modules/config-stores can provide their own paths for
+which spring-like references should be ignored.
 
 <a id="override-envsys"></a>
 #### Overriding system properties and environment variables

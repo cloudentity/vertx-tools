@@ -8,6 +8,7 @@
     },
     "consul-sd-provider": {
       "main": "com.cloudentity.tools.vertx.sd.provider.ConsulSdProvider",
+      "dependsOn": ["service-discovery"],
       "verticleConfig": {
         "consul": {
           "host": "$env:CONSUL_HOST:string",
