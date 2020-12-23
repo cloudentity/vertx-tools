@@ -1,3 +1,7 @@
+## [Unreleased]
+### Added
+- Support for escape character \\ for dots in path in json extractor
+
 ## [1.3.0] - 2020-12-01
 ### Added
 - capability to enable micrometrics configs for jmx, influx and prometheus
