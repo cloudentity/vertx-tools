@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.3.0] - 2020-12-01
 ### Added
 - capability to enable micrometrics configs for jmx, influx and prometheus
 - spring-like conf reference
