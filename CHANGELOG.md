@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.4.0] - 2020-12-30
 ### Added
 - Support for escape character \\ for dots in path in json extractor
 
