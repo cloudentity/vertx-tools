@@ -31,7 +31,7 @@ public abstract class ComponentVerticle extends AbstractVerticle {
   private TracingService tracingService;
   private TracingManager tracing;
 
-  private Map<String, Handler<JsonObject>> confChangeListeners = new HashMap<>();
+  private Map<String, Handler<ConfigChanged>> confChangeListeners = new HashMap<>();
 
   @Override
   public void start(Future<Void> start) {
@@ -59,13 +59,14 @@ public abstract class ComponentVerticle extends AbstractVerticle {
 
   /**
    * Provided listener will be notified when configuration of this verticle is changed.
+   * Use ConfigChanged.hasChanged method to check if a specific attribute has changed.
    *
    * The listener execution is thread-safe, i.e. no other message consumed by the ComponentVerticle is handled concurrently with the listener execution.
    *
    * @param listener will be called when configuration changed
    * @return listener id
    */
-  protected String registerSelfConfChangeListener(Handler<JsonObject> listener) {
+  protected String registerSelfConfChangeListener(Handler<ConfigChanged> listener) {
     String listenerId = UUID.randomUUID().toString();
     confChangeListeners.put(listenerId, listener);
     return listenerId;
@@ -143,17 +144,18 @@ public abstract class ComponentVerticle extends AbstractVerticle {
         Optional<JsonObject> newConf = JsonExtractor.resolve(change.getNewConfiguration(), configPath());
         if (newConf.isPresent() && !newConf.get().equals(conf)) {
           log.debug("Updating configuration. Old={}, new={}", conf, newConf);
+          ConfigChanged configChanged = new ConfigChanged(Optional.ofNullable(conf), newConf.get());
           conf = newConf.get();
 
-          notifyConfChangeListeners(newConf.get());
+          notifyConfChangeListeners(configChanged);
         }
       }
     });
   }
 
-  private void notifyConfChangeListeners(JsonObject newConf) {
-    for (Handler<JsonObject> listener : confChangeListeners.values()) {
-      listener.handle(newConf);
+  private void notifyConfChangeListeners(ConfigChanged configChanged) {
+    for (Handler<ConfigChanged> listener : confChangeListeners.values()) {
+      listener.handle(configChanged);
     }
   }
 
@@ -286,5 +288,38 @@ public abstract class ComponentVerticle extends AbstractVerticle {
 
   public <T> T createClient(Class<T> clazz, String addressPrefix, DeliveryOptions opts) {
     return VertxEndpointClient.makeWithTracing(vertx, tracing, clazz, Optional.ofNullable(addressPrefix), opts);
+  }
+
+  public static class ConfigChanged {
+    private Optional<JsonObject> _previousConfig;
+    private JsonObject _newConfig;
+
+    public ConfigChanged(Optional<JsonObject> previousConfig, JsonObject newConfig) {
+      _previousConfig = previousConfig;
+      _newConfig = newConfig;
+    }
+
+    public ConfigChanged(JsonObject previousConfig, JsonObject newConfig) {
+      _previousConfig = Optional.ofNullable(previousConfig);
+      _newConfig = newConfig;
+    }
+
+    /**
+     * Returns true if attribute value at given path is different in previous and new configuration.
+     * If previous config was not set then always return true.
+     */
+    public boolean hasChanged(String path) {
+      if (_previousConfig.isPresent()) {
+        return !JsonExtractor.resolveValue(_previousConfig.get(), path).equals(JsonExtractor.resolveValue(_newConfig, path));
+      } else return true;
+    }
+
+    public Optional<JsonObject> previousConfig() {
+      return _previousConfig;
+    }
+
+    public JsonObject nextConfig() {
+      return _newConfig;
+    }
   }
 }
