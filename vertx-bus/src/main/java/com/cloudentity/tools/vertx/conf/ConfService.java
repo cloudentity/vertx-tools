@@ -10,4 +10,7 @@ public interface ConfService {
 
   @VertxEndpoint
   Future<JsonObject> getGlobalConf();
+
+  @VertxEndpoint
+  Future<JsonObject> getMaskedGlobalConf();
 }

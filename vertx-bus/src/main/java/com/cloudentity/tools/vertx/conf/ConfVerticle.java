@@ -53,6 +53,7 @@ public class ConfVerticle extends ServiceVerticle implements ConfService {
   }
 
   JsonObject globalConf;
+  JsonObject maskedGlobalConf;
   JsonObject rawGlobalConf;
 
   @Override
@@ -77,6 +78,7 @@ public class ConfVerticle extends ServiceVerticle implements ConfService {
     if (configResult.isRight()) {
       ConfBuilder.Config cfg = configResult.get();
       globalConf = cfg.resolvedConfig;
+      maskedGlobalConf = cfg.resolvedConfigWithMask;
 
       initLog.info("Environment variables in root configuration: ");
       ConfPrinter.logEnvVariables(config, log);
@@ -142,6 +144,11 @@ public class ConfVerticle extends ServiceVerticle implements ConfService {
   @Override
   public Future<JsonObject> getGlobalConf() {
     return Future.succeededFuture(globalConf);
+  }
+
+  @Override
+  public Future<JsonObject> getMaskedGlobalConf() {
+    return Future.succeededFuture(maskedGlobalConf);
   }
 
   @Override

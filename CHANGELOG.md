@@ -1,4 +1,7 @@
 ## [Unreleased]
+### Added
+- GetConfigRoute implementation returning masked global config
+
 ### Breaking changes
 - ComponentVerticle.registerSelfConfChangeListener accepts Handler<ConfigChanged> instead of Handler<JsonObject>
 
