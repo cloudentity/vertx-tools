@@ -1840,6 +1840,9 @@ The verticle's id can be accessed from verticle's code with `AbstractVerticle.co
 
 IMPORTANT: `config` is reserved key in the registry configuration object, it can't be used as verticle id.
 
+NOTE: `VertxBootstrap` deploys `system-init` registry before HTTP server start (before `beforeServerStart` method is executed)
+and `system-ready` after HTTP server start (before `afterServerStart` method).
+
 <a id="di-strategy"></a>
 ### Defining deployment strategy
 

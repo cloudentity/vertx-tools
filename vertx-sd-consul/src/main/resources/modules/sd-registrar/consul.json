@@ -1,5 +1,5 @@
 {
-  "registry:system": {
+  "registry:system-ready": {
     "consul-sd-registrar": {
       "main": "com.cloudentity.tools.vertx.sd.register.ConsulSdRegistrar",
       "verticleConfig": {
