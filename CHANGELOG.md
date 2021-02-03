@@ -5,6 +5,12 @@
 ### Breaking changes
 - ComponentVerticle.registerSelfConfChangeListener accepts Handler<ConfigChanged> instead of Handler<JsonObject>
 
+### Changed
+- Version upgrade (vertx 3.9.4 -> 3.9.5)
+
+### Security
+- [CVE-2019-17640](https://nvd.nist.gov/vuln/detail/CVE-2019-17640) - Fixed by upgrading vertx to 3.9.5
+
 ## [1.4.0] - 2020-12-30
 ### Added
 - Support for escape character \\ for dots in path in json extractor
