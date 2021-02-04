@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.5.0] - 2021-02-04
 ### Added
 - GetConfigRoute implementation returning masked global config
 
