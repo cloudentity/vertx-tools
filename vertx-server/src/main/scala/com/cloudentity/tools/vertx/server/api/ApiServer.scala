@@ -105,6 +105,12 @@ class ApiServer(serverConf: ApiServerConf) extends ScalaServiceVerticle with Htt
   }
 
   override def getActualPort(): VxFuture[Int] = VxFuture.succeededFuture(actualPort)
+
+  override def vertxServiceAddressPrefixS: Option[String] = Option(verticleId())
+}
+
+object ApiServer {
+  val defaultVerticleId = "apiServer"
 }
 
 object RouteHandler {

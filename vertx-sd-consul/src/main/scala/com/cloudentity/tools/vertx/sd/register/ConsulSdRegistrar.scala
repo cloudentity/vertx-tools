@@ -4,7 +4,6 @@ import java.net.NetworkInterface
 
 import io.circe.generic.auto._
 import io.circe.syntax._
-import com.cloudentity.tools.vertx.bus.ComponentVerticle
 import com.cloudentity.tools.vertx.sd.Location
 import com.cloudentity.tools.vertx.sd.consul.ConsulConf
 import com.cloudentity.tools.vertx.sd.register.ConsulSdRegistrar._
@@ -55,6 +54,7 @@ object ConsulSdRegistrar {
   *     "port": 9050,
   *     "root": "/authz"
   *     "ssl": false,
+ *      "serverVerticleAddress": "adminServer",
   *     "healthCheckHost": "authz-1.cloudentity.com",
   *     "healthCheckPort": 8080,
   *     "healthCheckPath": "/alive",
@@ -75,7 +75,10 @@ object ConsulSdRegistrar {
   *
   * If 'register.[host|port\ssl]' attribute is missing there is an attempt to read it from ConfVerticle under 'apiServer.http.[host|port|ssl]' key.
   *
+  * If register port is set to 0 then registrator call HttpService.getActualPort at 'serverVerticleAddress' prefix address (default 'apiServer', i.e. default HTTP server started by VertxBootstrap app)
+  *
   * 'root' attribute is optional
+  * 'serverVerticleAddress' attribute is optional
   * 'tags' is optional, custom Consul tags
   * 'healthCheckInterval' attribute is optional, defaults to '3s'
   * 'healthCheckHost' attribute is optional, defaults to 'host' attribute value
@@ -113,7 +116,8 @@ class ConsulSdRegistrar extends ScalaComponentVerticle {
 
     for {
       port <- Option(registerConf.getInteger("port")).orElse(defaultServicePort).toOperation[String](missingAttr(s"$REGISTER_CONF_KEY.port"))
-      registerPort <- if (port == 0) createClient(classOf[HttpService]).getActualPort().toOperation[String] else Operation.success[String, Int](port)
+      httpServerAddressPrefix = Option(registerConf.getString("serverVerticleAddress")).getOrElse(API_SERVER_CONF_KEY)
+      registerPort <- if (port == 0) createClient(classOf[HttpService], httpServerAddressPrefix).getActualPort().toOperation[String] else Operation.success[String, Int](port)
     } yield (registerPort)
   }
 

@@ -18,7 +18,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ApiServerRoot() extends ScalaComponentVerticle {
   val log = LoggerFactory.getLogger(this.getClass)
 
-  override def verticleId(): String = Option(super.verticleId()).getOrElse("apiServer")
+  override def verticleId(): String = Option(super.verticleId()).getOrElse(ApiServer.defaultVerticleId)
 
   override def initComponentAsync(): VxFuture[Void] = {
       decode[ApiServerConf](getConfig().toString).left.map(_.fillInStackTrace()) match {
@@ -52,6 +52,6 @@ class ApiServerRoot() extends ScalaComponentVerticle {
     }
 
   def deployServer(vertx: Vertx, serverConf: ApiServerConf)(implicit ec: ExecutionContext): Future[Void] = {
-    VertxDeploy.deploy(vertx, new ApiServer(serverConf)).toScala.map(_ => null: Void)
+    VertxDeploy.deploy(vertx, new ApiServer(serverConf), verticleId()).toScala.map(_ => null: Void)
   }
 }
