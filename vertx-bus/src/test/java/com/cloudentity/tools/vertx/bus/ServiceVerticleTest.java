@@ -1,5 +1,6 @@
 package com.cloudentity.tools.vertx.bus;
 
+import com.cloudentity.tools.vertx.bus.ComponentVerticle.ConfigChanged;
 import com.google.common.base.Strings;
 import com.cloudentity.tools.vertx.conf.ConfVerticle;
 import com.cloudentity.tools.vertx.verticles.VertxDeploy;
@@ -516,13 +517,13 @@ public class ServiceVerticleTest {
 
   interface ConfListener {
     @VertxEndpoint
-    Future<JsonObject> changedConfig();
+    Future<ConfigChanged> changedConfig();
   }
 
   static class MyVerticleSelfConfChangeListener extends ServiceVerticle implements ConfListener {
     public static final String CONFIG_PATH = "my-verticle";
 
-    JsonObject changed = new JsonObject();
+    ConfigChanged changed;
 
     @Override
     public void initService() {
@@ -535,7 +536,7 @@ public class ServiceVerticleTest {
     }
 
     @Override
-    public Future<JsonObject> changedConfig() {
+    public Future<ConfigChanged> changedConfig() {
       return Future.succeededFuture(changed);
     }
   }
@@ -544,18 +545,33 @@ public class ServiceVerticleTest {
   public void shouldReceiveNotificationOnSelfConfChangeWhenRegistered(TestContext ctx) {
     VertxBus.registerPayloadCodec(vertx.eventBus());
 
-    JsonObject changedGlobalConf = new JsonObject().put(MyVerticleSelfConfChangeListener.CONFIG_PATH, new JsonObject().put("changed", true));
+    JsonObject changedGlobalConf1 = new JsonObject().put(MyVerticleSelfConfChangeListener.CONFIG_PATH, new JsonObject().put("changed", 1));
+    JsonObject changedGlobalConf2 = new JsonObject().put(MyVerticleSelfConfChangeListener.CONFIG_PATH, new JsonObject().put("changed", 2));
     String confStoreAddress = "test-conf-address";
 
     ConfigRetrieverOptions opts = new ConfigRetrieverOptions();
-    opts.setScanPeriod(50).addStore(new ConfigStoreOptions().setType("event-bus").setConfig(new JsonObject().put("address", confStoreAddress)));
+    opts.setScanPeriod(20).addStore(new ConfigStoreOptions().setType("event-bus").setConfig(new JsonObject().put("address", confStoreAddress)));
+
+    ConfListener confListener = VertxEndpointClient.make(vertx, ConfListener.class);
 
     VertxDeploy.deploy(vertx, new ConfVerticle(ConfigRetriever.create(vertx, opts))) // deploy ConfVerticle
       .compose(x -> VertxDeploy.deploy(vertx, new MyVerticleSelfConfChangeListener())) // deploy ServiceVerticle
-      .map(x -> vertx.eventBus().publish(confStoreAddress, changedGlobalConf)) // change configuration
-      .compose(x -> wait(vertx, 200)) // wait for configuration to be propagated
-      .compose(x -> VertxEndpointClient.make(vertx, ConfListener.class).changedConfig()) // get changed configuration from ServiceVerticle
-      .map(changedConf -> ctx.assertEquals(true, ((JsonObject)changedConf).getBoolean("changed"))) // assert
+      .map(x -> vertx.eventBus().publish(confStoreAddress, changedGlobalConf1)) // change configuration
+      .compose(x -> wait(vertx, 100)) // wait for configuration to be propagated
+      .compose(x -> confListener.changedConfig()) // get changed configuration from ServiceVerticle
+      .map(changedConf -> {
+        ctx.assertEquals(1, ((ConfigChanged)changedConf).nextConfig().getInteger("changed"));
+        ctx.assertEquals(Optional.empty(), ((ConfigChanged)changedConf).previousConfig());
+        return null;
+      }) // assert
+      .map(x -> vertx.eventBus().publish(confStoreAddress, changedGlobalConf2)) // change configuration
+      .compose(x -> wait(vertx, 100)) // wait for configuration to be propagated
+      .compose(x -> confListener.changedConfig()) // get changed configuration from ServiceVerticle
+      .map(changedConf -> {
+        ctx.assertEquals(2, ((ConfigChanged)changedConf).nextConfig().getInteger("changed"));
+        ctx.assertEquals(1, ((ConfigChanged)changedConf).previousConfig().get().getInteger("changed"));
+        return null;
+      }) // // nfiguration
       .setHandler(ctx.asyncAssertSuccess());
   }
 
