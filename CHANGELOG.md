@@ -1,6 +1,12 @@
 ## [1.5.0] - 2021-02-04
 ### Added
 - GetConfigRoute implementation returning masked global config
+- ConsulSdRegistrar supports dynamic port
+- ConsulSdRegistrar module deploys 'system-ready' registry
+
+### Changed
+- Deploying 1 instance of ApiServer instead of 2*CPUs (vertx-server) - improves performance + allows using dynamic port
+- VertxBootstrap starts 'system-init' registry before server start and 'system-ready' after server start (vertx-server)
 
 ### Breaking changes
 - ComponentVerticle.registerSelfConfChangeListener accepts Handler<ConfigChanged> instead of Handler<JsonObject>

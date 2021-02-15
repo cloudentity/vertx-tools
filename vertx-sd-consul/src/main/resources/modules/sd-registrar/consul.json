@@ -1,5 +1,5 @@
 {
-  "registry:system": {
+  "registry:system-ready": {
     "consul-sd-registrar": {
       "main": "com.cloudentity.tools.vertx.sd.register.ConsulSdRegistrar",
       "verticleConfig": {
@@ -16,6 +16,7 @@
           "host": "$env:?REGISTER_SD_HOST:string",
           "port": "$env:REGISTER_SD_PORT:int",
           "ssl": "$env:REGISTER_SD_SSL:boolean:false",
+          "serverVerticleAddress": "$env:?REGISTER_SD_SERVER_VERTICLE_ADDRESS:string",
           "preferIp": "$env:?REGISTER_SD_PREFER_IP:boolean",
           "preferredIp": "$env:?REGISTER_SD_PREFERRED_IP:string",
           "preferredHost": "$env:?REGISTER_SD_PREFERRED_HOST:string",
