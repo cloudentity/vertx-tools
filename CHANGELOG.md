@@ -2,6 +2,7 @@
 ### Added
 - ConsulSdRegistrar supports dynamic port
 - ConsulSdRegistrar module deploys 'system-ready' registry
+- Ability to override name of the service config for vertx service tests
 
 ### Changed
 - Deploying 1 instance of ApiServer instead of 2*CPUs (vertx-server) - improves performance + allows using dynamic port

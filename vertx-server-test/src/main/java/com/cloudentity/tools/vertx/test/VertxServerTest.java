@@ -38,6 +38,10 @@ abstract public class VertxServerTest {
 
   protected abstract String getMainVerticle();
 
+  protected String serverConfigName() {
+    return "apiServer";
+  }
+
   protected void cleanup() {
   }
 
@@ -82,7 +86,7 @@ abstract public class VertxServerTest {
     ConfigRetrieverConf metaConf = ConfigFactory.build(metaConfJson, ConfigRetrieverConf.class);
     String configPath = metaConf.getStores().get(0).getConfig().getString("path");
 
-    JsonObject apiServer = new JsonObject(new String(Files.readAllBytes(Paths.get(configPath)))).getJsonObject("apiServer");
+    JsonObject apiServer = new JsonObject(new String(Files.readAllBytes(Paths.get(configPath)))).getJsonObject(serverConfigName());
     Integer port = readPort(apiServer.getJsonObject("http"));
     log.debug("Configure rest assured, port: {}", port);
     RestAssured.reset();
