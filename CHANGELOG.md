@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.6.0] - 2021-02-26
 ### Added
 - ConsulSdRegistrar supports dynamic port
 - ConsulSdRegistrar module deploys 'system-ready' registry
