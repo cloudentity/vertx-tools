@@ -3,11 +3,12 @@ package com.cloudentity.tools.vertx.server.api
 import java.util.Optional
 
 import com.cloudentity.tools.vertx.bus.VertxEndpointClient
-import com.cloudentity.tools.vertx.scala.{FutureConversions, VertxExecutionContext}
+import com.cloudentity.tools.vertx.http.HttpService
+import com.cloudentity.tools.vertx.scala.bus.ScalaServiceVerticle
+import com.cloudentity.tools.vertx.scala.VertxExecutionContext
 import com.cloudentity.tools.vertx.server.api.conf.{ApiServerConf, RouteConf}
 import com.cloudentity.tools.vertx.server.api.filters.RouteFilter
 import com.cloudentity.tools.vertx.server.api.routes.RouteService
-import io.vertx.core.AbstractVerticle
 import io.vertx.core.http.HttpServer
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.{Route, Router}
@@ -16,12 +17,13 @@ import io.vertx.core.{Future => VxFuture}
 
 import scala.concurrent.Future
 
-class ApiServer(serverConf: ApiServerConf) extends AbstractVerticle with FutureConversions {
+class ApiServer(serverConf: ApiServerConf) extends ScalaServiceVerticle with HttpService {
   val log = LoggerFactory.getLogger(this.getClass)
+  var actualPort: Int = _
 
   implicit lazy val ec = VertxExecutionContext(vertx.getOrCreateContext())
 
-  override def start(async: VxFuture[Void]): Unit = {
+  override def initServiceAsync(): VxFuture[Void] = {
     val allRouteConfs = serverConf.prependRoutes.getOrElse(Nil) ::: serverConf.routes.value ::: serverConf.appendRoutes.getOrElse(Nil)
     val activeRouteConfs = allRouteConfs.filterNot(route => serverConf.disabledRoutes.getOrElse(Nil).contains(route.id))
 
@@ -29,7 +31,9 @@ class ApiServer(serverConf: ApiServerConf) extends AbstractVerticle with FutureC
       for {
         routeVerticleClients <- Future.successful(activeRouteConfs.map(route => (route, makeRouteServiceClient(route.handler.getOrElse(route.id.value)))))
         router                = Router.router(vertx)
-        _                    <- asFuture[HttpServer](h => vertx.createHttpServer(serverConf.http).requestHandler(router.accept _).listen(h)).toScala()
+        server               <- asFuture[HttpServer](h => vertx.createHttpServer(serverConf.http).requestHandler(router.accept _).listen(h)).toScala()
+        _                     = actualPort = server.actualPort()
+        _                     = log.info(s"Started HTTP server on port $actualPort")
       } yield (routeVerticleClients, router)
 
     val registerHandlers = createServer.map { case (deployedApiVerticles, router) =>
@@ -44,7 +48,7 @@ class ApiServer(serverConf: ApiServerConf) extends AbstractVerticle with FutureC
       log.error("Error on creating HTTP server", ex)
     }
 
-    registerHandlers.map[Void](_ => null).toJava().setHandler(async)
+    registerHandlers.map[Void](_ => null).toJava()
   }
 
   private def makeRouteServiceClient(routeId: String) = {
@@ -99,6 +103,14 @@ class ApiServer(serverConf: ApiServerConf) extends AbstractVerticle with FutureC
       }
     }
   }
+
+  override def getActualPort(): VxFuture[Int] = VxFuture.succeededFuture(actualPort)
+
+  override def vertxServiceAddressPrefixS: Option[String] = Option(verticleId())
+}
+
+object ApiServer {
+  val defaultVerticleId = "apiServer"
 }
 
 object RouteHandler {

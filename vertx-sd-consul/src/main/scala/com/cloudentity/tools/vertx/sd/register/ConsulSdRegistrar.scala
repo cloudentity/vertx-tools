@@ -4,7 +4,6 @@ import java.net.NetworkInterface
 
 import io.circe.generic.auto._
 import io.circe.syntax._
-import com.cloudentity.tools.vertx.bus.ComponentVerticle
 import com.cloudentity.tools.vertx.sd.Location
 import com.cloudentity.tools.vertx.sd.consul.ConsulConf
 import com.cloudentity.tools.vertx.sd.register.ConsulSdRegistrar._
@@ -18,6 +17,10 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 import scalaz._
 import Scalaz._
+import com.cloudentity.tools.vertx.http.HttpService
+import com.cloudentity.tools.vertx.scala.Operation
+import com.cloudentity.tools.vertx.scala.bus.ScalaComponentVerticle
+import scalaz.{-\/, \/-}
 
 import scala.collection.mutable.ListBuffer
 
@@ -51,6 +54,7 @@ object ConsulSdRegistrar {
   *     "port": 9050,
   *     "root": "/authz"
   *     "ssl": false,
+ *      "serverVerticleAddress": "adminServer",
   *     "healthCheckHost": "authz-1.cloudentity.com",
   *     "healthCheckPort": 8080,
   *     "healthCheckPath": "/alive",
@@ -71,14 +75,17 @@ object ConsulSdRegistrar {
   *
   * If 'register.[host|port\ssl]' attribute is missing there is an attempt to read it from ConfVerticle under 'apiServer.http.[host|port|ssl]' key.
   *
+  * If register port is set to 0 then registrator call HttpService.getActualPort at 'serverVerticleAddress' prefix address (default 'apiServer', i.e. default HTTP server started by VertxBootstrap app)
+  *
   * 'root' attribute is optional
+  * 'serverVerticleAddress' attribute is optional
   * 'tags' is optional, custom Consul tags
   * 'healthCheckInterval' attribute is optional, defaults to '3s'
   * 'healthCheckHost' attribute is optional, defaults to 'host' attribute value
   * 'healthCheckPort' attribute is optional, defaults to 'port' attribute value
   * 'deregisterAfter' attribute is optional, defines max time-span when the node's health-check is failing, when it expires Consul deregisters the node
   */
-class ConsulSdRegistrar extends ComponentVerticle {
+class ConsulSdRegistrar extends ScalaComponentVerticle {
   val log = LoggerFactory.getLogger(this.getClass)
 
   private var client: ConsulClient = null
@@ -86,31 +93,32 @@ class ConsulSdRegistrar extends ComponentVerticle {
 
   override protected def verticleId(): String = Option(super.verticleId()).getOrElse("consul-sd-registrar")
 
-  override def start(startFuture: Future[Void]): Unit = {
-    val superStart = Future.future[Void]()
-    super.start(superStart)
+  override def initComponentAsync(): Future[Void] = {
+    for {
+      defaultConsulConf <- getConfService.getConf(CONSUL_CONF_KEY).toOperation[String]
+      apiServerConf     <- getConfService.getConf(API_SERVER_CONF_KEY).toOperation[String]
+      verticleConf      <- Option(getConfig).toOperation(s"Missing '${verticleId()}' configuration")
+      registerConf      <- Option(verticleConf.getJsonObject(REGISTER_CONF_KEY)).toOperation(s"Missing '${verticleId()}.$REGISTER_CONF_KEY' configuration")
+      apiServerHttpConfOpt = Try(Option(apiServerConf.getJsonObject("http")).get).toOption
+      registerPort      <- resolvePort(apiServerHttpConfOpt, registerConf)
+      conf              <- buildConfiguration(Option(verticleConf.getJsonObject(CONSUL_CONF_KEY)), registerConf, registerPort, apiServerHttpConfOpt, Option(defaultConsulConf)).toOperation
+    } yield conf
+  }.run.toJava.compose {
+    case \/-(conf) =>
+      log.debug(s"Configuration built: $conf")
+      tryRegister(conf)
+    case -\/(msg) =>
+      Future.failedFuture[Void](msg)
+  }
 
-    superStart.compose { _ =>
-      getConfService.getConf(CONSUL_CONF_KEY).compose { defaultConsulConf =>
-        getConfService.getConf(API_SERVER_CONF_KEY).compose { apiServerConf =>
-          val confResult: Either[String, ConsulSdRegistrarConf] =
-            for {
-              verticleConf <- Option(getConfig).toRight(s"Missing '${verticleId()}' configuration")
-              registerConf <- Option(verticleConf.getJsonObject(REGISTER_CONF_KEY)).toRight(s"Missing '${verticleId()}.$REGISTER_CONF_KEY' configuration")
-              apiServerHttpConfOpt = Try(Option(apiServerConf.getJsonObject("http")).get).toOption
-              conf <- buildConfiguration(Option(verticleConf.getJsonObject(CONSUL_CONF_KEY)), registerConf, apiServerHttpConfOpt, Option(defaultConsulConf))
-            } yield (conf)
+  private def resolvePort(apiServerHttpConf: Option[VxJsonObject], registerConf: VxJsonObject): Operation[String, Int] = {
+    val defaultServicePort = apiServerHttpConf.flatMap(c => Option(c.getInteger("port")))
 
-          confResult match {
-            case Right(conf) =>
-              log.debug(s"Configuration built: $conf")
-              tryRegister(conf)
-            case Left(msg) =>
-              Future.failedFuture[Void](msg)
-          }
-        }
-      }
-    }.setHandler(startFuture)
+    for {
+      port <- Option(registerConf.getInteger("port")).orElse(defaultServicePort).toOperation[String](missingAttr(s"$REGISTER_CONF_KEY.port"))
+      httpServerAddressPrefix = Option(registerConf.getString("serverVerticleAddress")).getOrElse(API_SERVER_CONF_KEY)
+      registerPort <- if (port == 0) createClient(classOf[HttpService], httpServerAddressPrefix).getActualPort().toOperation[String] else Operation.success[String, Int](port)
+    } yield (registerPort)
   }
 
   private def tryRegister(conf: ConsulSdRegistrarConf): Future[Void] = {
@@ -136,14 +144,13 @@ class ConsulSdRegistrar extends ComponentVerticle {
     ConsulClient.create(vertx, consul)
   }
 
-  private def buildConfiguration(consulConf: Option[VxJsonObject], registerConf: VxJsonObject, apiServerHttpConf: Option[VxJsonObject], defaultConsulConf: Option[VxJsonObject]): Either[String, ConsulSdRegistrarConf] = {
+  private def buildConfiguration(consulConf: Option[VxJsonObject], registerConf: VxJsonObject, registerPort: Int, apiServerHttpConf: Option[VxJsonObject], defaultConsulConf: Option[VxJsonObject]): Either[String, ConsulSdRegistrarConf] = {
     log.debug(s"Attempting to build Consul SD registrar configuration: ${verticleId()}.consul=$consulConf, ${verticleId()}.register=$registerConf, apiServer.http=$apiServerHttpConf, consul=$defaultConsulConf")
 
     val consulConfEither: Either[String, Option[ConsulClientOptions]] = consulConf.map(ConsulConf.fromVxJsonObject).sequenceU
     val defaultConsulConfOpt: Option[ConsulClientOptions] = defaultConsulConf.flatMap(ConsulConf.fromVxJsonObject(_).toOption)
 
     val defaultServiceHost = apiServerHttpConf.flatMap(c => Option(c.getString("host")))
-    val defaultServicePort = apiServerHttpConf.flatMap(c => Option(c.getInteger("port")))
     val defaultServiceSsl = apiServerHttpConf.flatMap(c => Option(c.getBoolean("ssl")))
 
     val resolveHost = SdHostResolver.resolve(SdHostResolver.convert(NetworkInterface.getNetworkInterfaces.asScala.toList)) _
@@ -166,7 +173,7 @@ class ConsulSdRegistrar extends ComponentVerticle {
                                .orElse(resolveHost(preferIp, preferredNetwork, preferredIp, preferredHost))
                                .orElse(defaultServiceHost)
                                .toRight(missingAttr(s"$REGISTER_CONF_KEY.host"))
-      port                <- Option(registerConf.getInteger("port")).orElse(defaultServicePort).toRight(missingAttr(s"$REGISTER_CONF_KEY.port"))
+      port                 = registerPort
       ssl                 <- Option(registerConf.getBoolean("ssl")).orElse(defaultServiceSsl).toRight(missingAttr(s"$REGISTER_CONF_KEY.ssl"))
       rootPathOpt          = Option(registerConf.getString("rootPath"))
 
@@ -174,7 +181,7 @@ class ConsulSdRegistrar extends ComponentVerticle {
       healthCheckHost      = Option(registerConf.getString("healthCheckHost"))
                                .orElse(resolveHost(preferHcIp, preferredHcNetwork, preferredHcIp, preferredHcHost))
                                .getOrElse(host)
-      healthCheckPort      = Option(registerConf.getInteger("healthCheckPort")).getOrElse(port)
+      healthCheckPort      = Option(registerConf.getInteger("healthCheckPort")).map(_.toInt).getOrElse(port)
       healthCheckPath     <- Option(registerConf.getString("healthCheckPath")).toRight(missingAttr(s"$REGISTER_CONF_KEY.healthCheckPath"))
       healthCheckInterval  = registerConf.getString("healthCheckInterval", "3s")
       deregisterAfter      = Option(registerConf.getString("deregisterAfter"))

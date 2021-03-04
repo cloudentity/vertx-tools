@@ -7,6 +7,7 @@ import com.cloudentity.tools.vertx.conf.modules.ModulesReader;
 import com.cloudentity.tools.vertx.json.VertxJson;
 import com.cloudentity.tools.vertx.launchers.OrchisCommandLauncher;
 import com.cloudentity.tools.vertx.logging.InitLog;
+import com.cloudentity.tools.vertx.registry.RegistryVerticle;
 import com.cloudentity.tools.vertx.server.api.ApiServerDeployer;
 import com.cloudentity.tools.vertx.shutdown.ShutdownVerticle;
 import com.cloudentity.tools.vertx.tracing.TracingVerticle;
@@ -47,8 +48,10 @@ public class VertxBootstrap extends AbstractVerticle {
             this.shutdownVerticleDeploymentId = deploymentId;
             return Future.succeededFuture();
           })
+          .compose(x -> RegistryVerticle.deploy(vertx, "system-init", false))
           .compose(x -> beforeServerStart())
           .compose(x -> deployServer())
+          .compose(x -> RegistryVerticle.deploy(vertx, "system-ready", false))
           .compose(x -> afterServerStart())
           .setHandler(handler(startFuture));
 
