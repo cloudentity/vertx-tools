@@ -4,7 +4,10 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;
 
+import java.util.Base64;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class ConfReferenceTest {
   @Test
@@ -85,7 +88,7 @@ public class ConfReferenceTest {
 
     // then
     JsonObject obj = result.getJsonObject("obj");
-    assertEquals(null, obj.getInteger("port"));
+    assertNull(obj.getInteger("port"));
   }
 
   @Test
@@ -150,13 +153,16 @@ public class ConfReferenceTest {
 
   @Test
   public void shouldCastConfReference() {
+    String foobar64Encoded = new String(Base64.getEncoder().encode("foo-bar".getBytes()));
     // given
     JsonObject conf =
       new JsonObject()
         .put("xInt", "$ref:yStringInt:int").put("yStringInt", "100")
         .put("xStringInt", "$ref:yInt:string").put("yInt", 100)
         .put("xBoolean", "$ref:yStringBoolean:boolean").put("yStringBoolean", "true")
-        .put("xStringBoolean", "$ref:yBoolean:string").put("yBoolean", true);
+        .put("xStringBoolean", "$ref:yBoolean:string").put("yBoolean", true)
+        .put("xBase64EncodeIt", "$ref:yBase64EncodeIt:base64encode").put("yBase64EncodeIt", "foo-bar")
+        .put("xBase64DecodeIt", "$ref:yBase64DecodeIt:base64decode").put("yBase64DecodeIt", foobar64Encoded);
 
     // when
     JsonObject result = ConfReference.populateInnerRefs(conf, conf);
@@ -166,6 +172,8 @@ public class ConfReferenceTest {
     assertEquals("100", result.getString("xStringInt"));
     assertEquals(true, result.getBoolean("xBoolean"));
     assertEquals("true", result.getString("xStringBoolean"));
+    assertEquals(foobar64Encoded, result.getString("xBase64EncodeIt"));
+    assertEquals("foo-bar", result.getString("xBase64DecodeIt"));
   }
 
   @Test
@@ -196,7 +204,7 @@ public class ConfReferenceTest {
         );
 
     // when
-    JsonObject result = ConfReference.populateInnerRefs(globalConf, globalConf);
+    ConfReference.populateInnerRefs(globalConf, globalConf);
   }
 
   @Test
@@ -325,7 +333,7 @@ public class ConfReferenceTest {
     JsonObject result = ConfReference.populateSysRefs(conf, new JsonObject());
 
     // then
-    assertEquals(null, result.getValue("x"));
+    assertNull(result.getValue("x"));
   }
 
   @Test
