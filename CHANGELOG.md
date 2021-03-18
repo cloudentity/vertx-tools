@@ -1,3 +1,7 @@
+## [Unreleased]
+### Added
+- Support base64 endcoding and decoding of referenced values
+
 ## [1.6.0] - 2021-02-26
 ### Added
 - ConsulSdRegistrar supports dynamic port

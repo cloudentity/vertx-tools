@@ -27,6 +27,8 @@ public class ConfReference {
     converters.put("boolean", Boolean::valueOf);
     converters.put("object", x -> new JsonObject(x));
     converters.put("array", x -> new JsonArray(x));
+    converters.put("base64encode", x -> Base64.getEncoder().encodeToString(x.getBytes()));
+    converters.put("base64decode", x -> new String(Base64.getDecoder().decode(x)));
   }
 
   /**
