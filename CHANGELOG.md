@@ -1,6 +1,9 @@
 ## [Unreleased]
 ### Added
-- Support base64 endcoding and decoding of referenced values
+- Support base64 encoding and decoding of referenced values
+
+### Changed
+- On deployment failure exit with status 15
 
 ## [1.6.0] - 2021-02-26
 ### Added
