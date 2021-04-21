@@ -1,3 +1,7 @@
+## [Unreleased]
+### Fixed
+- Deploy registries sequentially for VertxModuleTest
+
 ## [1.7.0] - 2021-04-12
 ### Added
 - Support base64 encoding and decoding of referenced values
