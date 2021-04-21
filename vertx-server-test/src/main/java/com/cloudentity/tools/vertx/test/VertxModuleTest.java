@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +31,9 @@ abstract public class VertxModuleTest extends VertxUnitTest {
 
   /**
    * Return true if verticles you are testing depend on ShutdownVerticle. Otherwise false.
-   *
+   * <p>
    * If true ShutdownVerticle will be deployed before verticle registries.
+   *
    * @return flag controlling ShutdownVerticle deployment
    */
   protected boolean withShutdown() {
@@ -41,7 +43,7 @@ abstract public class VertxModuleTest extends VertxUnitTest {
   /**
    * Deploys configuration verticle with given module configuration and starts verticle registries.
    *
-   * @param module configuration module to load
+   * @param module     configuration module to load
    * @param registries types of registries to deploy
    * @return
    */
@@ -52,7 +54,7 @@ abstract public class VertxModuleTest extends VertxUnitTest {
   /**
    * Deploys configuration verticle with given multiple modules configuration and starts verticle registries.
    *
-   * @param modules configuration modules to load
+   * @param modules    configuration modules to load
    * @param registries types of registries to deploy
    * @return
    */
@@ -63,9 +65,9 @@ abstract public class VertxModuleTest extends VertxUnitTest {
   /**
    * Deploys configuration verticle with given module and extra configuration and starts verticle registries.
    *
-   * @param module configuration module to load
+   * @param module      configuration module to load
    * @param extraConfig extra configuration object
-   * @param registries types of registries to deploy
+   * @param registries  types of registries to deploy
    * @return
    */
   public Future<List<String>> deployModule(String module, JsonObject extraConfig, String... registries) {
@@ -75,7 +77,7 @@ abstract public class VertxModuleTest extends VertxUnitTest {
   /**
    * Deploys configuration verticle with given module configuration and extra configuration from file and starts verticle registries.
    *
-   * @param module configuration module to load
+   * @param module     configuration module to load
    * @param configPath path to extra config json file
    * @param registries types of registries to deploy
    * @return
@@ -87,7 +89,7 @@ abstract public class VertxModuleTest extends VertxUnitTest {
   /**
    * Deploys configuration verticle with given multiple modules configuration and extra configuration from file and starts verticle registries.
    *
-   * @param modules configuration modules to load
+   * @param modules    configuration modules to load
    * @param configPath path to extra config json file
    * @param registries types of registries to deploy
    * @return
@@ -104,9 +106,9 @@ abstract public class VertxModuleTest extends VertxUnitTest {
   /**
    * Deploys configuration verticle with given multiple modules and extra configuration and starts verticle registries.
    *
-   * @param modules configuration module to load
+   * @param modules     configuration module to load
    * @param extraConfig extra configuration object
-   * @param registries types of registries to deploy
+   * @param registries  types of registries to deploy
    * @return
    */
   public Future<List<String>> deployModules(List<String> modules, JsonObject extraConfig, String... registries) {
@@ -116,9 +118,9 @@ abstract public class VertxModuleTest extends VertxUnitTest {
     JsonObject localMapExtraConfig = new JsonObject().put("name", "module-test").put("key", "config");
 
     JsonArray configStores =
-      new JsonArray()
-        .add(new JsonObject().put("type", "json").put("format", "json").put("config", modulesConfig))
-        .add(new JsonObject().put("type", "shared-local-map").put("format", "json").put("config", localMapExtraConfig));
+        new JsonArray()
+            .add(new JsonObject().put("type", "json").put("format", "json").put("config", modulesConfig))
+            .add(new JsonObject().put("type", "shared-local-map").put("format", "json").put("config", localMapExtraConfig));
 
     return deployModulesWithConfigStores(configStores, registries);
   }
@@ -127,17 +129,30 @@ abstract public class VertxModuleTest extends VertxUnitTest {
    * Deploys configuration verticle with given config stores and starts verticle registries.
    *
    * @param configStores config stores to load
-   * @param registries types of registries to deploy
+   * @param registries   types of registries to deploy
    * @return
    */
   public Future<List<String>> deployModulesWithConfigStores(JsonArray configStores, String... registries) {
     JsonObject metaConfig = new JsonObject().put("scanPeriod", 100).put("stores", configStores);
-
     return ConfVerticleDeploy.deployVerticleFromMetaConfig(vertx(), metaConfig)
-      .compose(x -> {
-        if (withShutdown()) return VertxDeploy.deploy(vertx(), new ShutdownVerticle());
-        else return Future.succeededFuture();
-      })
-      .compose(x -> FutureUtils.sequence(Lists.newArrayList(registries).stream().map(r -> RegistryVerticle.deploy(vertx(), r)).collect(Collectors.toList())));
+        .compose(x -> {
+          if (withShutdown()) return VertxDeploy.deploy(vertx(), new ShutdownVerticle());
+          else return Future.succeededFuture();
+        })
+        .compose(x -> deployRegistriesSequentially(Future.succeededFuture(new ArrayList<>()), Lists.newArrayList(registries)));
+  }
+
+  private Future<List<String>> deployRegistriesSequentially(Future<List<String>> acc, List<String> registriesToDeploy) {
+    if (registriesToDeploy.size() > 0) {
+      String registry = registriesToDeploy.get(0);
+      Future<List<String>> newAcc =
+          acc.compose(alreadyDeployedRegistries -> {
+            alreadyDeployedRegistries.add(registry);
+            return RegistryVerticle.deploy(vertx(), registry).map(x -> alreadyDeployedRegistries);
+          });
+      return deployRegistriesSequentially(newAcc, registriesToDeploy.subList(1, registriesToDeploy.size()));
+    } else {
+      return acc;
+    }
   }
 }
