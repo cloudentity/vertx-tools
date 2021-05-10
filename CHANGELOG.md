@@ -8,6 +8,7 @@
 
 ### Changed
 - On deployment failure exit with status 15
+- Switched off running OWASP plugin by default
 
 ## [1.6.0] - 2021-02-26
 ### Added
