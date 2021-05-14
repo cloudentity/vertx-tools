@@ -4,7 +4,7 @@
 
   <groupId>com.cloudentity.tools.vertx</groupId>
   <artifactId>vertx-tools</artifactId>
-  <version>1.7.0</version>
+  <version>1.8.0</version>
 
   <modules>
     <module>vertx-config-common</module>
@@ -161,7 +161,7 @@
     <profile>
       <id>check-deps</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <build>
         <plugins>

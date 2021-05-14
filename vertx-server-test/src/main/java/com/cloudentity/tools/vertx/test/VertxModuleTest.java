@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -134,10 +135,24 @@ abstract public class VertxModuleTest extends VertxUnitTest {
     JsonObject metaConfig = new JsonObject().put("scanPeriod", 100).put("stores", configStores);
 
     return ConfVerticleDeploy.deployVerticleFromMetaConfig(vertx(), metaConfig)
-      .compose(x -> {
-        if (withShutdown()) return VertxDeploy.deploy(vertx(), new ShutdownVerticle());
-        else return Future.succeededFuture();
-      })
-      .compose(x -> FutureUtils.sequence(Lists.newArrayList(registries).stream().map(r -> RegistryVerticle.deploy(vertx(), r)).collect(Collectors.toList())));
+        .compose(x -> {
+          if (withShutdown()) return VertxDeploy.deploy(vertx(), new ShutdownVerticle());
+          else return Future.succeededFuture();
+        })
+        .compose(x -> deployRegistriesSequentially(Future.succeededFuture(new ArrayList<>()), Lists.newArrayList(registries)));
+  }
+
+  private Future<List<String>> deployRegistriesSequentially(Future<List<String>> acc, List<String> registriesToDeploy) {
+    if (registriesToDeploy.size() > 0) {
+      String registry = registriesToDeploy.get(0);
+      Future<List<String>> newAcc =
+          acc.compose(alreadyDeployedRegistries -> {
+            alreadyDeployedRegistries.add(registry);
+            return RegistryVerticle.deploy(vertx(), registry).map(x -> alreadyDeployedRegistries);
+          });
+      return deployRegistriesSequentially(newAcc, registriesToDeploy.subList(1, registriesToDeploy.size()));
+    } else {
+      return acc;
+    }
   }
 }

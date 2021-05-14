@@ -1,9 +1,14 @@
+## [1.8.0] - 2021-05-07
+### Fixed
+- Deploy registries sequentially for VertxModuleTest
+
 ## [1.7.0] - 2021-04-12
 ### Added
 - Support base64 encoding and decoding of referenced values
 
 ### Changed
 - On deployment failure exit with status 15
+- Switched off running OWASP plugin by default
 
 ## [1.6.0] - 2021-02-26
 ### Added
