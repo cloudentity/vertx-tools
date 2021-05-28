@@ -518,6 +518,9 @@ After resolution, we end up with the following configuration:
 }
 ```
 
+>NOTE<br/>
+> Environment variables can be overridden also for spring-like references.
+
 ##### Replacing sensitive environment variable with configuration reference
 
 If an environment variable contains sensitive value (e.g. database password) we should read it from secure storage like Vault.
