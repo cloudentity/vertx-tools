@@ -71,6 +71,7 @@ public class ConfSpringlikeReference {
 
   private static Pattern springRefPlaceholder = Pattern.compile(".*(\\$\\{[^}]+?\\}).*");
   private static Function<String, String> replaceSpringlikeRef(JsonObject root) {
+    JsonObject envFallback = root.getJsonObject("env", new JsonObject());
     return in -> {
       Matcher m = springRefPlaceholder.matcher(in);
       if (m.matches()) {
@@ -85,7 +86,11 @@ public class ConfSpringlikeReference {
         }
 
         String refValue = JsonExtractor.resolveValue(root, refPath).map(x -> x.toString())
-          .orElseGet(() -> Optional.ofNullable(System.getenv(refPath)).orElse(defaultValue));
+          .orElseGet(() ->
+            Optional.ofNullable(envFallback.getString(refPath))
+              .orElse(Optional.ofNullable(System.getenv(refPath))
+              .orElse(defaultValue))
+          );
         return replaceSpringlikeRef(root).apply(in.replace(placeholder, refValue));
       } else {
         return in;

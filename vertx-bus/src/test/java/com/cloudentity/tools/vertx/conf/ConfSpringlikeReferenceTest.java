@@ -21,6 +21,19 @@ public class ConfSpringlikeReferenceTest {
   }
 
   @Test
+  public void shouldReplaceSimpleSingleSpringlikeReferenceWithEnvFallback() {
+    // given
+    JsonObject env = new JsonObject().put("Y", "100");
+    JsonObject conf = new JsonObject().put("x","${Y}").put("env", env);
+
+    // when
+    JsonObject result = ConfSpringlikeReference.populateRefs(conf);
+
+    // then
+    assertEquals("100", result.getValue("x"));
+  }
+
+  @Test
   public void shouldReplaceSimpleSingleSpringlikeReferenceWithDefaultValue() {
     // given
     JsonObject conf = new JsonObject().put("x","${y:200}").put("y", 100);

@@ -1,3 +1,7 @@
+## [1.9.0] - 2021-06-11
+### Added
+- spring-like references can use environment variables from 'env' config fallback
+
 ## [1.8.0] - 2021-05-07
 ### Fixed
 - Deploy registries sequentially for VertxModuleTest
