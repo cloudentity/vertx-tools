@@ -4,11 +4,12 @@ import com.cloudentity.tools.vertx.http.SmartHttp._
 import com.cloudentity.tools.vertx.http._
 import com.cloudentity.tools.vertx.http.client.SmartHttpClientImpl
 import com.cloudentity.tools.vertx.sd.Location
-import io.vertx.core.http.{HttpClientOptions}
+import com.cloudentity.tools.vertx.tracing.{LoggingWithTracing, TracingContext}
+import io.vertx.core.http.HttpClientOptions
 import io.vertx.core.json.{JsonArray, JsonObject}
 import io.vertx.core.{Future, Vertx}
-
 import scalaz.Scalaz._
+
 import scala.util.Try
 
 class SmartHttpClientBuilderImpl(vertx: Vertx, val values: SmartHttpClientBuilderImpl.SmartHttpClientValues) extends SmartHttpClientBuilder with CallValuesBuilderImpl[SmartHttpClientBuilder] {
@@ -29,10 +30,14 @@ class SmartHttpClientBuilderImpl(vertx: Vertx, val values: SmartHttpClientBuilde
   override def build(): Future[SmartHttpClient] = {
     val sdFutOpt: Option[Future[Sd]] =
     (values.serviceName, values.serviceLocation) match {
-        case (_, Some(serviceLocation)) =>
+        case (_, Some(serviceLocation)) => {
+
           Option(Future.succeededFuture(Sd.withStaticLocation(serviceLocation)))
-        case (Some(serviceName), _) =>
+        }
+        case (Some(serviceName), _) =>{
+
           Option(sdWithCircuitBreakerConfig(vertx, serviceName, values.serviceTags.getOrElse(Nil), values.circuitBreakerConfig).asInstanceOf[Future[Sd]])
+        }
         case (None, None) =>
           None
       }
@@ -40,6 +45,7 @@ class SmartHttpClientBuilderImpl(vertx: Vertx, val values: SmartHttpClientBuilde
     sdFutOpt match {
       case Some(sdFut) =>
         sdFut.compose { sd =>
+            println(s"XXX: values.httpClientOptions: ${values.httpClientOptions.getOrElse(new HttpClientOptions()).getKeepAliveTimeout}")
           val vertxClient = vertx.createHttpClient(values.httpClientOptions.getOrElse(new HttpClientOptions()))
           val client =
             new SmartHttpClientImpl(sd, vertxClient,
@@ -67,6 +73,7 @@ class SmartHttpClientBuilderImpl(vertx: Vertx, val values: SmartHttpClientBuilde
 
 object SmartHttpClientBuilderImpl {
   type EvaluateResponseCallStatus = Function[SmartHttpResponse, CallStatus]
+  val log = LoggingWithTracing.getLogger(this.getClass)
 
   sealed trait CallStatus
     case class CallFailed(retry: Boolean) extends CallStatus
@@ -99,12 +106,24 @@ object SmartHttpClientBuilderImpl {
 
     // we need to wrap in Try, becayse JsonObject.getXxx can throw ClassCastException
     Try {
+      log.warn(TracingContext.dummy(), s"XXX: httpClientOptions: ${config.getJsonObject("httpClientOptions", config.getJsonObject("http"))}")
+      val httpOptions        = Option(config.getJsonObject("httpClientOptions", config.getJsonObject("http"))).map(o => new HttpClientOptions(o))
+      httpOptions.map(w => {
+        w.setLogActivity(true)
+        w.setKeepAliveTimeout(600)
+        w.setHttp2KeepAliveTimeout(600)
+        log.warn(TracingContext.dummy(),s"XXX: w.getKeepAliveTimeout: ${w.getKeepAliveTimeout}")
+        log.warn(TracingContext.dummy(),s"XXX: w.getHttp2KeepAliveTimeout: ${w.getHttp2KeepAliveTimeout}")
+
+      })
+      log.warn( TracingContext.dummy() ,s"XXX: httpClientOps with additional logging: ${httpOptions}")
+
       new SmartHttpClientBuilderImpl(vertx,
         SmartHttpClientValues(
           serviceName              = Option(config.getString("serviceName")),
           serviceLocation          = Option(config.getJsonObject("serviceLocation")).map(decodeServiceLocation(_).get), // it may throw, but it's
           serviceTags              = Option(config.getJsonArray("serviceTags")).flatMap(tags),
-          httpClientOptions        = Option(config.getJsonObject("httpClientOptions", config.getJsonObject("http"))).map(o => new HttpClientOptions(o)),
+          httpClientOptions        = httpOptions,
 
           // For integer and boolean values we can't use Option(config.getBoolean("field")) because there is weird interoperability issue between Scala and Java Boolean/Int.
           // If we had CallValues(retries = Option(config.getInteger("retries"))) and config.retries was null we would get CallValues(retries = Some(0)); similarly with Booleans.
