@@ -37,7 +37,7 @@ class SmartHttpBuilderTest extends AssertionsForJUnit with MustMatchers {
     // then
     builder.values.serviceName mustBe(Some("service-a"))
     builder.values.serviceLocation mustBe(Some(Location("localhost", 80, true, Some("/root"))))
-    builder.values.httpClientOptions.map(_.toJson) mustBe(Some(new HttpClientOptions().setDefaultPort(8000).toJson))
+    builder.values.httpClientOptions.map(_.toJson) mustBe(Some(new HttpClientOptions().setDefaultPort(8000).setLogActivity(true).toJson))
     builder.values.circuitBreakerConfig mustBe(Some(json().put("off", true)))
     builder.values.callValues.responseFailure.map(_.apply(new SmartDummyResponse(500))) mustBe(Some(true))
     builder.values.callValues.retryFailedResponse mustBe(Some(true))
