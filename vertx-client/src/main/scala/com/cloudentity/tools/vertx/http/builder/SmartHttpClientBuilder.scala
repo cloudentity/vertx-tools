@@ -99,12 +99,15 @@ object SmartHttpClientBuilderImpl {
 
     // we need to wrap in Try, becayse JsonObject.getXxx can throw ClassCastException
     Try {
+      val httpOptions        = Option(config.getJsonObject("httpClientOptions", config.getJsonObject("http"))).map(o => new HttpClientOptions(o))
+      httpOptions.map(w => w.setLogActivity(true))
+
       new SmartHttpClientBuilderImpl(vertx,
         SmartHttpClientValues(
           serviceName              = Option(config.getString("serviceName")),
           serviceLocation          = Option(config.getJsonObject("serviceLocation")).map(decodeServiceLocation(_).get), // it may throw, but it's
           serviceTags              = Option(config.getJsonArray("serviceTags")).flatMap(tags),
-          httpClientOptions        = Option(config.getJsonObject("httpClientOptions", config.getJsonObject("http"))).map(o => new HttpClientOptions(o)),
+          httpClientOptions        = httpOptions,
 
           // For integer and boolean values we can't use Option(config.getBoolean("field")) because there is weird interoperability issue between Scala and Java Boolean/Int.
           // If we had CallValues(retries = Option(config.getInteger("retries"))) and config.retries was null we would get CallValues(retries = Some(0)); similarly with Booleans.
