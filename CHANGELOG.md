@@ -1,4 +1,25 @@
-##[Unreleased]
+## [Unreleased]
+### Security
+- [CVE-2020-13949](https://nvd.nist.gov/vuln/detail/CVE-2020-13949)
+  - Solved by upgrading jaeger-client 1.2.0 -> 1.8.0 (transitively libthrift 0.13.0 -> 0.14.1)
+  - Avoiding importing tomcat-embed-core 8.5.46, with its new vulnerabilities, by setting overriding libthrift -> 0.16.0
+  - Upgraded okhttp mockwebserver version from 3.14.9 to 4.9.0 to match that imported by jaeger 1.8.0
+- [CVE-2020-29582](https://nvd.nist.gov/vuln/detail/CVE-2020-29582)
+  - Solved by upgrading kotlin-stdlib and kotlin-stdlib-common from 1.3.50 -> 1.4.32
+  - Note that kotlin-stdlib 1.4.10 and kotlin-stdlib-common 1.4.0 would have been imported by okhttp 4.9.0 above
+- [CVE-2022-21653](https://nvd.nist.gov/vuln/detail/CVE-2022-21653)
+  - Upgrading circe 0.11.1 to 0.14.1 to move keep transient scala-reflect vulnerabilities in test scope - moves jawn-parser 0.14.1 -> 1.1.2
+  - Upgrading jawn-parser -> 1.3.2 to solve vulnerability
+- [CVE-2018-12541](https://nvd.nist.gov/vuln/detail/CVE-2018-12541) - Solved by upgrading vertx 3.9.5 -> 3.9.12 (transitively netty-transport 4.1.49 -> 4.1.72)
+- [CVE-2021-21290](https://nvd.nist.gov/vuln/detail/CVE-2021-21290) - Solved by upgrading vertx 3.9.5 -> 3.9.12 (transitively netty-transport 4.1.49 -> 4.1.72)
+- [CVE-2021-21295](https://nvd.nist.gov/vuln/detail/CVE-2021-21295) - Solved by upgrading vertx 3.9.5 -> 3.9.12 (transitively netty-transport 4.1.49 -> 4.1.72)
+- [CVE-2021-21409](https://nvd.nist.gov/vuln/detail/CVE-2021-21409) - Solved by upgrading vertx 3.9.5 -> 3.9.12 (transitively netty-transport 4.1.49 -> 4.1.72)
+- [CVE-2021-37136](https://nvd.nist.gov/vuln/detail/CVE-2021-37136) - Solved by upgrading vertx 3.9.5 -> 3.9.12 (transitively netty-transport 4.1.49 -> 4.1.72)
+- [CVE-2021-37137](https://nvd.nist.gov/vuln/detail/CVE-2021-37137) - Solved by upgrading vertx 3.9.5 -> 3.9.12 (transitively netty-transport 4.1.49 -> 4.1.72)
+- [CVE-2021-43797](https://nvd.nist.gov/vuln/detail/CVE-2021-43797) - Solved by upgrading vertx 3.9.5 -> 3.9.12 (transitively netty-transport 4.1.49 -> 4.1.72)
+- [CVE-2021-29425](https://nvd.nist.gov/vuln/detail/CVE-2021-29425) - Solved by upgrading commons-io 2.5 -> 2.11.0
+- [CVE-2020-17521](https://nvd.nist.gov/vuln/detail/CVE-2020-17521) - Solved by upgrading rest-assured 3.3.0 -> 4.5.1 (transitively groovy 2.4.15 -> 3.0.9, httpclient 4.5.3 -> 4.5.13)
+- [CVE-2020-13956](https://nvd.nist.gov/vuln/detail/CVE-2020-13956) - Solved by upgrading rest-assured 3.3.0 -> 4.5.1 (transitively groovy 2.4.15 -> 3.0.9, httpclient 4.5.3 -> 4.5.13)
 
 ## [1.10.0] - 2021-11-17
 ### Changed

@@ -41,7 +41,10 @@
     <embedded-consul.version>1.0.2</embedded-consul.version>
     <slf4j.version>1.7.30</slf4j.version>
     <junit.version>4.13.1</junit.version>
-    <okhttp3.version>4.9.3</okhttp3.version>
+    <okhttp3.mockserver.version>4.9.0</okhttp3.mockserver.version>
+    <libthrift.version>0.16.0</libthrift.version>
+    <kotlin.version>1.4.32</kotlin.version>
+    <jawn.version>1.3.2</jawn.version>
     <rest.assured.version>4.5.1</rest.assured.version>
     <logback.classic.version>1.2.0</logback.classic.version>
     <owaspdt.url>https://owaspdt.int.cloudentity.com</owaspdt.url>
@@ -475,27 +478,23 @@
       <dependency>
         <groupId>org.apache.thrift</groupId>
         <artifactId>libthrift</artifactId>
-        <version>0.16.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>okhttp</artifactId>
-        <version>${okhttp3.version}</version>
+        <version>${libthrift.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
-        <version>1.4.32</version>
+        <version>${kotlin.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib-common</artifactId>
-        <version>1.4.32</version>
+        <version>${kotlin.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.typelevel</groupId>
         <artifactId>jawn-parser_2.12</artifactId>
-        <version>1.3.2</version>
+        <version>${jawn.version}</version>
       </dependency>
 
       <!--TEST-->
@@ -514,7 +513,7 @@
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>mockwebserver</artifactId>
-        <version>${okhttp3.version}</version>
+        <version>${okhttp3.mockserver.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
