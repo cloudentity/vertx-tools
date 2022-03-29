@@ -1,4 +1,7 @@
 ## [Unreleased]
+### Removed
+- Removed Cassandra references in README
+
 ### Security
 - [CVE-2020-13949](https://nvd.nist.gov/vuln/detail/CVE-2020-13949)
   - Solved by upgrading jaeger-client 1.2.0 -> 1.8.0 (transitively libthrift 0.13.0 -> 0.14.1)
