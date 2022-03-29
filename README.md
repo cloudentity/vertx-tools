@@ -295,11 +295,11 @@ For example, the following configuration:
 ```
 {
   "verticle-a": {
-    "cassandra-port": "$ref:cassandra.port",
-    "cassandra-host": ["$ref:cassandra.host1", "$ref:cassandra.host2"]
+    "ldap-port": "$ref:ldap.port",
+    "ldap-host": ["$ref:ldap.host1", "$ref:ldap.host2"]
   },
-  "cassandra": {
-    "port": 9000,
+  "ldap": {
+    "port": 1389,
     "host1": "localhost",
     "host2": "127.0.0.1"
   }
@@ -311,11 +311,11 @@ after reference resolution looks like this:
 ```
 {
   "verticle-a": {
-    "cassandra-port": 9000,
-    "cassandra-host": ["localhost", "127.0.0.1"]
+    "ldap-port": 1389,
+    "ldap-host": ["localhost", "127.0.0.1"]
   },
-  "cassandra": {
-    "port": 9000,
+  "ldap": {
+    "port": 1389,
     "host1": "localhost",
     "host2": "127.0.0.1"
   }
@@ -375,30 +375,30 @@ Example, following configuration:
 
 ```
 {
-  "cassandra-port": "$env:CASSANDRA_PORT:int:9000"
+  "ldap-port": "$env:LDAP_PORT:int:1389"
 }
 ```
 
-is resolved to this one (provided CASSANDRA_PORT environment property is set to 8000):
+is resolved to this one (provided LDAP_PORT environment property is set to 2636):
 
 ```
 {
-  "cassandra-port": 8000
+  "ldap-port": 2636
 }
 ```
 
-or to this one (provided CASSANDRA_PORT is not set):
+or to this one (provided LDAP_PORT is not set):
 
 ```
 {
-  "cassandra-port": 9000
+  "ldap-port": 1389
 }
 ```
 Default value is optional, so we can have following configuration:
 
 ```
 {
-  "cassandra-port": "$env:CASSANDRA_PORT:int"
+  "ldap-port": "$env:LDAP_PORT:int"
 }
 ```
 
@@ -496,13 +496,13 @@ Also, for unit testing it might be cumbersome to provide environment or system v
 To overcome that, instead of setting those variables you can define a map in the root configuration at `env` or `sys` attribute and provide values for the variables.
 Environment or system variable is overridden by the value read from corresponding attribute in root configuration.
 
-For example let's have following reference to `CASSANDRA_PORT` environment variable:
+For example let's have following reference to `LDAP_PORT` environment variable:
 
 ```
 {
-  "cassandra-port": "$env:CASSANDRA_PORT:int",
+  "ldap-port": "$env:LDAP_PORT:int",
   "env": {
-    "CASSANDRA_PORT": 9000
+    "LDAP_PORT": 1389
   }
 }
 ```
@@ -511,9 +511,9 @@ After resolution, we end up with the following configuration:
 
 ```
 {
-  "cassandra-port": 9000,
+  "ldap-port": 1389,
   "env": {
-    "CASSANDRA_PORT": 9000
+    "LDAP_PORT": 1389
   }
 }
 ```
@@ -1052,21 +1052,21 @@ Let’s say our root configuration looks like this:
     }
   },
   "modules": [
-    "policy-storage/cassandra",
+    "policy-storage/ldap",
     "sd-registrar/consul"
   ]
 }
 ```
 
-`ConfVerticle` tries to read `policy-storage/cassandra` and `sd-registrar/consul` modules configuration from classpath.
+`ConfVerticle` tries to read `policy-storage/ldap` and `sd-registrar/consul` modules configuration from classpath.
 The modules configuration should be stored on classpath in `modules` folder. This means that `ConfVerticle` searches for
-`modules/policy-storage/cassandra.json` and `modules/sd-registrar/consul.json` files.
+`modules/policy-storage/ldap.json` and `modules/sd-registrar/consul.json` files.
 
-Let `modules/policy-storage/cassandra.json` has following content:
+Let `modules/policy-storage/ldap.json` has following content:
 
 ```
 {
-  "cassandra": {
+  "ldap": {
     "host": "localhost",
     "port": 9042
   }
@@ -1096,7 +1096,7 @@ The global configuration looks as follows:
     }
   },
 
-  "cassandra": {
+  "ldap": {
     "host": "localhost",
     "port": 9042
   },
@@ -1107,7 +1107,7 @@ The global configuration looks as follows:
   },
 
   "modules": [
-    "policy-storage/cassandra",
+    "policy-storage/ldap",
     "sd-registrar/consul"
   ]
 }
@@ -1202,7 +1202,7 @@ From the perspective of someone who wants to run a docker with your application 
 
 * set meta-config environment variables (if any) that control where the configuration is coming from
 
-* decide what modules you want to run (e.g. `policy-storage/cassandra` and `sd-registrar/consul`) and set `MODULES` environment variable (e.g. `policy-storage/cassandra,sd-registrar/consul`)
+* decide what modules you want to run (e.g. `policy-storage/ldap` and `sd-registrar/consul`) and set `MODULES` environment variable (e.g. `policy-storage/ldap,sd-registrar/consul`)
 
 * set required application environment variables
 

@@ -1,4 +1,6 @@
-##[Unreleased]
+## [Unreleased]
+### Removed
+- Removed Cassandra references in README
 
 ## [1.10.0] - 2021-11-17
 ### Changed
