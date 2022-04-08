@@ -31,7 +31,7 @@ trait CirceVertxCodecs {
 
   implicit def encoder[A](implicit e: io.circe.Encoder[A]) =
     new VertxEncoder[A] {
-      override def encode(a: A): String = e(a).pretty(printer)
+      override def encode(a: A): String = e(a).printWith(printer)
     }
 }
 
